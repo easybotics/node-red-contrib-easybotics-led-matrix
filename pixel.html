@@ -1,0 +1,59 @@
+
+<script type="text/javascript">
+	RED.nodes.registerType('led-matrix', {
+		category: 'config', 
+		defaults: {
+			height: {value:64, required:true}, 
+			width:  {value:64, required:true}
+		},
+		label: function() { 
+			return "LED MATRIX";
+		}
+	});
+</script> 
+
+<script type="text/x-red" data-template-name="led-matrix">
+	<div class="form-row">
+		<label for="node-config-input-width"><i class="icon-bookmark"></i> Width</label> 
+		<input type="text" id="node-config-input-width">
+	</div> 
+	<div class="form-row">
+		<label for="node-config-input-height"><i class="icon-bookmark"></i> Height</label> 
+		<input type="text" id="node-config-input-height"> 
+	</div> 
+</script>
+
+
+<script type="text/javascript">
+    RED.nodes.registerType('pixel',{
+        category: 'function',
+        color: '#a6bbcf',
+        defaults: {
+            name: {value:""},
+			color: {value:"haa"},
+			matrix: { type:'led-matrix'},
+        },
+        inputs:1,
+        outputs:0,
+        icon: "file.png",
+        label: function() {
+            return this.name||"pixel";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="pixel">
+    <div class="form-row">
+        <label for="node-config-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+	<div class='form-row'>
+		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
+		<input type='text' id='node-input-matrix'/>
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="pixel">
+    <p>prints a colour to a pixel</p>
+</script>
+
