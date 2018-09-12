@@ -15,7 +15,7 @@ module.exports = function(RED) {
 
 	}
 
-	function PixelNode(config) 
+	function PixelNode (config) 
 	{
 		RED.nodes.createNode(this, config); 
 		var node = this; 
@@ -24,17 +24,25 @@ module.exports = function(RED) {
 
 		node.on('input', function(msg) 
 		{ 
-			node.send(msg); 
-			led.setPixel(0,0,255,255,255);
-			led.update();
+			led.setPixel(msg.x, msg.y, msg.r, msg.g, msg.b);
 
 		});
 	}
 
+	function RefreshMatrix (config)
+	{
+		RED.nodes.createNode(this, config); 
+		var node = this; 
 
+		node.on('input', function(msg) 
+		{
+			led.update(); 
+		}); 
+	}
 
 
 	RED.nodes.registerType("led-matrix", LedMatrix);
 	RED.nodes.registerType("pixel", PixelNode);
+	RED.nodes.registerType("refresh-matrix", RefreshMatrix);
 }
 			

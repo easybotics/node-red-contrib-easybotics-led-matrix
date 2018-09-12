@@ -7,11 +7,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC", 
-  "node-red" : {
-	"nodes" : {
-		"pixel": "pixel.js"
-	}
+  "license": "ISC",
+  "node-red": {
+    "nodes": {
+      "pixel": "pixel.js"
+    }
   }
 }
-
