@@ -93,3 +93,39 @@
 	<p> updates the display with vysnc </p> 
 </script> 
 
+<script type="text/javascript"> 
+	RED.nodes.registerType('image-to-pixels',  
+	{
+		category: 'function', 
+		color: '#a6bbcf', 
+
+		defaults: 
+		{
+			name: {value:""}, 
+			file: {value:""}, 
+		}, 
+		
+		inputs:1, 
+		outputs:1, 
+		icon: "file.png", 
+		label: function() 
+		{
+			return this.name || "image to pixels"; 
+		}
+	}); 
+</script> 
+
+<script type="text/x-red" data-template-name="image-to-pixels"> 
+	<div class="form-row">
+		<label for="node-config-input-name"> <i class="icon-tag"></i> Name </label> 
+		<input type="text" id="node-input-name" placeholder="Name"> 
+	</div> 
+
+	<div class="form-row"> 
+		<label for="node-config-input-file"> <i class="icon-tag"></i> File </label> 
+		<input type="text" id="node-input-file" placeholder="File://"> 
+	</div> 
+</script> 
+
+
+
