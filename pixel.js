@@ -57,6 +57,11 @@ module.exports = function(RED) {
 
 		node.on('input', function(msg) 
 		{
+			if(msg)
+			{
+				node.file = msg; 
+			}
+
 			getPixels(node.file, function(err, pixels) 
 			{
 				for(var x = 0; x < 128; x++) 
