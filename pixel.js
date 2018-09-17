@@ -13,9 +13,17 @@ module.exports = function(RED) {
 		RED.nodes.createNode(this, n);
 		this.width = n.width; 
 		this.height = n.height; 
+
+		console.log("initing led matrix node"); 
 		if(!led) 
 		{
 			led = new Matrix(64, 64, 1, 2, "adafruit-hat-pwm");
+		}
+
+		if(led) 
+		{
+			led.clear();
+			led.update(); 
 		}
 
 	}
@@ -97,9 +105,8 @@ module.exports = function(RED) {
 		{
 			if(msg.payload) 
 			{
-				led.fill(0,0,0); 
-				led.update(); 
-				led.clear();
+				console.log("clearing");
+				led.clear(); 
 			}
 		}); 
 	}
