@@ -6,15 +6,17 @@ var getPixels = require('get-pixels');
 
 module.exports = function(RED) {
 
-	var led = {};
+	var led;
 
 	function LedMatrix(n) 
 	{
 		RED.nodes.createNode(this, n);
 		this.width = n.width; 
 		this.height = n.height; 
-
-		led = new Matrix(64, 64, 1, 2, "adafruit-hat-pwm");
+		if(!led) 
+		{
+			led = new Matrix(64, 64, 1, 2, "adafruit-hat-pwm");
+		}
 
 	}
 
@@ -97,6 +99,7 @@ module.exports = function(RED) {
 			{
 				led.fill(0,0,0); 
 				led.update(); 
+				led.clear();
 			}
 		}); 
 	}
