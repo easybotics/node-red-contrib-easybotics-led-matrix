@@ -1,6 +1,6 @@
 
 <script type="text/javascript">
-	RED.nodes.registerType('led-matrix', {
+	RED.nodes.registerType('rled-matrix', {
 		category: 'config', 
 		defaults: {
 			height: {value:64, required:true}, 
@@ -12,7 +12,7 @@
 	});
 </script> 
 
-<script type="text/x-red" data-template-name="led-matrix">
+<script type="text/x-red" data-template-name="rled-matrix">
 	<div class="form-row">
 		<label for="node-config-input-width"><i class="icon-bookmark"></i> Width</label> 
 		<input type="text" id="node-config-input-width">
@@ -25,24 +25,24 @@
 
 
 <script type="text/javascript">
-    RED.nodes.registerType('pixel',{
+    RED.nodes.registerType('rpixel',{
         category: 'function',
-        color: '#a6bbcf',
+        color: '#F8FF00',
         defaults: {
             name: {value:""},
 			color: {value:"haa"},
-			matrix: { type:'led-matrix'},
+			matrix: { type:'rled-matrix'},
         },
         inputs:1,
         outputs:0,
         icon: "file.png",
         label: function() {
-            return this.name||"pixel";
+            return this.name||"rpixel";
         }
     });
 </script>
 
-<script type="text/x-red" data-template-name="pixel">
+<script type="text/x-red" data-template-name="rpixel">
     <div class="form-row">
         <label for="node-config-input-name"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -53,31 +53,31 @@
 	</div>
 </script>
 
-<script type="text/x-red" data-help-name="pixel">
+<script type="text/x-red" data-help-name="rpixel">
     <p>prints a colour to a pixel</p>
 </script>
 
 <script type="text/javascript"> 
-	RED.nodes.registerType("refresh-matrix",  
+	RED.nodes.registerType("rrefresh-matrix",  
 	{
 		category: 'function', 
-		color: '#a6bbcf', 
+		color: '#F8FF00', 
 		defaults: 
 		{
 			name: {value:""}, 
-			matrix: {type: 'led-matrix'}, 
+			matrix: {type: 'rled-matrix'}, 
 		}, 
 		inputs:1, 
 		outputs:0, 
 		icon: "file.png", 
 		label: function () 
 		{
-			return this.name || "refresh-matrix"; 
+			return this.name || "rrefresh-matrix"; 
 		} 
 	}); 
 </script> 
 
-<script type="text/x-red" data-template-name="refresh-matrix"> 
+<script type="text/x-red" data-template-name="rrefresh-matrix"> 
 	<div class="form-row"> 
 		<label for="node-config-input-name"> <i class="icon-tag"></i> Name </label> 
 		<input type="text" id="node-input-name" placeholder="Name"> 
@@ -89,15 +89,15 @@
 	</div> 
 </script> 
 
-<script type="text/x-red" data-help-name="pixel"> 
+<script type="text/x-red" data-help-name="rpixel"> 
 	<p> updates the display with vysnc </p> 
 </script> 
 
 <script type="text/javascript"> 
-	RED.nodes.registerType('image-to-pixels',  
+	RED.nodes.registerType('rimage-to-pixels',  
 	{
 		category: 'function', 
-		color: '#a6bbcf', 
+		color: '#F8FF00', 
 
 		defaults: 
 		{
@@ -110,12 +110,12 @@
 		icon: "file.png", 
 		label: function() 
 		{
-			return this.name || "image to pixels"; 
+			return this.name || "rimage to pixels"; 
 		}
 	}); 
 </script> 
 
-<script type="text/x-red" data-template-name="image-to-pixels"> 
+<script type="text/x-red" data-template-name="rimage-to-pixels"> 
 	<div class="form-row">
 		<label for="node-config-input-name"> <i class="icon-tag"></i> Name </label> 
 		<input type="text" id="node-input-name" placeholder="Name"> 
@@ -129,14 +129,14 @@
 
 
 <script type="text/javascript"> 
-	RED.nodes.registerType("clear-matrix", 
+	RED.nodes.registerType("rclear-matrix", 
 	{
 		category: 'function', 
-		color: '#a6bbcf', 
+		color: '#F8FF00', 
 		defaults: 
 		{
 			name: {value:""}, 
-			matrix: {type: "led-matrix"}, 
+			matrix: {type: "rled-matrix"}, 
 		}, 
 		inputs:1, 
 		outputs:0, 
@@ -148,7 +148,7 @@
 	}); 
 </script> 
 
-<script type="text/x-red" data-template-name = "clear-matrix"> 
+<script type="text/x-red" data-template-name = "rclear-matrix"> 
 	<div class="form-row">
 		<label for="node-config-input-name"> <i class="icon-tag"></i> Name </label> 
 		<input type="text" id="node-input-name" placeholder="Name"> 
@@ -160,7 +160,7 @@
 	</div> 
 </script> 
 
-<script type="text/x-red" data-help-name="clear-matrix"> 
+<script type="text/x-red" data-help-name="rclear-matrix"> 
 	<p> clear pixels off the display </p> 
 </script>
 

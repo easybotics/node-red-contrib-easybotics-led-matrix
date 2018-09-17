@@ -1,5 +1,5 @@
 {
-  "name": "contrib-pixel-matrix",
+  "name": "contrib-ryan-pixel-matrix",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -10,7 +10,7 @@
   "license": "ISC",
   "node-red": {
     "nodes": {
-      "pixel": "pixel.js"
+      "pixel": "rpixel.js"
     }
   }
 }

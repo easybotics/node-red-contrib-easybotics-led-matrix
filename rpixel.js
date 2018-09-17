@@ -115,10 +115,10 @@ module.exports = function(RED) {
 
 
 
-	RED.nodes.registerType("led-matrix", LedMatrix);
-	RED.nodes.registerType("clear-matrix", ClearMatrix);
-	RED.nodes.registerType("pixel", PixelNode);
-	RED.nodes.registerType("refresh-matrix", RefreshMatrix);
-	RED.nodes.registerType("image-to-pixels", ImageToPixels);
+	RED.nodes.registerType("rled-matrix", LedMatrix);
+	RED.nodes.registerType("rclear-matrix", ClearMatrix);
+	RED.nodes.registerType("rpixel", PixelNode);
+	RED.nodes.registerType("rrefresh-matrix", RefreshMatrix);
+	RED.nodes.registerType("rimage-to-pixels", ImageToPixels);
 }
 			
