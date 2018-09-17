@@ -37,7 +37,10 @@ module.exports = function(RED) {
 
 		node.on('input', function(msg) 
 		{
-			led.update(); 
+			if(msg.payload) 
+			{
+				led.update(); 
+			}
 		}); 
 	}
 
@@ -51,6 +54,7 @@ module.exports = function(RED) {
 
 		function readySend () 
 		{
+			console.log("sending pixels");
 			node.send([output]); 
 		}
 
@@ -70,6 +74,7 @@ module.exports = function(RED) {
 					{
 						if(pixels.get(x,y,0))
 						{
+							console.log(x, y);
 							output.push({payload: { x:x, y:y, r:pixels.get(x,y,0), g:pixels.get(x,y,1), b:pixels.get(x,y,2)} });
 						}
 					}
@@ -81,11 +86,27 @@ module.exports = function(RED) {
 		});
 	}
 
+	function ClearMatrix (config) 
+	{
+		RED.nodes.createNode(this, config); 
+		var node = this; 
+
+		node.on('input', function(msg) 
+		{
+			if(msg.payload) 
+			{
+				led.fill(0,0,0); 
+				led.update(); 
+			}
+		}); 
+	}
+			
 
 
 
 
 	RED.nodes.registerType("led-matrix", LedMatrix);
+	RED.nodes.registerType("clear-matrix", ClearMatrix);
 	RED.nodes.registerType("pixel", PixelNode);
 	RED.nodes.registerType("refresh-matrix", RefreshMatrix);
 	RED.nodes.registerType("image-to-pixels", ImageToPixels);

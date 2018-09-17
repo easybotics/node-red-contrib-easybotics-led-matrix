@@ -128,4 +128,40 @@
 </script> 
 
 
+<script type="text/javascript"> 
+	RED.nodes.registerType("clear-matrix", 
+	{
+		category: 'function', 
+		color: '#a6bbcf', 
+		defaults: 
+		{
+			name: {value:""}, 
+			matrix: {type: "clear-matrix"}, 
+		}, 
+		inputs:1, 
+		outputs:0, 
+		icon: "file.png", 
+		label: function() 
+		{
+			return this.name || "led-matrix";
+		}
+	}); 
+</script> 
+
+<script type="text/x-red" data-template-name = "clear-matrix"> 
+	<div class="form-row">
+		<label for="node-config-input-name"> <i class="icon-tag"></i> Name </label> 
+		<input type="text" id="node-input-name" placeholder="Name"> 
+	</div> 
+
+	<div class="form-row"> 
+		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display </label> 
+		<input type="text" id="node-input-matrix"/>
+	</div> 
+</script> 
+
+<script type="text/x-red" data-help-name="clear-matrix"> 
+	<p> clear pixels off the display </p> 
+</script>
+
 
