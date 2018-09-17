@@ -8,7 +8,8 @@ module.exports = function(RED) {
 
 	var led = {};
 
-	function LedMatrix(n) {
+	function LedMatrix(n) 
+	{
 		RED.nodes.createNode(this, n);
 		this.width = n.width; 
 		this.height = n.height; 
@@ -22,11 +23,9 @@ module.exports = function(RED) {
 		RED.nodes.createNode(this, config); 
 		var node = this; 
 
-
-
 		node.on('input', function(msg) 
 		{ 
-			led.setPixel(msg.x, msg.y, msg.r, msg.g, msg.b);
+			led.setPixel(msg.payload.x, msg.payload.y, msg.payload.r, msg.payload.g, msg.payload.b);
 
 		});
 	}
@@ -57,9 +56,10 @@ module.exports = function(RED) {
 
 		node.on('input', function(msg) 
 		{
-			if(msg)
+			if(msg.payload)
 			{
-				node.file = msg; 
+				console.log(msg.payload);
+				node.file = msg.payload; 
 			}
 
 			getPixels(node.file, function(err, pixels) 
@@ -70,7 +70,7 @@ module.exports = function(RED) {
 					{
 						if(pixels.get(x,y,0))
 						{
-							output.push({ x:x, y:y, r:pixels.get(x,y,0), g:pixels.get(x,y,1), b:pixels.get(x,y,2)});
+							output.push({payload: { x:x, y:y, r:pixels.get(x,y,0), g:pixels.get(x,y,1), b:pixels.get(x,y,2)} });
 						}
 					}
 				}
