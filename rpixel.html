@@ -24,6 +24,12 @@
 </script>
 
 
+<!-- 
+	this block describes  the appearance of the node itself 
+	and also what type of settings it holds 
+	also the category, config is a special category; all others are arbitrary 
+--> 
+
 <script type="text/javascript">
     RED.nodes.registerType('rpixel',{
         category: 'function',
@@ -42,6 +48,10 @@
     });
 </script>
 
+<!-- 
+	this block describes the settings page where we can select which config nodes to bind 
+	and other paramters we have previously mentioned in the 'defaults' block up there ^ 
+--> 
 <script type="text/x-red" data-template-name="rpixel">
     <div class="form-row">
         <label for="node-config-input-name"><i class="icon-tag"></i> Name</label>
@@ -53,6 +63,9 @@
 	</div>
 </script>
 
+<!-- 
+	this block describes the help text 
+--> 
 <script type="text/x-red" data-help-name="rpixel">
     <p>prints a colour to a pixel</p>
 </script>
