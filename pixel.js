@@ -20,16 +20,16 @@ module.exports = function(RED) {
 
 		//get the field settings, these inputs are defined in the html 
 		
-		this.width = n.width; 
-		this.height = n.height; 
-		this.chained = n.chained; 
-		this.parallel = n.parallel; 
-		this.mapping = n.mapping; 
+		this.width		= (n.width	  || 64); 
+		this.height		= (n.height	  || 64); 
+		this.chained	= (n.chained  || 1); 
+		this.parallel	= (n.parallel || 2);
+		this.mapping	= (n.mapping  || "adafruit-hat-pwm");
 
 		//if led is undefined we create a new one
 		if(!led) 
 		{
-			led = new Matrix(this.width, this.height, this.chained, this.parallel, this.mapping);
+			led = new Matrix(64, 64, 1, 2, "adafruit-hat-pwm");
 		}
 
 		//otherwise we clear the one we have, without these checks it can spawn new evertime we deploy 
@@ -53,9 +53,6 @@ module.exports = function(RED) {
 
 		node.on('input', function(msg) 
 		{ 
-			//console.log("setting");
-			//console.log(msg.payload.x); 
-			//console.log(msg.payload.y);
 			//self documenting 
 			led.setPixel(msg.payload.x, msg.payload.y, msg.payload.r, msg.payload.g, msg.payload.b);
 
@@ -173,9 +170,7 @@ module.exports = function(RED) {
 		{
 			if(msg.payload)
 			{
-				led.textTest(msg.payload, "/home/pi/node-red-contrib-led-matrix/9x18B.bdf"); 
-				led.setPixel(0,0,255,255,255);
-				led.update();
+				led.drawText(0,30,msg.payload, "/home/pi/node-red-contrib-led-matrix/9x18B.bdf"); 
 			}
 		}); 
 	}
