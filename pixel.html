@@ -4,7 +4,10 @@
 		category: 'config', 
 		defaults: {
 			height: {value:64, required:true}, 
-			width:  {value:64, required:true}
+			width:  {value:64, required:true},
+			chained: {value:2, required:true}, 
+			parallel: {value:1, required:true}
+			mapping: {value:"adafruit-hat-pwm", required:true},
 		},
 		label: function() { 
 			return "LED MATRIX";
@@ -21,6 +24,23 @@
 		<label for="node-config-input-height"><i class="icon-bookmark"></i> Height</label> 
 		<input type="text" id="node-config-input-height"> 
 	</div> 
+	<div class="form-row">
+		<label for="node-config-input-chained"><i class="icon-bookmark"></i> Height</label> 
+		<input type="text" id="node-config-input-chained"> 
+	</div> 
+
+	<div class="form-row">
+		<label for="node-config-input-parallel"><i class="icon-bookmark"></i> Height</label> 
+		<input type="text" id="node-config-input-parallel"> 
+	</div> 
+
+	<div class="form-row">
+		<label for="node-config-input-mapping"><i class="icon-bookmark"></i> Height</label> 
+		<input type="text" id="node-config-input-mapping"> 
+	</div> 
+
+
+
 </script>
 
 
@@ -180,3 +200,37 @@
 </script>
 
 
+<script type="text/javascript">
+    RED.nodes.registerType('text',{
+        category: 'function',
+        color: '#a6bbcf',
+        defaults: {
+            name: {value:""},
+			color: {value:"haa"},
+			matrix: { type:'led-matrix'},
+        },
+        inputs:1,
+        outputs:0,
+        icon: "file.png",
+        label: function() {
+            return this.name||"pixel";
+        }
+    });
+</script>
+
+
+
+<script type="text/x-red" data-template-name="text"> 
+    <div class="form-row">
+        <label for="node-config-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+	<div class='form-row'>
+		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
+		<input type='text' id='node-input-matrix'/>
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="text">
+    <p>prints text to </p>
+</script>
