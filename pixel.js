@@ -53,8 +53,29 @@ module.exports = function(RED) {
 
 		node.on('input', function(msg) 
 		{ 
-			//self documenting 
-			led.setPixel(msg.payload.x, msg.payload.y, msg.payload.r, msg.payload.g, msg.payload.b);
+
+			//if someone injects a string then split it on comas and try and feat it to the matrix 
+			if(typeof msg.payload == "string")
+			{
+				var vals = msg.payload.split(',');
+				if(vals.length < 4)
+				{
+					node.error("your pixel csv doesn't seem correct:", vals);
+				}
+
+				led.setPixel(vals[0], vals[1], vals[2], vals[3], vals[4]);
+				return;
+			}
+
+			//but normally we want to use a javascript object 
+			//here we do some crude javascript type checking 
+			if(msg.payload.x && msg.payload.y && msg.payload.r && msg.payload.g && msg.payload.b)
+			{
+				led.setPixel(msg.payload.x, msg.payload.y, msg.payload.r, msg.payload.g, msg.payload.b);
+				return;
+			}
+
+
 
 		});
 	}
