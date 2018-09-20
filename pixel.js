@@ -22,14 +22,14 @@ module.exports = function(RED) {
 		
 		this.width		= (n.width	  || 64); 
 		this.height		= (n.height	  || 64); 
-		this.chained	= (n.chained  || 1); 
-		this.parallel	= (n.parallel || 2);
+		this.chained	= (n.chained  || 2); 
+		this.parallel	= (n.parallel || 1);
 		this.mapping	= (n.mapping  || "adafruit-hat-pwm");
 
 		//if led is undefined we create a new one
 		if(!led) 
 		{
-			led = new Matrix(64, 64, 1, 2, "adafruit-hat-pwm");
+			led = new Matrix(parseInt(this.width), parseInt(this.height), parseInt(this.parallel), parseInt(this.chained), this.mapping);
 		}
 
 		//otherwise we clear the one we have, without these checks it can spawn new evertime we deploy 
