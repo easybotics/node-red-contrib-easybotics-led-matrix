@@ -63,7 +63,7 @@ module.exports = function(RED) {
 					node.error("your pixel csv doesn't seem correct:", vals);
 				}
 
-				led.setPixel(vals[0], vals[1], vals[2], vals[3], vals[4]);
+				led.setPixel(parseInt(vals[0]), parseInt(vals[1]), parseInt(vals[2]), parseInt(vals[3]), parseInt(vals[4]));
 				return;
 			}
 
