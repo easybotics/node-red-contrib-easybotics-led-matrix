@@ -168,9 +168,13 @@ module.exports = function(RED) {
 
 		node.on('input', function(msg) 
 		{
+			var x		= msg.payload.x || 0; 
+			var y		= msg.payload.y || 0; 
+			var text	= msg.payload.text || msg.payload; 
+
 			if(msg.payload)
 			{
-				led.drawText(0,30,msg.payload, "/home/pi/node-red-contrib-led-matrix/9x18B.bdf"); 
+				led.drawText(x, y, text, "/home/pi/node-red-contrib-led-matrix/9x18B.bdf"); 
 			}
 		}); 
 	}

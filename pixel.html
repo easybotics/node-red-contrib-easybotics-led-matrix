@@ -63,7 +63,7 @@
         outputs:0,
         icon: "file.png",
         label: function() {
-            return this.name||"pixel";
+            return this.name||"pixel to matrix";
         }
     });
 </script>
@@ -89,7 +89,7 @@
 --> 
 
 <script type="text/x-red" data-help-name="pixel">
-    <p>prints a colour to a pixel</p>
+    <p>prints a pixel on the matrix buffer, refresh the matrix to see the result </p>
 </script>
 
 <script type="text/javascript"> 
@@ -220,7 +220,7 @@
 
 
 
-<script type="text/x-red" data-template-name="text"> 
+<script type="text/x-red" data-template-name="text-to-matrix"> 
     <div class="form-row">
         <label for="node-config-input-name"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -232,5 +232,5 @@
 </script>
 
 <script type="text/x-red" data-help-name="text">
-    <p>prints text to </p>
+    <p>prints text to the matrix buffer, refresh the matrix to see the result </p>
 </script>
