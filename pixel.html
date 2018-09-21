@@ -206,21 +206,20 @@
         color: '#a6bbcf',
         defaults: {
             name: {value:""},
-			color: {value:"haa"},
 			matrix: { type:'led-matrix'},
         },
         inputs:1,
         outputs:0,
         icon: "file.png",
         label: function() {
-            return this.name||"pixel";
+            return this.name||"text to matrix";
         }
     });
 </script>
 
 
 
-<script type="text/x-red" data-template-name="text-to-matrix"> 
+<script type="text/x-red" data-template-name="text"> 
     <div class="form-row">
         <label for="node-config-input-name"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">

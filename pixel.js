@@ -113,7 +113,6 @@ module.exports = function(RED) {
 
 		//filename or URL to look for an image 
 		//and an array we will will with pixels 
-		node.file = config.file; 
 		var output = [];
 
 		//function to actually send the output to the next node 
@@ -125,20 +124,12 @@ module.exports = function(RED) {
 			//node.send(output) would send one pixel to n outputs 
 			//node.send([output], true) sends the pixiels to output 1, and true to output 2 
 			node.send([output]); 
-			//console.log("sending pixels");
 		}
 
-		//if we receive input
-		node.on('input', function(msg) 
+		//function that takes a file, and an offset and tries to convert the file into a stream of pixels 
+		function createPixelStream (file, xOffset, yOffset)
 		{
-			//set the url var
-			if(msg.payload)
-			{
-				console.log(msg.payload);
-				node.file = msg.payload; 
-			}
-
-			getPixels(node.file, function(err, pixels) 
+			getPixels(file, function(err, pixels) 
 			{
 				//empties the array before we start 
 				output = [];
@@ -154,14 +145,32 @@ module.exports = function(RED) {
 							//push pixels to the output buffer 
 							//console.log(x);
 							//console.log(y);
-							output.push({payload: { x:x, y:y, r:pixels.get(x,y,0), g:pixels.get(x,y,1), b:pixels.get(x,y,2)} });
+							output.push({payload: { x: x + xOffset, y: y + yOffset, r:pixels.get(x,y,0), g:pixels.get(x,y,1), b:pixels.get(x,y,2)} });
 						}
 					}
 				}
 
 				//call our send function from earlier 
 				readySend();
-			});
+			})
+		}
+
+
+		//if we receive input
+		node.on('input', function(msg) 
+		{
+			/*
+			//set the url var
+			if( typeof msg.payload === "string")
+			{
+				return createPixelStream( msg.payload, 0, 0);
+			}
+			*/
+
+			if( msg.payload.file && msg.payload.x && msg.payload.y)
+			{
+				return createPixelStream(msg.payload.file, msg.payload.x, msg.payload.y);
+			}
 
 		});
 	}
@@ -200,7 +209,14 @@ module.exports = function(RED) {
 		}); 
 	}
 
+	/*
+	function JsonTransform (consig)
+	{
+		RED.nodes.createNode(this, config); 
+		var node = this; 
 
+	*/
+	
 
 
 
