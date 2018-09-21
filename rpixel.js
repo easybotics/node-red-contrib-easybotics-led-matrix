@@ -19,13 +19,17 @@ module.exports = function(RED) {
 		RED.nodes.createNode(this, n);
 
 		//get the field settings, these inputs are defined in the html 
-		this.width = n.width; 
-		this.height = n.height; 
+		
+		this.width		= (n.width	  || 64); 
+		this.height		= (n.height	  || 64); 
+		this.chained	= (n.chained  || 2); 
+		this.parallel	= (n.parallel || 1);
+		this.mapping	= (n.mapping  || "adafruit-hat-pwm");
 
 		//if led is undefined we create a new one
 		if(!led) 
 		{
-			led = new Matrix(64, 64, 1, 2, "adafruit-hat-pwm");
+			led = new Matrix(parseInt(this.width), parseInt(this.height), parseInt(this.parallel), parseInt(this.chained), this.mapping);
 		}
 
 		//otherwise we clear the one we have, without these checks it can spawn new evertime we deploy 
@@ -49,8 +53,29 @@ module.exports = function(RED) {
 
 		node.on('input', function(msg) 
 		{ 
-			//self documenting 
-			led.setPixel(msg.payload.x, msg.payload.y, msg.payload.r, msg.payload.g, msg.payload.b);
+
+			//if someone injects a string then split it on comas and try and feat it to the matrix 
+			if(typeof msg.payload == "string")
+			{
+				var vals = msg.payload.split(',');
+				if(vals.length < 4)
+				{
+					node.error("your pixel csv doesn't seem correct:", vals);
+				}
+
+				led.setPixel(parseInt(vals[0]), parseInt(vals[1]), parseInt(vals[2]), parseInt(vals[3]), parseInt(vals[4]));
+				return;
+			}
+
+			//but normally we want to use a javascript object 
+			//here we do some crude javascript type checking 
+			if(msg.payload.x && msg.payload.y && msg.payload.r && msg.payload.g && msg.payload.b)
+			{
+				led.setPixel(msg.payload.x, msg.payload.y, msg.payload.r, msg.payload.g, msg.payload.b);
+				return;
+			}
+
+
 
 		});
 	}
@@ -88,13 +113,12 @@ module.exports = function(RED) {
 
 		//filename or URL to look for an image 
 		//and an array we will will with pixels 
-		node.file = config.file; 
 		var output = [];
 
 		//function to actually send the output to the next node 
 		function readySend () 
 		{
-			console.log("sending pixels");
+			//console.log("sending pixels");
 			
 			//see node-red docmentation for how node.send treats arrays 
 			//node.send(output) would send one pixel to n outputs 
@@ -102,17 +126,10 @@ module.exports = function(RED) {
 			node.send([output]); 
 		}
 
-		//if we receive input
-		node.on('input', function(msg) 
+		//function that takes a file, and an offset and tries to convert the file into a stream of pixels 
+		function createPixelStream (file, xOffset, yOffset)
 		{
-			//set the url var
-			if(msg.payload)
-			{
-				console.log(msg.payload);
-				node.file = msg.payload; 
-			}
-
-			getPixels(node.file, function(err, pixels) 
+			getPixels(file, function(err, pixels) 
 			{
 				//empties the array before we start 
 				output = [];
@@ -126,14 +143,34 @@ module.exports = function(RED) {
 						if(pixels.get(x,y,0))
 						{
 							//push pixels to the output buffer 
-							output.push({payload: { x:x, y:y, r:pixels.get(x,y,0), g:pixels.get(x,y,1), b:pixels.get(x,y,2)} });
+							//console.log(x);
+							//console.log(y);
+							output.push({payload: { x: x + xOffset, y: y + yOffset, r:pixels.get(x,y,0), g:pixels.get(x,y,1), b:pixels.get(x,y,2)} });
 						}
 					}
 				}
 
 				//call our send function from earlier 
 				readySend();
-			});
+			})
+		}
+
+
+		//if we receive input
+		node.on('input', function(msg) 
+		{
+			/*
+			//set the url var
+			if( typeof msg.payload === "string")
+			{
+				return createPixelStream( msg.payload, 0, 0);
+			}
+			*/
+
+			if( msg.payload.file && msg.payload.x && msg.payload.y)
+			{
+				return createPixelStream(msg.payload.file, msg.payload.x, msg.payload.y);
+			}
 
 		});
 	}
@@ -154,6 +191,32 @@ module.exports = function(RED) {
 	}
 			
 
+	function Text (config) 
+	{
+		RED.nodes.createNode(this, config); 
+		var node = this; 
+
+		node.on('input', function(msg) 
+		{
+			var x		= msg.payload.x || 0; 
+			var y		= msg.payload.y || 0; 
+			var text	= msg.payload.text || msg.payload; 
+
+			if(msg.payload)
+			{
+				led.drawText(x, y, text, "/home/pi/node-red-contrib-led-matrix/9x18B.bdf"); 
+			}
+		}); 
+	}
+
+	/*
+	function JsonTransform (consig)
+	{
+		RED.nodes.createNode(this, config); 
+		var node = this; 
+
+	*/
+	
 
 
 
@@ -163,5 +226,6 @@ module.exports = function(RED) {
 	RED.nodes.registerType("rpixel", PixelNode);
 	RED.nodes.registerType("rrefresh-matrix", RefreshMatrix);
 	RED.nodes.registerType("rimage-to-pixels", ImageToPixels);
+	RED.nodes.registerType("rtext", Text); 
 }
 			
