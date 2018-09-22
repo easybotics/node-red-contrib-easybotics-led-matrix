@@ -3,39 +3,40 @@
 	RED.nodes.registerType('led-matrix', {
 		category: 'config', 
 		defaults: {
-			height: {value:64, required:true}, 
+			height: {value:64, required:true},
 			width:  {value:64, required:true},
-			chained: {value:2, required:true}, 
+			chained: {value:2, required:true},
 			parallel: {value:1, required:true},
 			brightness: {value:100, required:true},
 			mapping: {value:"adafruit-hat-pwm", required:true},
 		},
-		label: function() { 
+		label: function() {
 			return "LED MATRIX";
 		}
 	});
-</script> 
+</script>
 
 <script type="text/x-red" data-template-name="led-matrix">
 	<div class="form-row">
-		<label for="node-config-input-width"><i class="icon-bookmark"></i> Width</label> 
+		<label for="node-config-input-width"><i class="icon-bookmark"></i> Width</label>
 		<input type="text" id="node-config-input-width">
-	</div> 
+	</div>
 	<div class="form-row">
-		<label for="node-config-input-height"><i class="icon-bookmark"></i> Height</label> 
-		<input type="text" id="node-config-input-height"> 
-	</div> 
+		<label for="node-config-input-height"><i class="icon-bookmark"></i> Height</label>
+		<input type="text" id="node-config-input-height">
+	</div>
 	<div class="form-row">
-		<label for="node-config-input-chained"><i class="icon-bookmark"></i> Chained Panels</label> 
-		<input type="text" id="node-config-input-chained"> 
-	</div> 
+		<label for="node-config-input-chained"><i class="icon-bookmark"></i> Chained Panels</label>
+		<input type="text" id="node-config-input-chained">
+	</div>
 
 	<div class="form-row">
-		<label for="node-config-input-parallel"><i class="icon-bookmark"></i> Parallel Panels</label> 
-		<input type="text" id="node-config-input-parallel"> 
-	</div> 
+		<label for="node-config-input-parallel"><i class="icon-bookmark"></i> Parallel Panels</label>
+		<input type="text" id="node-config-input-parallel">
+	</div>
 
 	<div class="form-row">
+
 		<label for="node-config-input-brightness"><i class="icon-bookmark"></i> Panel Brightness</label> 
 		<input type="text" id="node-config-input-brightness"> 
 	</div> 
@@ -50,15 +51,15 @@
 </script>
 
 
-<!-- 
-	this block describes  the appearance of the node itself 
-	and also what type of settings it holds 
-	also the category, config is a special category; all others are arbitrary 
---> 
+<!--
+	this block describes  the appearance of the node itself
+	and also what type of settings it holds
+	also the category, config is a special category; all others are arbitrary
+-->
 
 <script type="text/javascript">
     RED.nodes.registerType('pixel',{
-        category: 'function',
+        category: 'Raspberry Pi',
         color: '#a6bbcf',
         defaults: {
             name: {value:""},
@@ -74,10 +75,10 @@
     });
 </script>
 
-<!-- 
-	this block describes the settings page where we can select which config nodes to bind 
-	and other paramters we have previously mentioned in the 'defaults' block up there ^ 
---> 
+<!--
+	this block describes the settings page where we can select which config nodes to bind
+	and other paramters we have previously mentioned in the 'defaults' block up there ^
+-->
 
 <script type="text/x-red" data-template-name="pixel">
     <div class="form-row">
@@ -90,125 +91,125 @@
 	</div>
 </script>
 
-<!-- 
-	this block describes the help text 
---> 
+<!--
+	this block describes the help text
+-->
 
 <script type="text/x-red" data-help-name="pixel">
     <p>prints a pixel on the matrix buffer, refresh the matrix to see the result </p>
 </script>
 
-<script type="text/javascript"> 
-	RED.nodes.registerType("refresh-matrix",  
+<script type="text/javascript">
+	RED.nodes.registerType("refresh-matrix",
 	{
-		category: 'function', 
-		color: '#a6bbcf', 
-		defaults: 
+		category: 'Raspberry Pi',
+		color: '#a6bbcf',
+		defaults:
 		{
-			name: {value:""}, 
-			matrix: {type: 'led-matrix'}, 
-		}, 
-		inputs:1, 
-		outputs:0, 
-		icon: "file.png", 
-		label: function () 
+			name: {value:""},
+			matrix: {type: 'led-matrix'},
+		},
+		inputs:1,
+		outputs:0,
+		icon: "file.png",
+		label: function ()
 		{
-			return this.name || "refresh-matrix"; 
-		} 
-	}); 
-</script> 
-
-<script type="text/x-red" data-template-name="refresh-matrix"> 
-	<div class="form-row"> 
-		<label for="node-config-input-name"> <i class="icon-tag"></i> Name </label> 
-		<input type="text" id="node-input-name" placeholder="Name"> 
-	</div>  
-	
-	<div class="form-row"> 
-		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display </label> 
-		<input type="text" id="node-input-matrix"/> 
-	</div> 
-</script> 
-
-<script type="text/x-red" data-help-name="pixel"> 
-	<p> updates the display with vysnc </p> 
-</script> 
-
-<script type="text/javascript"> 
-	RED.nodes.registerType('image-to-pixels',  
-	{
-		category: 'function', 
-		color: '#a6bbcf', 
-
-		defaults: 
-		{
-			name: {value:""}, 
-			file: {value:""}, 
-		}, 
-		
-		inputs:1, 
-		outputs:1, 
-		icon: "file.png", 
-		label: function() 
-		{
-			return this.name || "image to pixels"; 
+			return this.name || "refresh-matrix";
 		}
-	}); 
-</script> 
+	});
+</script>
 
-<script type="text/x-red" data-template-name="image-to-pixels"> 
+<script type="text/x-red" data-template-name="refresh-matrix">
 	<div class="form-row">
-		<label for="node-config-input-name"> <i class="icon-tag"></i> Name </label> 
-		<input type="text" id="node-input-name" placeholder="Name"> 
-	</div> 
+		<label for="node-config-input-name"> <i class="icon-tag"></i> Name </label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
 
-	<div class="form-row"> 
-		<label for="node-config-input-file"> <i class="icon-tag"></i> File </label> 
-		<input type="text" id="node-input-file" placeholder="File://"> 
-	</div> 
-</script> 
+	<div class="form-row">
+		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display </label>
+		<input type="text" id="node-input-matrix"/>
+	</div>
+</script>
 
+<script type="text/x-red" data-help-name="pixel">
+	<p> updates the display with vysnc </p>
+</script>
 
-<script type="text/javascript"> 
-	RED.nodes.registerType("clear-matrix", 
+<script type="text/javascript">
+	RED.nodes.registerType('image-to-pixels',
 	{
-		category: 'function', 
-		color: '#a6bbcf', 
-		defaults: 
+		category: 'Raspberry Pi',
+		color: '#a6bbcf',
+
+		defaults:
 		{
-			name: {value:""}, 
-			matrix: {type: "led-matrix"}, 
-		}, 
-		inputs:1, 
-		outputs:0, 
-		icon: "file.png", 
-		label: function() 
+			name: {value:""},
+			file: {value:""},
+		},
+
+		inputs:1,
+		outputs:1,
+		icon: "file.png",
+		label: function()
+		{
+			return this.name || "image to pixels";
+		}
+	});
+</script>
+
+<script type="text/x-red" data-template-name="image-to-pixels">
+	<div class="form-row">
+		<label for="node-config-input-name"> <i class="icon-tag"></i> Name </label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+
+	<div class="form-row">
+		<label for="node-config-input-file"> <i class="icon-tag"></i> File </label>
+		<input type="text" id="node-input-file" placeholder="File://">
+	</div>
+</script>
+
+
+<script type="text/javascript">
+	RED.nodes.registerType("clear-matrix",
+	{
+		category: 'Raspberry Pi',
+		color: '#a6bbcf',
+		defaults:
+		{
+			name: {value:""},
+			matrix: {type: "led-matrix"},
+		},
+		inputs:1,
+		outputs:0,
+		icon: "file.png",
+		label: function()
 		{
 			return this.name || "led-matrix";
 		}
-	}); 
-</script> 
+	});
+</script>
 
-<script type="text/x-red" data-template-name = "clear-matrix"> 
+<script type="text/x-red" data-template-name = "clear-matrix">
 	<div class="form-row">
-		<label for="node-config-input-name"> <i class="icon-tag"></i> Name </label> 
-		<input type="text" id="node-input-name" placeholder="Name"> 
-	</div> 
+		<label for="node-config-input-name"> <i class="icon-tag"></i> Name </label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
 
-	<div class="form-row"> 
-		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display </label> 
+	<div class="form-row">
+		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display </label>
 		<input type="text" id="node-input-matrix"/>
-	</div> 
-</script> 
+	</div>
+</script>
 
-<script type="text/x-red" data-help-name="clear-matrix"> 
-	<p> clear pixels off the display </p> 
+<script type="text/x-red" data-help-name="clear-matrix">
+	<p> clear pixels off the display </p>
 </script>
 
 
 <script type="text/javascript">
     RED.nodes.registerType('text',{
-        category: 'function',
+        category: 'Raspberry Pi',
         color: '#a6bbcf',
         defaults: {
             name: {value:""},
@@ -225,7 +226,7 @@
 
 
 
-<script type="text/x-red" data-template-name="text"> 
+<script type="text/x-red" data-template-name="text">
     <div class="form-row">
         <label for="node-config-input-name"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
