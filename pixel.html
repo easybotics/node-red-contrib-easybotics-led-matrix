@@ -240,3 +240,48 @@
 <script type="text/x-red" data-help-name="text">
     <p>prints text to the matrix buffer, refresh the matrix to see the result </p>
 </script>
+
+<script type="text/javascript"> 
+	RED.nodes.registerType('pixel-transform', 
+	{
+		category: 'Raspberry Pi', 
+		color: '#a6bbcf', 
+		defaults: 
+		{
+			name:		{value:""}, 
+			xOffset:	{value:0}, 
+			yOffset:	{value:0}, 
+			refresh:	{value:0}, 
+			color:		{value:""}, 
+		}, 
+		inputs: 1, 
+		outputs: 1, 
+		icon: "file.png", 
+		label: function() 
+		{
+			return this.name() || "Data Transform!";
+		}
+	});
+</script>
+ 
+<script type="text/x-red" data-template-name="pixel-transform">
+	<div class = "form-row">
+		<label for="node-config-input-name">< i class="icon-tag"></i> Name </label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div> 
+
+	<div class = "form-row">
+		<label for="node-config-input-xOffset">< i class="icon-tag"></i>X </label>
+		<input type="text" id="node-input-xOffset" placeholder="0">
+	</div> 
+
+	<div class = "form-row">
+		<label for="node-config-input-yOffset">< i class="icon-tag"></i>Y </label>
+		<input type="text" id="node-input-yOffset" placeholder="0">
+	</div> 
+</script>
+
+<script type="text/x-red" data-help-name="pixel-transform">
+    <p>modifies properties of a display object, or spawns one from a string </p>
+</script>
+

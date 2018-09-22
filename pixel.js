@@ -134,8 +134,9 @@ module.exports = function(RED) {
 			{
 				//empties the array before we start 
 				output = [];
-				var width  = max( 128, pixels.shape[0]);
-				var height = max( 64,  pixels.shape[1]);
+				var width  = Math.min( 128, pixels.shape[0]);
+				var height = Math.min( 64,  pixels.shape[1]);
+
 
 				//loop over the 2d array of pixels returned by getPixels 
 				for(var x = 0; x < width; x++) 
@@ -202,7 +203,6 @@ module.exports = function(RED) {
 			var x		= msg.payload.xOffset || 0; 
 			var y		= msg.payload.yOffset || 0; 
 			var data	= msg.payload.data || msg.payload; 
-			node.warn(msg.payload.xOffset);
 
 			if(msg.payload)
 			{
@@ -216,9 +216,9 @@ module.exports = function(RED) {
 		RED.nodes.createNode(this, config); 
 		var node = this; 
 
-		node.xOffset = (20); 
-		node.yOffset = (20); 
-		node.refresh = (20); 
+		node.xOffset = (config.xOffset || 0); 
+		node.yOffset = (config.yOffset || 0); 
+		node.refresh = (config.refresh || 0); 
 		node.color   = ("#ffffff");
 
 		function outputFromString (msg) 
