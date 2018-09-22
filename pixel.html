@@ -7,6 +7,7 @@
 			width:  {value:64, required:true},
 			chained: {value:2, required:true}, 
 			parallel: {value:1, required:true},
+			brightness: {value:100, required:true},
 			mapping: {value:"adafruit-hat-pwm", required:true},
 		},
 		label: function() { 
@@ -32,6 +33,11 @@
 	<div class="form-row">
 		<label for="node-config-input-parallel"><i class="icon-bookmark"></i> Parallel Panels</label> 
 		<input type="text" id="node-config-input-parallel"> 
+	</div> 
+
+	<div class="form-row">
+		<label for="node-config-input-brightness"><i class="icon-bookmark"></i> Panel Brightness</label> 
+		<input type="text" id="node-config-input-brightness"> 
 	</div> 
 
 	<div class="form-row">
