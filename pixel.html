@@ -7,6 +7,7 @@
 			width:  {value:64, required:true},
 			chained: {value:2, required:true},
 			parallel: {value:1, required:true},
+			brightness: {value:100, required:true},
 			mapping: {value:"adafruit-hat-pwm", required:true},
 		},
 		label: function() {
@@ -35,9 +36,15 @@
 	</div>
 
 	<div class="form-row">
-		<label for="node-config-input-mapping"><i class="icon-bookmark"></i> Hardware Mapping</label>
-		<input type="text" id="node-config-input-mapping">
-	</div>
+
+		<label for="node-config-input-brightness"><i class="icon-bookmark"></i> Panel Brightness</label> 
+		<input type="text" id="node-config-input-brightness"> 
+	</div> 
+
+	<div class="form-row">
+		<label for="node-config-input-mapping"><i class="icon-bookmark"></i> Hardware Mapping</label> 
+		<input type="text" id="node-config-input-mapping"> 
+	</div> 
 
 
 

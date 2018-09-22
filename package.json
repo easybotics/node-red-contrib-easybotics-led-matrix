@@ -2,6 +2,9 @@
   "name": "contrib-pixel-matrix",
   "version": "1.0.0",
   "description": "",
+  "dependencies": {
+    "get-pixels": "3.3.2"
+  },
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
