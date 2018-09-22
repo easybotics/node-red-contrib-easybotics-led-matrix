@@ -210,13 +210,61 @@ module.exports = function(RED) {
 		}); 
 	}
 
-	/*
-	function JsonTransform (consig)
+	function PixelDataTransform (consig)
 	{
 		RED.nodes.createNode(this, config); 
 		var node = this; 
 
-	*/
+		this.xOffset = (config.xOffset || 0); 
+		this.yOffset = (config.yOffset || 0); 
+		this.refresh = (config.refresh || 0); 
+		this.color   = (config.color   || "#ffffff");
+
+		function outputFromString (string) 
+		{
+			var output; 
+			output.xOffset = this.xOffset; 
+			output.yOffset = this.yOffset; 
+			output.refresh = this.refresh; 
+			output.color   = this.color; 
+			output.data    = string; 
+
+			var messageOut; 
+			messageOut.payload = output; 
+
+			node.send( messageOut); 
+		}
+
+		function outputFromObject (object) 
+		{
+			var output; 
+			output.xOffset = this.xOffset; 
+			output.yOffset = this.yOffset; 
+			output.refresh = this.refresh; 
+			output.color   = this.color; 
+			output.data    = object.data; 
+
+			var messageOut; 
+			messageOut.payload = output; 
+
+			node.send( messageOut); 
+		}
+
+		node.on('input', function(msg) 
+		{
+			if (typeof msg.payload == "string")
+			{
+				return outputFromString(msg.payload);
+			}
+
+			return outputFromObject(msg.payoad);
+		});
+	}
+
+	
+		
+
+
 	
 
 
@@ -228,5 +276,6 @@ module.exports = function(RED) {
 	RED.nodes.registerType("refresh-matrix", RefreshMatrix);
 	RED.nodes.registerType("image-to-pixels", ImageToPixels);
 	RED.nodes.registerType("text", Text); 
+	RED.nodes.registerType("PixelTransform", PixelDataTransform);
 }
 			
