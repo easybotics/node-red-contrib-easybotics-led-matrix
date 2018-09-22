@@ -134,11 +134,13 @@ module.exports = function(RED) {
 			{
 				//empties the array before we start 
 				output = [];
+				var width  = max( 128, pixels.shape[0]);
+				var height = max( 64,  pixels.shape[1]);
 
 				//loop over the 2d array of pixels returned by getPixels 
-				for(var x = 0; x < 128; x++) 
+				for(var x = 0; x < width; x++) 
 				{
-					for(var y = 0; y < 64; y++)
+					for(var y = 0; y < height; y++)
 					{
 						//make sure the array actually contains data for this location 
 						if(pixels.get(x,y,0))
@@ -160,17 +162,15 @@ module.exports = function(RED) {
 		//if we receive input
 		node.on('input', function(msg) 
 		{
-			/*
 			//set the url var
 			if( typeof msg.payload === "string")
 			{
 				return createPixelStream( msg.payload, 0, 0);
 			}
-			*/
 
-			if( msg.payload.file && msg.payload.x && msg.payload.y)
+			if( msg.payload.data && msg.payload.xOffset && msg.payload.yOffset)
 			{
-				return createPixelStream(msg.payload.file, msg.payload.x, msg.payload.y);
+				return createPixelStream(msg.payload.data, msg.payload.xOffset, msg.payload.yOffset);
 			}
 
 		});
@@ -199,65 +199,67 @@ module.exports = function(RED) {
 
 		node.on('input', function(msg) 
 		{
-			var x		= msg.payload.x || 0; 
-			var y		= msg.payload.y || 0; 
-			var text	= msg.payload.text || msg.payload; 
+			var x		= msg.payload.xOffset || 0; 
+			var y		= msg.payload.yOffset || 0; 
+			var data	= msg.payload.data || msg.payload; 
+			node.warn(msg.payload.xOffset);
 
 			if(msg.payload)
 			{
-				led.drawText(x, y, text, "/home/pi/node-red-contrib-led-matrix/9x18B.bdf"); 
+				led.drawText(x, y, data, "/home/pi/node-red-contrib-led-matrix/9x18B.bdf"); 
 			}
 		}); 
 	}
 
-	function PixelDataTransform (consig)
+	function PixelDataTransform (config)
 	{
 		RED.nodes.createNode(this, config); 
 		var node = this; 
 
-		this.xOffset = (config.xOffset || 0); 
-		this.yOffset = (config.yOffset || 0); 
-		this.refresh = (config.refresh || 0); 
-		this.color   = (config.color   || "#ffffff");
+		node.xOffset = (20); 
+		node.yOffset = (20); 
+		node.refresh = (20); 
+		node.color   = ("#ffffff");
 
-		function outputFromString (string) 
+		function outputFromString (msg) 
 		{
-			var output; 
-			output.xOffset = this.xOffset; 
-			output.yOffset = this.yOffset; 
-			output.refresh = this.refresh; 
-			output.color   = this.color; 
-			output.data    = string; 
+			var output = 
+			{
+				data:    msg.payload,
+				xOffset: parseInt(node.xOffset), 
+				yOffset: parseInt(node.yOffset), 
+				refresh: parseInt(node.refresh), 
+				color:   node.color
+			} 
 
-			var messageOut; 
-			messageOut.payload = output; 
-
-			node.send( messageOut); 
+			msg.payload = output;
+			node.send( msg); 
 		}
 
-		function outputFromObject (object) 
+		function outputFromObject (msg) 
 		{
-			var output; 
-			output.xOffset = this.xOffset; 
-			output.yOffset = this.yOffset; 
-			output.refresh = this.refresh; 
-			output.color   = this.color; 
-			output.data    = object.data; 
+			var output = 
+			{
+				data:    msg.payload.data,
+				xOffset: parseInt(node.xOffset), 
+				yOffset: parseInt(node.yOffset), 
+				refresh: parseInt(node.refresh), 
+				color:   node.color
+			} 
 
-			var messageOut; 
-			messageOut.payload = output; 
+			msg.payload = output;
+			node.send( msg); 
 
-			node.send( messageOut); 
 		}
 
 		node.on('input', function(msg) 
 		{
 			if (typeof msg.payload == "string")
 			{
-				return outputFromString(msg.payload);
+				return outputFromString(msg);
 			}
 
-			return outputFromObject(msg.payoad);
+			return outputFromObject(msg);
 		});
 	}
 
@@ -276,6 +278,6 @@ module.exports = function(RED) {
 	RED.nodes.registerType("refresh-matrix", RefreshMatrix);
 	RED.nodes.registerType("image-to-pixels", ImageToPixels);
 	RED.nodes.registerType("text", Text); 
-	RED.nodes.registerType("PixelTransform", PixelDataTransform);
+	RED.nodes.registerType("pixel-transform", PixelDataTransform);
 }
 			
