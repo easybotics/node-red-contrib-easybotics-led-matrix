@@ -1,5 +1,5 @@
-var Matrix = require('node-rpi-rgb-led-matrix')
-var getPixels = require('get-pixels'); 
+var Matrix		= require('node-rpi-rgb-led-matrix')
+var getPixels	= require('get-pixels'); 
 
 
 //var led = new LedMatrix(64, 64, 1, 2, "adafruit-hat-pwm");
@@ -20,17 +20,19 @@ module.exports = function(RED) {
 
 		//get the field settings, these inputs are defined in the html 
 		
-		this.width		= (n.width	  || 64); 
-		this.height		= (n.height	  || 64); 
-		this.chained	= (n.chained  || 2); 
-		this.parallel	= (n.parallel || 1);
+		this.width		= (n.width		|| 64); 
+		this.height		= (n.height		|| 64); 
+		this.chained	= (n.chained	|| 2); 
+		this.parallel	= (n.parallel	|| 1);
 		this.brightness = (n.brightness || 100); 
-		this.mapping	= (n.mapping  || "adafruit-hat-pwm");
+		this.mapping	= (n.mapping	|| "adafruit-hat-pwm");
+
+		this.warn(this.brightness);
 
 		//if led is undefined we create a new one
 		if(!led) 
 		{
-			led = new Matrix(parseInt(this.width), parseInt(this.height), parseInt(this.parallel), parseInt(this.chained), parseInt(this.brightness), this.mapping);
+			led = new Matrix( parseInt(this.width), parseInt(this.height), parseInt(this.parallel), parseInt(this.chained), parseInt(this.brightness), this.mapping);
 		}
 
 		//otherwise we clear the one we have, without these checks it can spawn new evertime we deploy 
@@ -198,6 +200,12 @@ module.exports = function(RED) {
 		RED.nodes.createNode(this, config); 
 		var node = this; 
 
+		node.warn("font:" );
+		node.warn(config.font);
+
+		node.font = config.font;
+
+
 		node.on('input', function(msg) 
 		{
 			var x		= msg.payload.xOffset || 0; 
@@ -206,7 +214,7 @@ module.exports = function(RED) {
 
 			if(msg.payload)
 			{
-				led.drawText(x, y, data, "/home/pi/node-red-contrib-led-matrix/9x18B.bdf"); 
+				led.drawText(x, y, data, node.font); 
 			}
 		}); 
 	}
