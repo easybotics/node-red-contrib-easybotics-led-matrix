@@ -1,7 +1,7 @@
 
 <script type="text/javascript">
 	RED.nodes.registerType('led-matrix', {
-		category: 'config', 
+		category: 'config',
 		defaults: {
 			height: {value:64, required:true},
 			width:  {value:64, required:true},
@@ -37,14 +37,14 @@
 
 	<div class="form-row">
 
-		<label for="node-config-input-brightness"><i class="icon-bookmark"></i> Panel Brightness</label> 
-		<input type="text" id="node-config-input-brightness"> 
-	</div> 
+		<label for="node-config-input-brightness"><i class="icon-bookmark"></i> Panel Brightness</label>
+		<input type="text" id="node-config-input-brightness">
+	</div>
 
 	<div class="form-row">
-		<label for="node-config-input-mapping"><i class="icon-bookmark"></i> Hardware Mapping</label> 
-		<input type="text" id="node-config-input-mapping"> 
-	</div> 
+		<label for="node-config-input-mapping"><i class="icon-bookmark"></i> Hardware Mapping</label>
+		<input type="text" id="node-config-input-mapping">
+	</div>
 
 
 
@@ -227,14 +227,14 @@
 
 		oneditprepare: function ()
 		{
-			$("#node-config-input-font").change(function()  
+			$("#node-config-input-font").change(function()
 				{
 					this.font = $("#node-config-input-font").val();
 				});
 
 
 			this.font = $("#node-config-input-font").val();
-		
+
         },
 
 		oneditsave: function ()
@@ -264,7 +264,7 @@
 				<option value="/home/pi/node-rpi-rgb-led-matrix/external/matrix/fonts/6x10.bdf">6x10</option>
 				<option value="/home/pi/node-rpi-rgb-led-matrix/external/matrix/fonts/4x6.bdf">4x6</option>
 				<option value="/home/pi/node-rpi-rgb-led-matrix/external/matrix/fonts/9x18B.bdf">9x18B</option>
-		</select> 
+		</select>
 	</div>
 
 	<div class='form-row'>
@@ -277,47 +277,46 @@
     <p>prints text to the matrix buffer, refresh the matrix to see the result </p>
 </script>
 
-<script type="text/javascript"> 
-	RED.nodes.registerType('pixel-transform', 
+<script type="text/javascript">
+	RED.nodes.registerType('pixel-transform',
 	{
-		category: 'Raspberry Pi', 
-		color: '#a6bbcf', 
-		defaults: 
+		category: 'Raspberry Pi',
+		color: '#a6bbcf',
+		defaults:
 		{
-			name:		{value:""}, 
-			xOffset:	{value:0}, 
-			yOffset:	{value:0}, 
-			refresh:	{value:0}, 
-			color:		{value:""}, 
-		}, 
-		inputs: 1, 
-		outputs: 1, 
-		icon: "file.png", 
-		label: function() 
+			name:		{value:""},
+			xOffset:	{value:0},
+			yOffset:	{value:0},
+			refresh:	{value:0},
+			color:		{value:""},
+		},
+		inputs: 1,
+		outputs: 1,
+		icon: "file.png",
+		label: function()
 		{
-			return this.name() || "Data Transform!";
+			return this.name || "Data Transform!";
 		}
 	});
 </script>
- 
+
 <script type="text/x-red" data-template-name="pixel-transform">
 	<div class = "form-row">
-		<label for="node-config-input-name">< i class="icon-tag"></i> Name </label>
+		<label for="node-config-input-name"><i class="icon-tag"></i> Name </label>
 		<input type="text" id="node-input-name" placeholder="Name">
-	</div> 
+	</div>
 
 	<div class = "form-row">
-		<label for="node-config-input-xOffset">< i class="icon-tag"></i>X </label>
+		<label for="node-config-input-xOffset"><i class="icon-tag"></i>X </label>
 		<input type="text" id="node-input-xOffset" placeholder="0">
-	</div> 
+	</div>
 
 	<div class = "form-row">
-		<label for="node-config-input-yOffset">< i class="icon-tag"></i>Y </label>
+		<label for="node-config-input-yOffset"><i class="icon-tag"></i>Y </label>
 		<input type="text" id="node-input-yOffset" placeholder="0">
-	</div> 
+	</div>
 </script>
 
 <script type="text/x-red" data-help-name="pixel-transform">
     <p>modifies properties of a display object, or spawns one from a string </p>
 </script>
-
