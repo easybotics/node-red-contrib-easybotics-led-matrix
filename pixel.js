@@ -200,9 +200,6 @@ module.exports = function(RED) {
 		RED.nodes.createNode(this, config); 
 		var node = this; 
 
-		node.warn("font:" );
-		node.warn(config.font);
-
 		node.font = config.font;
 
 
@@ -214,7 +211,7 @@ module.exports = function(RED) {
 
 			if(msg.payload)
 			{
-				led.drawText(x, y, data, node.font); 
+				led.drawText(x, y, data, node.font,255,0,0); 
 			}
 		}); 
 	}
