@@ -117,6 +117,7 @@ module.exports = function(RED) {
 		//filename or URL to look for an image 
 		//and an array we will will with pixels 
 		var output = [];
+		var lastSent;
 
 		//function to actually send the output to the next node 
 		function readySend () 
@@ -168,11 +169,20 @@ module.exports = function(RED) {
 			//set the url var
 			if( typeof msg.payload === "string")
 			{
+				if(msg.payload === lastSent)
+					return readySend();
+
+				lastSent = msg.payload;
 				return createPixelStream( msg.payload, 0, 0);
 			}
 
 			if( msg.payload.data && msg.payload.xOffset && msg.payload.yOffset)
 			{
+				if(msg.payload.data === lastSent)
+					return readySend();
+
+				lastSent = msg.payload.data;
+
 				return createPixelStream(msg.payload.data, msg.payload.xOffset, msg.payload.yOffset);
 			}
 
