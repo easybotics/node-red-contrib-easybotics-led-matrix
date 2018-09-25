@@ -115,8 +115,10 @@ module.exports = function(RED) {
 
 		//filename or URL to look for an image 
 		//and an array we will will with pixels 
-		var output = [];
+		var output;
 		var lastSent;
+		var lastX;
+		var lastY;
 
 		//function to actually send the output to the next node 
 		function readySend () 
@@ -135,6 +137,11 @@ module.exports = function(RED) {
 		{
 			getPixels(file, function(err, pixels) 
 			{
+				if(!pixels)
+				{
+					node.error("image did not convert correctly");
+					return;
+				}
 				//empties the array before we start 
 				output = [];
 				var width  = Math.min( 128, pixels.shape[0]);
@@ -174,9 +181,10 @@ module.exports = function(RED) {
 			//set the url var
 			if( typeof msg.payload === "string")
 			{
-				if(msg.payload === lastSent)
+				if(msg.payload === lastSent && (output && output.length > 0))
 				{
 
+					node.warn("memoize");
 					return readySend();
 				}
 
@@ -186,12 +194,15 @@ module.exports = function(RED) {
 
 			if( msg.payload.data && msg.payload.xOffset && msg.payload.yOffset)
 			{
-				if(msg.payload.data === lastSent)
+				if(msg.payload.data === lastSent && (output && output.length > 0) && lastX == msg.payload.xOffset && lastY == msg.payload.yOffset)
 				{
+					node.warn("memoize");
 					return readySend();
 				}
 
 				lastSent = msg.payload.data;
+				lastX = msg.payload.xOffset;
+				lastY = msg.payload.yOffset;
 
 				return createPixelStream(msg.payload.data, msg.payload.xOffset, msg.payload.yOffset);
 			}
