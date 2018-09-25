@@ -14,6 +14,15 @@ module.exports = function(RED) {
 	 * but right now it uses global var 'led' meaning its limited to one hardware output per flow 
 	 */ 
 
+	function eatRGBString (str)
+	{
+		var s = str.split(',');
+		var output = {r: parseInt(s[0]), g: parseInt(s[1]), b: parseInt(s[2])};
+
+		return output;
+
+	}
+
 	function LedMatrix(n) 
 	{
 		RED.nodes.createNode(this, n);
@@ -235,11 +244,13 @@ module.exports = function(RED) {
 		{
 			var x		= msg.payload.xOffset || 0; 
 			var y		= msg.payload.yOffset || 0; 
-			var data	= msg.payload.data || msg.payload; 
-
+			var data	= msg.payload.data	  || msg.payload; 
+			var rgb		= msg.payload.rgb	  || "255,255,255";
 			if(msg.payload)
 			{
-				led.drawText(x, y, data, node.font,255,0,0); 
+				var color = eatRGBString(rgb);
+
+				led.drawText(x, y, data, node.font, color.r, color.g, color.b); 
 			}
 		}); 
 	}
@@ -252,7 +263,7 @@ module.exports = function(RED) {
 		node.xOffset = (config.xOffset || 0); 
 		node.yOffset = (config.yOffset || 0); 
 		node.refresh = (config.refresh || 0); 
-		node.color   = ("#ffffff");
+		node.rgb	 = (config.rgb     || "255,255,255");
 
 		function outputFromString (msg) 
 		{
@@ -262,7 +273,8 @@ module.exports = function(RED) {
 				xOffset: parseInt(node.xOffset), 
 				yOffset: parseInt(node.yOffset), 
 				refresh: parseInt(node.refresh), 
-				color:   node.color
+				rgb:	 node.rgb,
+		
 			} 
 
 			msg.payload = output;
@@ -277,7 +289,8 @@ module.exports = function(RED) {
 				xOffset: parseInt(node.xOffset), 
 				yOffset: parseInt(node.yOffset), 
 				refresh: parseInt(node.refresh), 
-				color:   node.color
+				rgb    : node.rgb,
+
 			} 
 
 			msg.payload = output;
