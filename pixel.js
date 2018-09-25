@@ -27,7 +27,6 @@ module.exports = function(RED) {
 		this.brightness = (n.brightness || 100); 
 		this.mapping	= (n.mapping	|| "adafruit-hat-pwm");
 
-		this.warn(this.brightness);
 
 		//if led is undefined we create a new one
 		if(!led) 
@@ -123,6 +122,7 @@ module.exports = function(RED) {
 		function readySend () 
 		{
 			//console.log("sending pixels");
+			node.warn("sending pixels");
 			
 			//see node-red docmentation for how node.send treats arrays 
 			//node.send(output) would send one pixel to n outputs 
@@ -166,11 +166,19 @@ module.exports = function(RED) {
 		//if we receive input
 		node.on('input', function(msg) 
 		{
+			if(!msg.payload)
+			{
+				node.error("empty payload");
+				return;
+			}
 			//set the url var
 			if( typeof msg.payload === "string")
 			{
 				if(msg.payload === lastSent)
+				{
+
 					return readySend();
+				}
 
 				lastSent = msg.payload;
 				return createPixelStream( msg.payload, 0, 0);
@@ -179,7 +187,9 @@ module.exports = function(RED) {
 			if( msg.payload.data && msg.payload.xOffset && msg.payload.yOffset)
 			{
 				if(msg.payload.data === lastSent)
+				{
 					return readySend();
+				}
 
 				lastSent = msg.payload.data;
 
