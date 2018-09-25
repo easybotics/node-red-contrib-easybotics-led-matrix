@@ -124,7 +124,6 @@ module.exports = function(RED) {
 		function readySend () 
 		{
 			//console.log("sending pixels");
-			node.warn("sending pixels");
 			
 			//see node-red docmentation for how node.send treats arrays 
 			//node.send(output) would send one pixel to n outputs 
@@ -184,7 +183,6 @@ module.exports = function(RED) {
 				if(msg.payload === lastSent && (output && output.length > 0))
 				{
 
-					node.warn("memoize");
 					return readySend();
 				}
 
@@ -192,11 +190,10 @@ module.exports = function(RED) {
 				return createPixelStream( msg.payload, 0, 0);
 			}
 
-			if( msg.payload.data && msg.payload.xOffset && msg.payload.yOffset)
+			if( msg.payload.data)
 			{
 				if(msg.payload.data === lastSent && (output && output.length > 0) && lastX == msg.payload.xOffset && lastY == msg.payload.yOffset)
 				{
-					node.warn("memoize");
 					return readySend();
 				}
 
