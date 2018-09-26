@@ -137,7 +137,14 @@ module.exports = function(RED) {
 			//see node-red docmentation for how node.send treats arrays 
 			//node.send(output) would send one pixel to n outputs 
 			//node.send([output], true) sends the pixiels to output 1, and true to output 2 
-			node.send([output]); 
+			//
+			//node.send([output]); 
+			//instead of sending it out we're not just processing it in place here to match the text node
+			for(var i = 0; i < output.length; i++)
+			{
+				let payload = output[i].payload;
+				led.setPixel( parseInt(payload.x), parseInt(payload.y), parseInt(payload.r), parseInt(payload.g), parseInt(payload.b));
+			}
 		}
 
 		//function that takes a file, and an offset and tries to convert the file into a stream of pixels 
@@ -147,7 +154,7 @@ module.exports = function(RED) {
 			{
 				if(!pixels)
 				{
-					node.error("image did not convert correctly");
+					node.error("image did not convert correctly\n please check the url or file location");
 					return;
 				}
 				//empties the array before we start 
@@ -310,20 +317,14 @@ module.exports = function(RED) {
 	}
 
 	
-		
-
-
-	
-
-
 
 	//register our functions with node-red 
 	RED.nodes.registerType("led-matrix", LedMatrix);
 	RED.nodes.registerType("clear-matrix", ClearMatrix);
 	RED.nodes.registerType("pixel", PixelNode);
 	RED.nodes.registerType("refresh-matrix", RefreshMatrix);
-	RED.nodes.registerType("image-to-pixels", ImageToPixels);
-	RED.nodes.registerType("text", Text); 
+	RED.nodes.registerType("image-to-matrix", ImageToPixels);
+	RED.nodes.registerType("text-to-matrix", Text); 
 	RED.nodes.registerType("pixel-transform", PixelDataTransform);
 }
 			
