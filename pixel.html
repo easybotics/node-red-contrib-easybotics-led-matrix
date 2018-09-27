@@ -145,6 +145,8 @@
 		{
 			name: {value:""},
 			file: {value:""},
+			xOffset: {value:0, required:true}, 
+			yOffset: {value:0, required:true}, 
 			matrix: { type:'led-matrix', required:true},
 		},
 
@@ -164,10 +166,23 @@
 		<input type="text" id="node-input-name" placeholder="Name">
 	</div>
 
+	<div class="form-row"> 
+		<label for="node-config-input-xOffset"> <i class="fa fa-tag"></i> X position</label> 
+		<input type="number" id="node-input-xOffset" min="0" placeholder="0"/> 
+	<div>
+
+	<div class="form-row"> 
+		<label for="node-config-input-yOffset"> <i class="fa fa-tag"></i> Y position</label> 
+		<input type="number" id="node-input-yOffset" min="0" placeholder="0" /> 
+	<div>
+
+
 	<div class='form-row'>
 		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
 		<input type='text' id='node-input-matrix'/>
 	</div>
+
+
 </script>
 
 
@@ -215,6 +230,9 @@
 
         defaults: {
             name: {value:""},
+			xOffset:      {value:0, required: true}, 
+			yOffset:	  {value:0, required: true}, 
+			rgb:		  {value:"255,255,255"}, 
 			font: {value:"/home/pi/node-red-contrib-led-matrix/9x18B.bdf", required:true},
 			matrix: { type:'led-matrix', required:true},
         },
@@ -228,6 +246,23 @@
 
 		oneditprepare: function ()
 		{
+			$("#node-input-rgb2").change(function() 
+			{
+				var hex = $("#node-input-rgb2").val();
+				var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+				hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+					return r + r + g + g + b + b;
+				});
+
+				var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+				var output =  "" + parseInt(result[1], 16) + ',' + parseInt(result[2], 16) + ',' + parseInt(result[3], 16);
+
+				$("#node-input-rgb").val(output);
+			});
+
+
+			$("#node-input-rgb2").val("#43DB2D");
+
 			$("#node-config-input-font").change(function()
 				{
 					this.font = $("#node-config-input-font").val();
@@ -288,10 +323,32 @@
 		</select>
 	</div>
 
+	<div class="form-row"> 
+		<label for="node-config-input-xOffset"> <i class="fa fa-tag"></i> X position</label> 
+		<input type="number" id="node-input-xOffset" min="0" placeholder="0"/> 
+	<div>
+
+	<div class="form-row"> 
+		<label for="node-config-input-yOffset"> <i class="fa fa-tag"></i> Y position</label> 
+		<input type="number" id="node-input-yOffset" min="0" placeholder="0" /> 
+	<div>
+
 	<div class='form-row'>
 		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
 		<input type='text' id='node-input-matrix'/>
 	</div>
+
+	<div class = "form-row">
+		<label for="node-config-input-rgb"><i class="icon-tag"></i>RGB color </label>
+		<input type="text" id="node-input-rgb" placeholder="255,255,255">
+	</div>
+
+	<div class = "form-row">
+		<label for="node-config-input-rgb2"><i class="icon-tag"></i>Color picker</label>
+		<input type="color" id="node-input-rgb2">
+	</div>
+
+	
 </script>
 
 <script type="text/x-red" data-help-name="text">
@@ -311,6 +368,7 @@
 			refresh:	{value:0},
 			rgb:		{value:"255,255,255"},
 			rgb2:		{value:"#FFFFFF"},
+
 		},
 		inputs: 1,
 		outputs: 1,
@@ -341,9 +399,6 @@
 		oneditprepare: function () 
 		{
 
-			$("#node-input-rgb2").val("#ffffff");
-
-
 			$("#node-input-rgb2").change(function() 
 			{
 				var hex = $("#node-input-rgb2").val();
@@ -357,11 +412,13 @@
 
 				$("#node-input-rgb").val(output);
 			});
+
+
+			$("#node-input-rgb2").val("#43DB2D");
 		},
 
 		oneditsave: function () 
 		{
-			this.rgb2 = $("#node-input-rgb2").val();
 		},
 
 

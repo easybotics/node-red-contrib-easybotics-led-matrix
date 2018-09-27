@@ -138,6 +138,9 @@ module.exports = function(RED) {
 		RED.nodes.createNode(this, config); 
 		var node = this; 
 
+		node.xOffset = config.xOffset; 
+		node.yOffset = config.yOffset; 
+
 		//filename or URL to look for an image 
 		//and an array we will will with pixels 
 		var output;
@@ -212,14 +215,18 @@ module.exports = function(RED) {
 			//set the url var
 			if( typeof msg.payload === "string")
 			{
-				if(msg.payload === lastSent && (output && output.length > 0))
+				if(msg.payload === lastSent && (output && output.length > 0) && lastY == node.yOffset && lastX == node.xOffset)
 				{
 
 					return readySend();
 				}
 
+				lastX = node.xOffset;
+				lastY = node.yOffset;
 				lastSent = msg.payload;
-				return createPixelStream( msg.payload, 0, 0);
+
+
+				return createPixelStream( msg.payload, parseInt(node.xOffset), parseInt(node.yOffset));
 			}
 
 			if( msg.payload.data)
@@ -260,20 +267,26 @@ module.exports = function(RED) {
 		RED.nodes.createNode(this, config); 
 		var node = this; 
 
-		node.font = config.font;
+		node.font		= config.font;
+		node.xOffset	= config.xOffset; 
+		node.yOffset	= config.yOffset; 
+		node.rgb		= config.rgb; 
+		
+
 
 
 		node.on('input', function(msg) 
 		{
-			var x		= msg.payload.xOffset || 0; 
-			var y		= msg.payload.yOffset || 0; 
+			var x		= msg.payload.xOffset ? msg.payload.xOffset : node.xOffset; 
+			var y		= msg.payload.yOffset ? msg.payload.yOffset : node.yOffset; 
 			var data	= msg.payload.data	  || msg.payload; 
-			var rgb		= msg.payload.rgb	  || "255,255,255";
+			var rgb		= msg.payload.rgb	  || node.rgb;
+
 			if(msg.payload)
 			{
 				var color = eatRGBString(rgb);
 
-				led.drawText(x, y, data, node.font, color.r, color.g, color.b); 
+				led.drawText(parseInt(x), parseInt(y), data, node.font, parseInt(color.r), parseInt(color.g), parseInt(color.b)); 
 			}
 		}); 
 	}
