@@ -224,6 +224,19 @@
 
 
 <script type="text/javascript">
+
+		function componentToHex(c) 
+		{
+			var hex = c.toString(16);
+			return hex.length == 1 ? "0" + hex : hex;
+		}
+
+		function rgbToHex(r, g, b) 
+		{
+			return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+		}
+
+
     RED.nodes.registerType('text-to-matrix',{
         category: 'LED Matrix',
         color: '#a6bbcf',
@@ -232,7 +245,7 @@
             name: {value:""},
 			xOffset:      {value:0, required: true}, 
 			yOffset:	  {value:0, required: true}, 
-			rgb:		  {value:"255,255,255"}, 
+			rgb:		  {value:"0,255,41"}, 
 			font: {value:"/home/pi/node-red-contrib-led-matrix/9x18B.bdf", required:true},
 			matrix: { type:'led-matrix', required:true},
         },
@@ -260,8 +273,10 @@
 				$("#node-input-rgb").val(output);
 			});
 
+			var tr = $("#node-input-rgb").val(); 
+			var split = tr.split(','); 
 
-			$("#node-input-rgb2").val("#43DB2D");
+			$("#node-input-rgb2").val( rgbToHex( parseInt(split[0]), parseInt(split[1]), parseInt(split[2])));
 
 			$("#node-config-input-font").change(function()
 				{
@@ -340,12 +355,12 @@
 
 	<div class = "form-row">
 		<label for="node-config-input-rgb"><i class="icon-tag"></i>RGB color </label>
-		<input type="text" id="node-input-rgb" placeholder="255,255,255">
+		<input type="text" id="node-input-rgb" placeholder="112,79,86">
 	</div>
 
 	<div class = "form-row">
 		<label for="node-config-input-rgb2"><i class="icon-tag"></i>Color picker</label>
-		<input type="color" id="node-input-rgb2">
+		<input type="color" id="node-input-rgb2" placeholder="#43DB2D">
 	</div>
 
 	
