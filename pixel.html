@@ -381,8 +381,7 @@
 			xOffset:	{value:0},
 			yOffset:	{value:0},
 			refresh:	{value:0},
-			rgb:		{value:"255,255,255"},
-			rgb2:		{value:"#FFFFFF"},
+			rgb:		{value:"0,255,41"},
 
 		},
 		inputs: 1,
@@ -393,23 +392,6 @@
 			return this.name || "Data Transform!";
 		},
 
-		/*
-		function eatHexString (hex) 
-		{
-			// Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
-			var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-			hex = hex.replace(shorthandRegex, function(m, r, g, b) {
-				return r + r + g + g + b + b;
-			});
-
-			var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-			return result ? {
-				r: parseInt(result[1], 16),
-				g: parseInt(result[2], 16),
-				b: parseInt(result[3], 16)
-			} : null;
-		},
-		*/
 
 		oneditprepare: function () 
 		{
@@ -428,8 +410,12 @@
 				$("#node-input-rgb").val(output);
 			});
 
+			var tr = $("#node-input-rgb").val(); 
+			var split = tr.split(','); 
 
-			$("#node-input-rgb2").val("#43DB2D");
+			$("#node-input-rgb2").val( rgbToHex( parseInt(split[0]), parseInt(split[1]), parseInt(split[2])));
+
+
 		},
 
 		oneditsave: function () 
