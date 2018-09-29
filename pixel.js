@@ -14,6 +14,31 @@ module.exports = function(RED) {
 	 * but right now it uses global var 'led' meaning its limited to one hardware output per flow 
 	 */ 
 
+	function eatRGBString (str)
+	{
+		var s = str.split(',');
+		var output = {r: parseInt(s[0]), g: parseInt(s[1]), b: parseInt(s[2])};
+
+		return output;
+
+	}
+
+	function eatHexString (hex) 
+	{
+		// Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+		var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+		hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+			return r + r + g + g + b + b;
+		});
+
+		var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+		return result ? {
+			r: parseInt(result[1], 16),
+			g: parseInt(result[2], 16),
+			b: parseInt(result[3], 16)
+		} : null;
+	}
+
 	function LedMatrix(n) 
 	{
 		RED.nodes.createNode(this, n);
@@ -113,6 +138,9 @@ module.exports = function(RED) {
 		RED.nodes.createNode(this, config); 
 		var node = this; 
 
+		node.xOffset = config.xOffset; 
+		node.yOffset = config.yOffset; 
+
 		//filename or URL to look for an image 
 		//and an array we will will with pixels 
 		var output;
@@ -124,12 +152,18 @@ module.exports = function(RED) {
 		function readySend () 
 		{
 			//console.log("sending pixels");
-			node.warn("sending pixels");
 			
 			//see node-red docmentation for how node.send treats arrays 
 			//node.send(output) would send one pixel to n outputs 
 			//node.send([output], true) sends the pixiels to output 1, and true to output 2 
-			node.send([output]); 
+			//
+			//node.send([output]); 
+			//instead of sending it out we're not just processing it in place here to match the text node
+			for(var i = 0; i < output.length; i++)
+			{
+				let payload = output[i].payload;
+				led.setPixel( parseInt(payload.x), parseInt(payload.y), parseInt(payload.r), parseInt(payload.g), parseInt(payload.b));
+			}
 		}
 
 		//function that takes a file, and an offset and tries to convert the file into a stream of pixels 
@@ -139,7 +173,7 @@ module.exports = function(RED) {
 			{
 				if(!pixels)
 				{
-					node.error("image did not convert correctly");
+					node.error("image did not convert correctly\n please check the url or file location");
 					return;
 				}
 				//empties the array before we start 
@@ -181,22 +215,24 @@ module.exports = function(RED) {
 			//set the url var
 			if( typeof msg.payload === "string")
 			{
-				if(msg.payload === lastSent && (output && output.length > 0))
+				if(msg.payload === lastSent && (output && output.length > 0) && lastY == node.yOffset && lastX == node.xOffset)
 				{
 
-					node.warn("memoize");
 					return readySend();
 				}
 
+				lastX = node.xOffset;
+				lastY = node.yOffset;
 				lastSent = msg.payload;
-				return createPixelStream( msg.payload, 0, 0);
+
+
+				return createPixelStream( msg.payload, parseInt(node.xOffset), parseInt(node.yOffset));
 			}
 
-			if( msg.payload.data && msg.payload.xOffset && msg.payload.yOffset)
+			if( msg.payload.data)
 			{
 				if(msg.payload.data === lastSent && (output && output.length > 0) && lastX == msg.payload.xOffset && lastY == msg.payload.yOffset)
 				{
-					node.warn("memoize");
 					return readySend();
 				}
 
@@ -231,18 +267,26 @@ module.exports = function(RED) {
 		RED.nodes.createNode(this, config); 
 		var node = this; 
 
-		node.font = config.font;
+		node.font		= config.font;
+		node.xOffset	= config.xOffset; 
+		node.yOffset	= config.yOffset; 
+		node.rgb		= config.rgb; 
+		
+
 
 
 		node.on('input', function(msg) 
 		{
-			var x		= msg.payload.xOffset || 0; 
-			var y		= msg.payload.yOffset || 0; 
-			var data	= msg.payload.data || msg.payload; 
+			var x		= msg.payload.xOffset ? msg.payload.xOffset : node.xOffset; 
+			var y		= msg.payload.yOffset ? msg.payload.yOffset : node.yOffset; 
+			var data	= msg.payload.data	  || msg.payload; 
+			var rgb		= msg.payload.rgb	  || node.rgb;
 
 			if(msg.payload)
 			{
-				led.drawText(x, y, data, node.font,255,0,0); 
+				var color = eatRGBString(rgb);
+
+				led.drawText(parseInt(x), parseInt(y), data, node.font, parseInt(color.r), parseInt(color.g), parseInt(color.b)); 
 			}
 		}); 
 	}
@@ -255,7 +299,8 @@ module.exports = function(RED) {
 		node.xOffset = (config.xOffset || 0); 
 		node.yOffset = (config.yOffset || 0); 
 		node.refresh = (config.refresh || 0); 
-		node.color   = ("#ffffff");
+		node.rgb	 = (config.rgb     || "255,255,255");
+		node.rgb2    = (config.rgb2    || "none");
 
 		function outputFromString (msg) 
 		{
@@ -265,7 +310,8 @@ module.exports = function(RED) {
 				xOffset: parseInt(node.xOffset), 
 				yOffset: parseInt(node.yOffset), 
 				refresh: parseInt(node.refresh), 
-				color:   node.color
+				rgb:	 node.rgb,
+		
 			} 
 
 			msg.payload = output;
@@ -280,7 +326,8 @@ module.exports = function(RED) {
 				xOffset: parseInt(node.xOffset), 
 				yOffset: parseInt(node.yOffset), 
 				refresh: parseInt(node.refresh), 
-				color:   node.color
+				rgb    : node.rgb,
+
 			} 
 
 			msg.payload = output;
@@ -300,20 +347,14 @@ module.exports = function(RED) {
 	}
 
 	
-		
-
-
-	
-
-
 
 	//register our functions with node-red 
 	RED.nodes.registerType("led-matrix", LedMatrix);
 	RED.nodes.registerType("clear-matrix", ClearMatrix);
 	RED.nodes.registerType("pixel", PixelNode);
 	RED.nodes.registerType("refresh-matrix", RefreshMatrix);
-	RED.nodes.registerType("image-to-pixels", ImageToPixels);
-	RED.nodes.registerType("text", Text); 
+	RED.nodes.registerType("image-to-matrix", ImageToPixels);
+	RED.nodes.registerType("text-to-matrix", Text); 
 	RED.nodes.registerType("pixel-transform", PixelDataTransform);
 }
 			

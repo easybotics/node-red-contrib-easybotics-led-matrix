@@ -1,2 +1,6 @@
 # node-red-contrib-led-matrix
-node red node for controlling rgb matrix panels 
+set of node-red nodes binding to node-rpi-rgb-led-matrix library
+
+![Example Flow](https://u.teknik.io/WFuMk.png)
+
+![Example Output](https://u.teknik.io/ZY9K2.jpg)
