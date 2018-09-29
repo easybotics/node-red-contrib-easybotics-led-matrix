@@ -102,8 +102,6 @@ module.exports = function(RED) {
 				return;
 			}
 
-
-
 		});
 	}
 
@@ -300,7 +298,6 @@ module.exports = function(RED) {
 		node.yOffset = (config.yOffset || 0); 
 		node.refresh = (config.refresh || 0); 
 		node.rgb	 = (config.rgb     || "255,255,255");
-		node.rgb2    = (config.rgb2    || "none");
 
 		function outputFromString (msg) 
 		{
@@ -346,7 +343,44 @@ module.exports = function(RED) {
 		});
 	}
 
-	
+
+	function CircleToMatrix (config)
+	{
+		RED.nodes.createNode(this, config);
+		var node = this; 
+
+		node.xPos	 = (config.xPos   || 0); 
+		node.yPos	 = (config.yPos	  || 0); 
+		node.radius	 = (config.radius || 0); 
+		node.rgb	 = (config.rgb    || "255,255,255");
+
+		node.on('input', function (msg) 
+		{
+			var color = eatRGBString(node.rgb);
+			led.drawCircle( parseInt(node.xPos), parseInt(node.yPos), parseInt(node.radius), parseInt(color.r), parseInt(color.g), parseInt(color.b));
+		});
+	};
+
+	function LineToMatrix (config)
+	{
+		RED.nodes.createNode(this, config); 
+		var node = this;
+
+		node.x0Pos = (config.x0Pos || 0);
+		node.y0Pos = (config.y0Pos || 0);
+		node.x1Pos = (config.x1Pos || 0);
+		node.y1Pos = (config.y1Pos || 0);
+		node.rgb   = (config.rgb || "255,255,255");
+
+		node.on('input', function (msg) 
+		{
+			var color = eatRGBString(node.rgb);
+			led.drawLine( parseInt(node.x0Pos), parseInt(node.y0Pos), parseInt(node.x1Pos), parseInt(node.y1Pos), parseInt(color.r), parseInt(color.g), parseInt(color.b));
+		});
+
+
+	};
+
 
 	//register our functions with node-red 
 	RED.nodes.registerType("led-matrix", LedMatrix);
@@ -356,5 +390,7 @@ module.exports = function(RED) {
 	RED.nodes.registerType("image-to-matrix", ImageToPixels);
 	RED.nodes.registerType("text-to-matrix", Text); 
 	RED.nodes.registerType("pixel-transform", PixelDataTransform);
+	RED.nodes.registerType("circle-to-matrix", CircleToMatrix);
+	RED.nodes.registerType("line-to-matrix", LineToMatrix);
 }
 			
