@@ -68,7 +68,7 @@
         },
         inputs:1,
         outputs:0,
-        icon: "pixel.png",
+        icon: "pixel-matrix.png",
         label: function() {
             return this.name||"pixel to matrix";
         }
@@ -111,7 +111,7 @@
 		},
 		inputs:1,
 		outputs:0,
-		icon: "file.png",
+		icon: "refresh-matrix.png",
 		label: function ()
 		{
 			return this.name || "refresh-matrix";
@@ -152,7 +152,7 @@
 
 		inputs:1,
 		outputs:0,
-		icon: "image.png",
+		icon: "image-matrix.png",
 		label: function()
 		{
 			return this.name || "image to matrix";
@@ -198,7 +198,7 @@
 		},
 		inputs:1,
 		outputs:0,
-		icon: "file.png",
+		icon: "clear-matrix.png",
 		label: function()
 		{
 			return this.name || "led-matrix";
@@ -252,7 +252,7 @@
 
         inputs:1,
         outputs:0,
-        icon: "text.png",
+        icon: "text-matrix.png",
         label: function() {
             return this.name||"text to matrix";
         },
@@ -386,7 +386,7 @@
 		},
 		inputs: 1,
 		outputs: 1,
-		icon: "transform.png",
+		icon: "transform-matrix.png",
 		label: function()
 		{
 			return this.name || "Data Transform!";
@@ -463,45 +463,45 @@
 
 <script type="text/javascript">
 
-	function componentToHex(c) 
+	function componentToHex(c)
 	{
 		var hex = c.toString(16);
 		return hex.length == 1 ? "0" + hex : hex;
 	}
 
-	function rgbToHex(r, g, b) 
+	function rgbToHex(r, g, b)
 	{
 		return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
 	}
 
 
-	RED.nodes.registerType('circle-to-matrix', 
+	RED.nodes.registerType('circle-to-matrix',
 		{
-			category: 'LED Matrix', 
-			color: '#a6bbcf', 
+			category: 'LED Matrix',
+			color: '#a6bbcf',
 
-			defaults: 
+			defaults:
 			{
-				name:	{value:""}, 
-				xPos:	{value:0, required: true}, 
-				yPos:	{value:0, required: true}, 
-				radius: {value:0, required: true}, 
-				rgb:	{value:"0,255,41"}, 
+				name:	{value:""},
+				xPos:	{value:0, required: true},
+				yPos:	{value:0, required: true},
+				radius: {value:0, required: true},
+				rgb:	{value:"0,255,41"},
 
-				matrix: {type: 'led-matrix', required:true}, 
-			}, 
+				matrix: {type: 'led-matrix', required:true},
+			},
 
-			inputs: 1, 
-			outputs:0, 
-			icon: "file.png", 
-			label: function () 
+			inputs: 1,
+			outputs:0,
+			icon: "circle-matrix.png",
+			label: function ()
 			{
-				return this.name || "circle to matrix"; 
-			}, 
+				return this.name || "circle to matrix";
+			},
 
 			oneditprepare: function ()
 			{
-				$("#node-input-rgb2").change(function() 
+				$("#node-input-rgb2").change(function()
 				{
 					var hex = $("#node-input-rgb2").val();
 					var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
@@ -515,35 +515,35 @@
 					$("#node-input-rgb").val(output);
 				});
 
-				var tr = $("#node-input-rgb").val(); 
-				var split = tr.split(','); 
+				var tr = $("#node-input-rgb").val();
+				var split = tr.split(',');
 
 				$("#node-input-rgb2").val( rgbToHex( parseInt(split[0]), parseInt(split[1]), parseInt(split[2])));
-			}, 
+			},
 		});
 </script>
 
-<script type="text/x-red" data-template-name="circle-to-matrix"> 
+<script type="text/x-red" data-template-name="circle-to-matrix">
 
 	<div class="form-row">
-		<label for="node-config-input-name"><i class="icon-tag"></i> Name </label> 
-		<input type="text" id="node-input-name" placeholder="Name"> 
-	</div> 
+		<label for="node-config-input-name"><i class="icon-tag"></i> Name </label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
 
-	<div class="form-row"> 
-		<label for="node-config-input-xPos"> <i class="fa fa-tag"></i> X Position </label> 
+	<div class="form-row">
+		<label for="node-config-input-xPos"> <i class="fa fa-tag"></i> X Position </label>
 		<input type="number" id="node-input-xPos" min = "0" placeholder="0" />
-	<div> 
+	<div>
 
-	<div class="form-row"> 
-		<label for="node-config-input-yPos"> <i class="fa fa-tag"></i> Y Position </label> 
+	<div class="form-row">
+		<label for="node-config-input-yPos"> <i class="fa fa-tag"></i> Y Position </label>
 		<input type="number" id="node-input-yPos" min = "0" placeholder="0" />
-	<div> 
+	<div>
 
-	<div class="form-row"> 
-		<label for="node-config-input-radius"> <i class="fa fa-tag"></i> Radius </label> 
+	<div class="form-row">
+		<label for="node-config-input-radius"> <i class="fa fa-tag"></i> Radius </label>
 		<input type="number" id="node-input-radius" min = "0" placeholder="0" />
-	<div> 
+	<div>
 
 
 	<div class = "form-row">
@@ -562,51 +562,51 @@
 	</div>
 
 
-</script> 
+</script>
 
 <script type="text/javascript">
 
-	function componentToHex(c) 
+	function componentToHex(c)
 	{
 		var hex = c.toString(16);
 		return hex.length == 1 ? "0" + hex : hex;
 	}
 
-	function rgbToHex(r, g, b) 
+	function rgbToHex(r, g, b)
 	{
 		return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
 	}
 
 
-	RED.nodes.registerType('line-to-matrix', 
+	RED.nodes.registerType('line-to-matrix',
 	{
-		category: 'LED Matrix', 
-		color: '#a6bbcf', 
+		category: 'LED Matrix',
+		color: '#a6bbcf',
 
-		defaults: 
+		defaults:
 		{
-			name:	{value:""}, 
-			x0Pos:	{value:0, required: true}, 
-			y0Pos:  {value:0, required: true}, 
-			x1Pos:  {value:0, required: true}, 
-			y1Pos:  {value:0, required: true}, 
-			rgb:	{value:"0, 255, 41"}, 
+			name:	{value:""},
+			x0Pos:	{value:0, required: true},
+			y0Pos:  {value:0, required: true},
+			x1Pos:  {value:0, required: true},
+			y1Pos:  {value:0, required: true},
+			rgb:	{value:"0, 255, 41"},
 
-			matrix:	{type: 'led-matrix', required: true}, 
-		}, 
+			matrix:	{type: 'led-matrix', required: true},
+		},
 
-		inputs: 1, 
-		outputs: 0, 
-		icon: "file.png", 
+		inputs: 1,
+		outputs: 0,
+		icon: "line-matrix.png", 
 		label: function ()
 		{
 			return this.name || "line to matrix";
-		}, 
+		},
 
-		oneditprepare: function () 
+		oneditprepare: function ()
 		{
 
-				$("#node-input-rgb2").change(function() 
+				$("#node-input-rgb2").change(function()
 				{
 					var hex = $("#node-input-rgb2").val();
 					var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
@@ -620,41 +620,41 @@
 					$("#node-input-rgb").val(output);
 				});
 
-				var tr = $("#node-input-rgb").val(); 
-				var split = tr.split(','); 
+				var tr = $("#node-input-rgb").val();
+				var split = tr.split(',');
 
 				$("#node-input-rgb2").val( rgbToHex( parseInt(split[0]), parseInt(split[1]), parseInt(split[2])));
-		}, 
+		},
 	});
-</script> 
+</script>
 
 
 <script type="text/x-red" data-template-name="line-to-matrix">
 
 	<div class="form-row">
-		<label for="node-config-input-name"><i class="icon-tag"></i> Name </label> 
-		<input type="text" id="node-input-name" placeholder="Name"> 
-	</div> 
+		<label for="node-config-input-name"><i class="icon-tag"></i> Name </label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
 
-	<div class="form-row"> 
-		<label for="node-config-input-x0Pos"> <i class="fa fa-tag"></i> X Position </label> 
+	<div class="form-row">
+		<label for="node-config-input-x0Pos"> <i class="fa fa-tag"></i> X Position </label>
 		<input type="number" id="node-input-x0Pos" min = "0" placeholder="0" />
-	<div> 
+	<div>
 
-	<div class="form-row"> 
-		<label for="node-config-input-y0Pos"> <i class="fa fa-tag"></i> Y Position </label> 
+	<div class="form-row">
+		<label for="node-config-input-y0Pos"> <i class="fa fa-tag"></i> Y Position </label>
 		<input type="number" id="node-input-y0Pos" min = "0" placeholder="0" />
-	<div> 
-			
-	<div class="form-row"> 
-		<label for="node-config-input-x1Pos"> <i class="fa fa-tag"></i> X Position </label> 
-		<input type="number" id="node-input-x1Pos" min = "0" placeholder="0" />
-	<div> 
+	<div>
 
-	<div class="form-row"> 
-		<label for="node-config-input-y1Pos"> <i class="fa fa-tag"></i> Y Position </label> 
+	<div class="form-row">
+		<label for="node-config-input-x1Pos"> <i class="fa fa-tag"></i> X Position </label>
+		<input type="number" id="node-input-x1Pos" min = "0" placeholder="0" />
+	<div>
+
+	<div class="form-row">
+		<label for="node-config-input-y1Pos"> <i class="fa fa-tag"></i> Y Position </label>
 		<input type="number" id="node-input-y1Pos" min = "0" placeholder="0" />
-	<div> 
+	<div>
 
 	<div class = "form-row">
 		<label for="node-config-input-rgb"><i class="icon-tag"></i>RGB color </label>
@@ -665,14 +665,10 @@
 		<label for="node-config-input-rgb2"><i class="icon-tag"></i>Color picker</label>
 		<input type="color" id="node-input-rgb2" placeholder="#43DB2D">
 	</div>
-	
+
 	<div class='form-row'>
 		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
 		<input type='text' id='node-input-matrix'/>
 	</div>
 
 </script>
-
-
-			
-
