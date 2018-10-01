@@ -84,6 +84,17 @@ module.exports = function(RED) {
 	{
 		RED.nodes.createNode(this, config); 
 		var node = this; 
+		var outputInfo;
+
+		node.draw = function ()
+		{
+			if( outputInfo != undefined)
+			{
+				let o = outputInfo; 
+				led.setPixel( o.x, o.y, o.r, o.g, o.b);
+			}
+		}
+
 
 		node.on('input', function(msg) 
 		{ 
@@ -97,7 +108,16 @@ module.exports = function(RED) {
 					node.error("your pixel csv doesn't seem correct:", vals);
 				}
 
-				led.setPixel(parseInt(vals[0]), parseInt(vals[1]), parseInt(vals[2]), parseInt(vals[3]), parseInt(vals[4]));
+				outputInfo = 
+					{
+						x: parseInt(vals[0]), 
+						y: parseInt(vals[1]), 
+						r: parseInt(vals[2]), 
+						g: parseInt(vals[3]), 
+						b: parseInt(vals[4]), 
+					};
+
+			//	led.setPixel(parseInt(vals[0]), parseInt(vals[1]), parseInt(vals[2]), parseInt(vals[3]), parseInt(vals[4]));
 				return;
 			}
 
@@ -126,7 +146,6 @@ module.exports = function(RED) {
 		{
 			for( let n of nodeRegister) 
 			{
-				node.log(n.font);
 				n.draw();
 			}
 
@@ -159,6 +178,19 @@ module.exports = function(RED) {
 		var lastX;
 		var lastY;
 
+		node.draw = function () 
+		{
+			if(output != undefined)
+			{
+				for(var i = 0; i < output.length; i++)
+				{
+					let payload = output[i].payload;
+					led.setPixel( parseInt(payload.x), parseInt(payload.y), parseInt(payload.r), parseInt(payload.g), parseInt(payload.b));
+				}
+			}
+		}
+
+
 		//function to actually send the output to the next node 
 		function readySend () 
 		{
@@ -170,11 +202,15 @@ module.exports = function(RED) {
 			//
 			//node.send([output]); 
 			//instead of sending it out we're not just processing it in place here to match the text node
+			/*
 			for(var i = 0; i < output.length; i++)
 			{
 				let payload = output[i].payload;
 				led.setPixel( parseInt(payload.x), parseInt(payload.y), parseInt(payload.r), parseInt(payload.g), parseInt(payload.b));
 			}
+			*/
+
+			nodeRegister.add(node);
 		}
 
 		//function that takes a file, and an offset and tries to convert the file into a stream of pixels 
