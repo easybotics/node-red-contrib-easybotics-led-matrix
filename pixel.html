@@ -631,30 +631,35 @@
 
 <script type="text/x-red" data-template-name="line-to-matrix">
 
+<!--
 	<div class="form-row">
 		<label for="node-config-input-name"><i class="icon-tag"></i> Name </label>
 		<input type="text" id="node-input-name" placeholder="Name">
 	</div>
+-->
 
 	<div class="form-row">
-		<label for="node-config-input-x0Pos"> <i class="fa fa-tag"></i> X Position </label>
-		<input type="number" id="node-input-x0Pos" min = "0" placeholder="0" />
+		<div class ="col">
+			<label for="node-config-input-x0Pos"> <i class="fa fa-tag"></i> X0 Position </label>
+			<input type="number" id="node-input-x0Pos" min = "0" placeholder="0" />
+		</div>
+		<div class ="col">
+			<label for="node-config-input-y0Pos"> <i class="fa fa-tag"></i> Y0 Position </label>
+			<input type="number" id="node-input-y0Pos" min = "0" placeholder="0" />
+		</div>
 	<div>
 
 	<div class="form-row">
-		<label for="node-config-input-y0Pos"> <i class="fa fa-tag"></i> Y Position </label>
-		<input type="number" id="node-input-y0Pos" min = "0" placeholder="0" />
-	<div>
+		<div class="col">
+			<label for="node-config-input-x1Pos"> <i class="fa fa-tag"></i> X Position </label>
+			<input type="number" id="node-input-x1Pos" min = "0" placeholder="0" />
+		<div>
+		<div class="col">
+			<label for="node-config-input-y1Pos"> <i class="fa fa-tag"></i> Y Position </label>
+			<input type="number" id="node-input-y1Pos" min = "0" placeholder="0" />
+		<div>
+	</div>
 
-	<div class="form-row">
-		<label for="node-config-input-x1Pos"> <i class="fa fa-tag"></i> X Position </label>
-		<input type="number" id="node-input-x1Pos" min = "0" placeholder="0" />
-	<div>
-
-	<div class="form-row">
-		<label for="node-config-input-y1Pos"> <i class="fa fa-tag"></i> Y Position </label>
-		<input type="number" id="node-input-y1Pos" min = "0" placeholder="0" />
-	<div>
 
 	<div class = "form-row">
 		<label for="node-config-input-rgb"><i class="icon-tag"></i>RGB color </label>

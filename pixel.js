@@ -7,6 +7,7 @@ var getPixels	= require('get-pixels');
 module.exports = function(RED) {
 
 	var led;
+	var nodeRegister;
 
 	/*
 	 * a config node that holds global state for the led matrix
@@ -43,20 +44,25 @@ module.exports = function(RED) {
 	{
 		RED.nodes.createNode(this, n);
 
+		var node = this;
+
 		//get the field settings, these inputs are defined in the html
 
-		this.width		= (n.width		|| 64);
-		this.height		= (n.height		|| 64);
-		this.chained	= (n.chained	|| 2);
-		this.parallel	= (n.parallel	|| 1);
-		this.brightness = (n.brightness || 100);
-		this.mapping	= (n.mapping	|| "adafruit-hat-pwm");
+		node.width		= (n.width		|| 64);
+		node.height		= (n.height		|| 64);
+		node.chained	= (n.chained	|| 2);
+		node.parallel	= (n.parallel	|| 1);
+		node.brightness = (n.brightness || 100);
+		node.mapping	= (n.mapping	|| "adafruit-hat-pwm");
+
+
 
 
 		//if led is undefined we create a new one
 		if(!led)
 		{
-			led = new Matrix( parseInt(this.width), parseInt(this.height), parseInt(this.parallel), parseInt(this.chained), parseInt(this.brightness), this.mapping);
+			led = new Matrix( parseInt(node.width), parseInt(node.height), parseInt(node.parallel), parseInt(node.chained), parseInt(node.brightness), node.mapping);
+			nodeRegister = new Set();
 		}
 
 		//otherwise we clear the one we have, without these checks it can spawn new evertime we deploy
@@ -64,6 +70,7 @@ module.exports = function(RED) {
 		{
 			led.clear();
 			led.update();
+			nodeRegister = new Set();
 		}
 
 	}
@@ -77,6 +84,17 @@ module.exports = function(RED) {
 	{
 		RED.nodes.createNode(this, config);
 		var node = this;
+		var outputInfo;
+
+		node.draw = function ()
+		{
+			if( outputInfo != undefined)
+			{
+				let o = outputInfo;
+				led.setPixel( o.x, o.y, o.r, o.g, o.b);
+			}
+		}
+
 
 		node.on('input', function(msg)
 		{
@@ -90,7 +108,16 @@ module.exports = function(RED) {
 					node.error("your pixel csv doesn't seem correct:", vals);
 				}
 
-				led.setPixel(parseInt(vals[0]), parseInt(vals[1]), parseInt(vals[2]), parseInt(vals[3]), parseInt(vals[4]));
+				outputInfo =
+					{
+						x: parseInt(vals[0]),
+						y: parseInt(vals[1]),
+						r: parseInt(vals[2]),
+						g: parseInt(vals[3]),
+						b: parseInt(vals[4]),
+					};
+
+			//	led.setPixel(parseInt(vals[0]), parseInt(vals[1]), parseInt(vals[2]), parseInt(vals[3]), parseInt(vals[4]));
 				return;
 			}
 
@@ -117,6 +144,11 @@ module.exports = function(RED) {
 
 		node.on('input', function(msg)
 		{
+			for( let n of nodeRegister)
+			{
+				n.draw();
+			}
+
 			//if the payload isn't null or false push the buffer
 			if(msg.payload)
 			{
@@ -146,6 +178,19 @@ module.exports = function(RED) {
 		var lastX;
 		var lastY;
 
+		node.draw = function ()
+		{
+			if(output != undefined)
+			{
+				for(var i = 0; i < output.length; i++)
+				{
+					let payload = output[i].payload;
+					led.setPixel( parseInt(payload.x), parseInt(payload.y), parseInt(payload.r), parseInt(payload.g), parseInt(payload.b));
+				}
+			}
+		}
+
+
 		//function to actually send the output to the next node
 		function readySend ()
 		{
@@ -157,11 +202,15 @@ module.exports = function(RED) {
 			//
 			//node.send([output]);
 			//instead of sending it out we're not just processing it in place here to match the text node
+			/*
 			for(var i = 0; i < output.length; i++)
 			{
 				let payload = output[i].payload;
 				led.setPixel( parseInt(payload.x), parseInt(payload.y), parseInt(payload.r), parseInt(payload.g), parseInt(payload.b));
 			}
+			*/
+
+			nodeRegister.add(node);
 		}
 
 		//function that takes a file, and an offset and tries to convert the file into a stream of pixels
@@ -271,20 +320,44 @@ module.exports = function(RED) {
 		node.rgb		= config.rgb;
 
 
+		var lastMsg;
+		var outputInfo;
+
+		node.draw = function ()
+		{
+			if(outputInfo != undefined)
+			{
+				let color = eatRGBString(outputInfo.rgb);
+				led.drawText(parseInt(outputInfo.x), parseInt(outputInfo.y), outputInfo.data, node.font, parseInt(color.r), parseInt(color.g), parseInt(color.b));
+			}
+		}
 
 
 		node.on('input', function(msg)
 		{
-			var x		= msg.payload.xOffset ? msg.payload.xOffset : node.xOffset;
-			var y		= msg.payload.yOffset ? msg.payload.yOffset : node.yOffset;
-			var data	= msg.payload.data	  || msg.payload;
-			var rgb		= msg.payload.rgb	  || node.rgb;
-
 			if(msg.payload)
 			{
-				var color = eatRGBString(rgb);
+				if(lastMsg != undefined)
+				{
+					if(lastMsg != msg)
+					{
+						outputInfo.rgb = "000,000,000";
+						node.draw();
+					}
+				}
 
-				led.drawText(parseInt(x), parseInt(y), data, node.font, parseInt(color.r), parseInt(color.g), parseInt(color.b));
+
+				outputInfo =
+				{
+					x : msg.payload.xOffset ? msg.payload.xOffset : node.xOffset,
+					y : msg.payload.yOffset ? msg.payload.yOffset : node.yOffset,
+					data : msg.payload.data	  || msg.payload,
+					rgb: msg.payload.rgb	  || node.rgb,
+				};
+
+				lastMsg = msg;
+
+				nodeRegister.add(node);
 			}
 		});
 	}
@@ -348,17 +421,42 @@ module.exports = function(RED) {
 	{
 		RED.nodes.createNode(this, config);
 		var node = this;
+		var outputInfo;
 
 		node.xPos	 = (config.xPos   || 0);
 		node.yPos	 = (config.yPos	  || 0);
 		node.radius	 = (config.radius || 0);
 		node.rgb	 = (config.rgb    || "255,255,255");
 
+		node.draw = function()
+		{
+			if (outputInfo != undefined)
+			{
+				let o = outputInfo;
+				led.drawCircle( o.xPos, o.yPos, o.radius, o.color.r, o.color.g, o.color.b);
+			}
+		}
+
+
+
 		node.on('input', function (msg)
 		{
-			var color = eatRGBString(node.rgb);
-			led.drawCircle( parseInt(node.xPos), parseInt(node.yPos), parseInt(node.radius), parseInt(color.r), parseInt(color.g), parseInt(color.b));
+			var data   = msg.payload.data != undefined ? msg.payload.data : msg;
+
+		//	node.log(data.xPos);
+
+			outputInfo =
+			{
+				color  : data.rgb	 != undefined   ? eatRGBString(data.rgb) : eatRGBString(node.rgb),
+				yPos   : data.yPos	 != undefined   ? parseInt(data.yPos)    : parseInt(node.yPos),
+				xPos   : data.xPos	 != undefined   ? parseInt(data.xPos)    : parseInt(node.xPos),
+				radius : data.radius != undefined   ? parseInt(data.radius)  : parseInt(node.radius),
+			};
+
+			nodeRegister.add(node);
+			//led.drawCircle( xPos, yPos, radius, color.r, color.g, color.b);
 		});
+
 	};
 
 	function LineToMatrix (config)
@@ -392,14 +490,23 @@ module.exports = function(RED) {
 		node.y1Pos = (config.y1Pos || 0);
 		node.x2Pos = (config.x2Pos || 0);
 		node.y2Pos = (config.y2Pos || 0);
-		node.rgb   = (config.rgb || "255,255,255");
+		node.rgb   = (config.rgb   || "255,255,255");
+
+		node.draw = function ()
+		{
+
+			var color = eatRGBString(node.rgb);
+			led.drawLine( parseInt(node.x0Pos), parseInt(node.y0Pos), parseInt(node.x1Pos), parseInt(node.y1Pos), parseInt(color.r), parseInt(color.g), parseInt(color.b));
+		}
+
 
 		node.on('input', function (msg)
 		{
+			nodeRegister.add(node);
+			/*
 			var color = eatRGBString(node.rgb);
 			led.drawLine( parseInt(node.x0Pos), parseInt(node.y0Pos), parseInt(node.x1Pos), parseInt(node.y1Pos), parseInt(color.r), parseInt(color.g), parseInt(color.b));
-			led.drawLine( parseInt(node.x1Pos), parseInt(node.y1Pos), parseInt(node.x2Pos), parseInt(node.y2Pos), parseInt(color.r), parseInt(color.g), parseInt(color.b));
-			led.drawLine( parseInt(node.x2Pos), parseInt(node.y2Pos), parseInt(node.x0Pos), parseInt(node.y0Pos), parseInt(color.r), parseInt(color.g), parseInt(color.b));
+			*/
 		});
 
 
