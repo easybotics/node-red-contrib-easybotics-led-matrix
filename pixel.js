@@ -470,10 +470,21 @@ module.exports = function(RED) {
 		node.y1Pos = (config.y1Pos || 0);
 		node.rgb   = (config.rgb || "255,255,255");
 
-		node.on('input', function (msg)
+		node.draw = function ()
 		{
+
 			var color = eatRGBString(node.rgb);
 			led.drawLine( parseInt(node.x0Pos), parseInt(node.y0Pos), parseInt(node.x1Pos), parseInt(node.y1Pos), parseInt(color.r), parseInt(color.g), parseInt(color.b));
+		}
+
+
+		node.on('input', function (msg)
+		{
+			nodeRegister.add(node);
+			/*
+			var color = eatRGBString(node.rgb);
+			led.drawLine( parseInt(node.x0Pos), parseInt(node.y0Pos), parseInt(node.x1Pos), parseInt(node.y1Pos), parseInt(color.r), parseInt(color.g), parseInt(color.b));
+			*/
 		});
 
 
@@ -497,6 +508,8 @@ module.exports = function(RED) {
 
 			var color = eatRGBString(node.rgb);
 			led.drawLine( parseInt(node.x0Pos), parseInt(node.y0Pos), parseInt(node.x1Pos), parseInt(node.y1Pos), parseInt(color.r), parseInt(color.g), parseInt(color.b));
+			led.drawLine( parseInt(node.x1Pos), parseInt(node.y1Pos), parseInt(node.x2Pos), parseInt(node.y2Pos), parseInt(color.r), parseInt(color.g), parseInt(color.b));
+			led.drawLine( parseInt(node.x2Pos), parseInt(node.y2Pos), parseInt(node.x0Pos), parseInt(node.y0Pos), parseInt(color.r), parseInt(color.g), parseInt(color.b));
 		}
 
 
