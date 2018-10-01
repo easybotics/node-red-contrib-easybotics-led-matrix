@@ -320,6 +320,7 @@ module.exports = function(RED) {
 		node.rgb		= config.rgb; 
 
 
+		var lastMsg;
 		var outputInfo;
 
 		node.draw = function ()
@@ -332,11 +333,20 @@ module.exports = function(RED) {
 		}
 
 
-
 		node.on('input', function(msg) 
 		{
 			if(msg.payload)
 			{
+				if(lastMsg != undefined)
+				{
+					if(lastMsg != msg)
+					{
+						outputInfo.rgb = "000,000,000";
+						node.draw();
+					}
+				}
+
+						
 				outputInfo = 
 				{
 					x : msg.payload.xOffset ? msg.payload.xOffset : node.xOffset, 
@@ -344,6 +354,8 @@ module.exports = function(RED) {
 					data : msg.payload.data	  || msg.payload, 
 					rgb: msg.payload.rgb	  || node.rgb,
 				};
+
+				lastMsg = msg;
 
 				nodeRegister.add(node); 
 			}
@@ -433,7 +445,7 @@ module.exports = function(RED) {
 
 		//	node.log(data.xPos);
 
-			var outputInfo = 
+			outputInfo = 
 			{
 				color  : data.rgb	 != undefined   ? eatRGBString(data.rgb) : eatRGBString(node.rgb),
 				yPos   : data.yPos	 != undefined   ? parseInt(data.yPos)    : parseInt(node.yPos), 
@@ -458,10 +470,21 @@ module.exports = function(RED) {
 		node.y1Pos = (config.y1Pos || 0);
 		node.rgb   = (config.rgb   || "255,255,255");
 
-		node.on('input', function (msg) 
+		node.draw = function ()
 		{
+
 			var color = eatRGBString(node.rgb);
 			led.drawLine( parseInt(node.x0Pos), parseInt(node.y0Pos), parseInt(node.x1Pos), parseInt(node.y1Pos), parseInt(color.r), parseInt(color.g), parseInt(color.b));
+		}
+
+
+		node.on('input', function (msg) 
+		{
+			nodeRegister.add(node);
+			/*
+			var color = eatRGBString(node.rgb);
+			led.drawLine( parseInt(node.x0Pos), parseInt(node.y0Pos), parseInt(node.x1Pos), parseInt(node.y1Pos), parseInt(color.r), parseInt(color.g), parseInt(color.b));
+			*/
 		});
 
 
