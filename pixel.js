@@ -356,9 +356,18 @@ module.exports = function(RED) {
 
 		node.on('input', function (msg) 
 		{
-			var color = eatRGBString(node.rgb);
-			led.drawCircle( parseInt(node.xPos), parseInt(node.yPos), parseInt(node.radius), parseInt(color.r), parseInt(color.g), parseInt(color.b));
+			var data   = msg.payload.data != undefined ? msg.payload.data : msg;
+
+		//	node.log(data.xPos);
+
+			var color  = data.rgb	 != undefined   ? eatRGBString(data.rgb) : eatRGBString(node.rgb);
+			var yPos   = data.yPos	 != undefined   ? parseInt(data.yPos)    : parseInt(node.yPos); 
+			var xPos   = data.xPos	 != undefined   ? parseInt(data.xPos)    : parseInt(node.xPos); 
+			var radius = data.radius != undefined   ? parseInt(data.radius)  : parseInt(node.radius);
+
+			led.drawCircle( xPos, yPos, radius, color.r, color.g, color.b);
 		});
+
 	};
 
 	function LineToMatrix (config)
@@ -370,7 +379,7 @@ module.exports = function(RED) {
 		node.y0Pos = (config.y0Pos || 0);
 		node.x1Pos = (config.x1Pos || 0);
 		node.y1Pos = (config.y1Pos || 0);
-		node.rgb   = (config.rgb || "255,255,255");
+		node.rgb   = (config.rgb   || "255,255,255");
 
 		node.on('input', function (msg) 
 		{
