@@ -7,6 +7,7 @@ var getPixels	= require('get-pixels');
 module.exports = function(RED) {
 
 	var led;
+	var nodeRegister;
 
 	/* 
 	 * a config node that holds global state for the led matrix 
@@ -43,20 +44,25 @@ module.exports = function(RED) {
 	{
 		RED.nodes.createNode(this, n);
 
+		var node = this;
+
 		//get the field settings, these inputs are defined in the html 
 		
-		this.width		= (n.width		|| 64); 
-		this.height		= (n.height		|| 64); 
-		this.chained	= (n.chained	|| 2); 
-		this.parallel	= (n.parallel	|| 1);
-		this.brightness = (n.brightness || 100); 
-		this.mapping	= (n.mapping	|| "adafruit-hat-pwm");
+		node.width		= (n.width		|| 64); 
+		node.height		= (n.height		|| 64); 
+		node.chained	= (n.chained	|| 2); 
+		node.parallel	= (n.parallel	|| 1);
+		node.brightness = (n.brightness || 100); 
+		node.mapping	= (n.mapping	|| "adafruit-hat-pwm");
+
+
 
 
 		//if led is undefined we create a new one
 		if(!led) 
 		{
-			led = new Matrix( parseInt(this.width), parseInt(this.height), parseInt(this.parallel), parseInt(this.chained), parseInt(this.brightness), this.mapping);
+			led = new Matrix( parseInt(node.width), parseInt(node.height), parseInt(node.parallel), parseInt(node.chained), parseInt(node.brightness), node.mapping);
+			nodeRegister = new Set();
 		}
 
 		//otherwise we clear the one we have, without these checks it can spawn new evertime we deploy 
@@ -64,6 +70,7 @@ module.exports = function(RED) {
 		{
 			led.clear();
 			led.update(); 
+			nodeRegister = new Set();
 		}
 
 	}
@@ -117,6 +124,12 @@ module.exports = function(RED) {
 
 		node.on('input', function(msg) 
 		{
+			for( let n of nodeRegister) 
+			{
+				node.log(n.font);
+				n.draw();
+			}
+
 			//if the payload isn't null or false push the buffer 
 			if(msg.payload) 
 			{
@@ -269,22 +282,34 @@ module.exports = function(RED) {
 		node.xOffset	= config.xOffset; 
 		node.yOffset	= config.yOffset; 
 		node.rgb		= config.rgb; 
-		
+
+
+		var outputInfo;
+
+		node.draw = function ()
+		{
+			if(outputInfo != undefined)
+			{
+				let color = eatRGBString(outputInfo.rgb);
+				led.drawText(parseInt(outputInfo.x), parseInt(outputInfo.y), outputInfo.data, node.font, parseInt(color.r), parseInt(color.g), parseInt(color.b)); 
+			}
+		}
 
 
 
 		node.on('input', function(msg) 
 		{
-			var x		= msg.payload.xOffset ? msg.payload.xOffset : node.xOffset; 
-			var y		= msg.payload.yOffset ? msg.payload.yOffset : node.yOffset; 
-			var data	= msg.payload.data	  || msg.payload; 
-			var rgb		= msg.payload.rgb	  || node.rgb;
-
 			if(msg.payload)
 			{
-				var color = eatRGBString(rgb);
+				outputInfo = 
+				{
+					x : msg.payload.xOffset ? msg.payload.xOffset : node.xOffset, 
+					y : msg.payload.yOffset ? msg.payload.yOffset : node.yOffset, 
+					data : msg.payload.data	  || msg.payload, 
+					rgb: msg.payload.rgb	  || node.rgb,
+				};
 
-				led.drawText(parseInt(x), parseInt(y), data, node.font, parseInt(color.r), parseInt(color.g), parseInt(color.b)); 
+				nodeRegister.add(node); 
 			}
 		}); 
 	}
