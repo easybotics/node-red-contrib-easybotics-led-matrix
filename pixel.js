@@ -144,16 +144,15 @@ module.exports = function(RED) {
 
 		node.on('input', function(msg) 
 		{
+
+			led.clear();
+
 			for( let n of nodeRegister) 
 			{
 				n.draw();
 			}
-
-			//if the payload isn't null or false push the buffer 
-			if(msg.payload) 
-			{
-				led.update(); 
-			}
+		
+			led.update(); 
 		}); 
 	}
 
@@ -493,9 +492,9 @@ module.exports = function(RED) {
 
 	//register our functions with node-red 
 	RED.nodes.registerType("led-matrix", LedMatrix);
-	RED.nodes.registerType("clear-matrix", ClearMatrix);
-	RED.nodes.registerType("pixel", PixelNode);
+//	RED.nodes.registerType("clear-matrix", ClearMatrix);
 	RED.nodes.registerType("refresh-matrix", RefreshMatrix);
+	RED.nodes.registerType("pixel", PixelNode);
 	RED.nodes.registerType("image-to-matrix", ImageToPixels);
 	RED.nodes.registerType("text-to-matrix", Text); 
 	RED.nodes.registerType("pixel-transform", PixelDataTransform);
