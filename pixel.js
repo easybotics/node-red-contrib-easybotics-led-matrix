@@ -409,11 +409,23 @@ module.exports = function(RED) {
 	{
 		RED.nodes.createNode(this, config);
 		var node = this; 
+		var outputInfo; 
 
 		node.xPos	 = (config.xPos   || 0); 
 		node.yPos	 = (config.yPos	  || 0); 
 		node.radius	 = (config.radius || 0); 
 		node.rgb	 = (config.rgb    || "255,255,255");
+
+		node.draw = function() 
+		{
+			if (outputInfo != undefined)
+			{
+				let o = outputInfo;
+				led.drawCircle( o.xPos, o.yPos, o.radius, o.color.r, o.color.g, o.color.b);
+			}
+		}
+ 
+
 
 		node.on('input', function (msg) 
 		{
@@ -421,12 +433,16 @@ module.exports = function(RED) {
 
 		//	node.log(data.xPos);
 
-			var color  = data.rgb	 != undefined   ? eatRGBString(data.rgb) : eatRGBString(node.rgb);
-			var yPos   = data.yPos	 != undefined   ? parseInt(data.yPos)    : parseInt(node.yPos); 
-			var xPos   = data.xPos	 != undefined   ? parseInt(data.xPos)    : parseInt(node.xPos); 
-			var radius = data.radius != undefined   ? parseInt(data.radius)  : parseInt(node.radius);
+			var outputInfo = 
+			{
+				color  : data.rgb	 != undefined   ? eatRGBString(data.rgb) : eatRGBString(node.rgb),
+				yPos   : data.yPos	 != undefined   ? parseInt(data.yPos)    : parseInt(node.yPos), 
+				xPos   : data.xPos	 != undefined   ? parseInt(data.xPos)    : parseInt(node.xPos), 
+				radius : data.radius != undefined   ? parseInt(data.radius)  : parseInt(node.radius),
+			};
 
-			led.drawCircle( xPos, yPos, radius, color.r, color.g, color.b);
+			nodeRegister.add(node);
+			//led.drawCircle( xPos, yPos, radius, color.r, color.g, color.b);
 		});
 
 	};
