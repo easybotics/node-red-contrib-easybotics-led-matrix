@@ -488,6 +488,11 @@ module.exports = function(RED) {
 
 	};
 
+
+	/*
+	 * node that draws a triangle to the screen 
+	 */ 
+
 	function TriangleToMatrix (config)
 	{
 		RED.nodes.createNode(this, config);
@@ -514,8 +519,6 @@ module.exports = function(RED) {
 			//need to update to take a csv and an .data object, see circle node
 			nodeRegister.add(node);
 		});
-
-
 	};
 
 
