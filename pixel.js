@@ -1,5 +1,5 @@
 var Matrix		= require('node-rpi-rgb-led-matrix')
-var getPixels	= require('get-pixels'); 
+var getPixels	= require('get-pixels');
 
 
 //var led = new LedMatrix(64, 64, 1, 2, "adafruit-hat-pwm");
@@ -10,9 +10,9 @@ module.exports = function(RED) {
 	var nodeRegister;
 
 
-	/* 
-	 * some functions for parsing color strings, between html hex values and rgb values 
-	 */ 
+	/*
+	 * some functions for parsing color strings, between html hex values and rgb values
+	 */
 	function eatRGBString (str)
 	{
 		const s = str.split(',');
@@ -21,12 +21,12 @@ module.exports = function(RED) {
 		return output;
 	}
 
-	function eatHexString (hex) 
+	function eatHexString (hex)
 	{
 		// Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
 		const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
 
-		hex = hex.replace(shorthandRegex, function(m, r, g, b) 
+		hex = hex.replace(shorthandRegex, function(m, r, g, b)
 			  {
 					return r + r + g + g + b + b;
 			  });
@@ -36,63 +36,63 @@ module.exports = function(RED) {
 	}
 
 
-	/* 
-	 * a config node that holds global state for the led matrix 
-	 * nodes that want to use the hardware will hook into an instance of this 
-	 * but right now it uses global var 'led' meaning its limited to one hardware output per flow 
-	 */ 
-	function LedMatrix(n) 
+	/*
+	 * a config node that holds global state for the led matrix
+	 * nodes that want to use the hardware will hook into an instance of this
+	 * but right now it uses global var 'led' meaning its limited to one hardware output per flow
+	 */
+	function LedMatrix(n)
 	{
 		RED.nodes.createNode(this, n);
 		const node = this;
 
-		//get the field settings, these inputs are defined in the html 
-		node.width		= (n.width		|| 64); 
-		node.height		= (n.height		|| 64); 
-		node.chained	= (n.chained	|| 2); 
+		//get the field settings, these inputs are defined in the html
+		node.width		= (n.width		|| 64);
+		node.height		= (n.height		|| 64);
+		node.chained	= (n.chained	|| 2);
 		node.parallel	= (n.parallel	|| 1);
-		node.brightness = (n.brightness || 100); 
+		node.brightness = (n.brightness || 100);
 		node.mapping	= (n.mapping	|| "adafruit-hat-pwm");
 
 		//if led is undefined we create a new one
-		if(!led) 
+		if(!led)
 		{
 			led = new Matrix( parseInt(node.width), parseInt(node.height), parseInt(node.parallel), parseInt(node.chained), parseInt(node.brightness), node.mapping);
 			nodeRegister = new Set();
 		}
 
-		//otherwise we clear the one we have, without these checks it can spawn new evertime we deploy 
-		if(led) 
+		//otherwise we clear the one we have, without these checks it can spawn new evertime we deploy
+		if(led)
 		{
 			led.clear();
-			led.update(); 
+			led.update();
 			nodeRegister = new Set();
 		}
 	}
 
 
-	/* 
-	 * this node takes a pixel object and sticks it on the canvas 
-	 * it won't show up until you update the display, but we might alter this control flow 
-	 */ 
-	function PixelNode (config) 
+	/*
+	 * this node takes a pixel object and sticks it on the canvas
+	 * it won't show up until you update the display, but we might alter this control flow
+	 */
+	function PixelNode (config)
 	{
-		RED.nodes.createNode(this, config); 
-		const node = this; 
+		RED.nodes.createNode(this, config);
+		const node = this;
 		var outputInfo;
 
 		node.draw = function ()
 		{
 			if( outputInfo != undefined)
 			{
-				const o = outputInfo; 
+				const o = outputInfo;
 				led.setPixel( o.x, o.y, o.r, o.g, o.b);
 			}
 		}
 
-		node.on('input', function (msg) 
-		{ 
-			//if someone injects a string then split it on comas and try and feat it to the matrix 
+		node.on('input', function (msg)
+		{
+			//if someone injects a string then split it on comas and try and feat it to the matrix
 			if(typeof msg.payload == "string")
 			{
 				const vals = msg.payload.split(',');
@@ -101,29 +101,29 @@ module.exports = function(RED) {
 					node.error("your pixel csv doesn't seem correct:", vals);
 				}
 
-				outputInfo = 
+				outputInfo =
 					{
-						x: parseInt(vals[0]), 
-						y: parseInt(vals[1]), 
-						r: parseInt(vals[2]), 
-						g: parseInt(vals[3]), 
-						b: parseInt(vals[4]), 
+						x: parseInt(vals[0]),
+						y: parseInt(vals[1]),
+						r: parseInt(vals[2]),
+						g: parseInt(vals[3]),
+						b: parseInt(vals[4]),
 					};
 
 				return;
 			}
 
-			//but normally we want to use a javascript object 
-			//here we do some crude javascript type checking 
+			//but normally we want to use a javascript object
+			//here we do some crude javascript type checking
 			if(msg.payload.x && msg.payload.y && msg.payload.r && msg.payload.g && msg.payload.b)
 			{
-				outputInfo = 
+				outputInfo =
 					{
-						x: parseInt(msg.payload.x), 
-						y: parseInt(msg.payload.y), 
-						r: parseInt(msg.payload.r), 
-						g: parseInt(msg.payload.g), 
-						b: parseInt(msg.payload.b), 
+						x: parseInt(msg.payload.x),
+						y: parseInt(msg.payload.y),
+						r: parseInt(msg.payload.r),
+						g: parseInt(msg.payload.g),
+						b: parseInt(msg.payload.b),
 					};
 
 				return;
@@ -133,50 +133,50 @@ module.exports = function(RED) {
 	}
 
 
-	/* 
-	 * this node pushes the frame buffer to the hardware 
-	 * faster than updating after every pixel change 
-	 */ 
+	/*
+	 * this node pushes the frame buffer to the hardware
+	 * faster than updating after every pixel change
+	 */
 	function RefreshMatrix (config)
 	{
-		RED.nodes.createNode(this, config); 
-		const node = this; 
+		RED.nodes.createNode(this, config);
+		const node = this;
 
-		node.on('input', function(msg) 
+		node.on('input', function(msg)
 		{
 			led.clear();
 
-			for(let n of nodeRegister) 
+			for(let n of nodeRegister)
 			{
 				n.draw();
 			}
-		
-			led.update(); 
-		}); 
+
+			led.update();
+		});
 	}
 
 
-	/* 
-	 * takes a url and turns it into an array of pixel objects 
-	 * instead of sending a buffer, it uses the node.send() method 
-	 * overload for an array, meaning it in effect calls its output over and over again 
-	 */ 
-	function ImageToPixels (config) 
+	/*
+	 * takes a url and turns it into an array of pixel objects
+	 * instead of sending a buffer, it uses the node.send() method
+	 * overload for an array, meaning it in effect calls its output over and over again
+	 */
+	function ImageToPixels (config)
 	{
-		RED.nodes.createNode(this, config); 
-		const node = this; 
+		RED.nodes.createNode(this, config);
+		const node = this;
 
-		node.xOffset = config.xOffset; 
-		node.yOffset = config.yOffset; 
+		node.xOffset = config.xOffset;
+		node.yOffset = config.yOffset;
 
-		//filename or URL to look for an image 
-		//and an array we will will with pixels 
+		//filename or URL to look for an image
+		//and an array we will will with pixels
 		var output;
 		var lastSent;
 		var lastX;
 		var lastY;
 
-		node.draw = function () 
+		node.draw = function ()
 		{
 			if(output != undefined)
 			{
@@ -188,16 +188,16 @@ module.exports = function(RED) {
 			}
 		}
 
-		//function to actually send the output to the next node 
-		function readySend () 
+		//function to actually send the output to the next node
+		function readySend ()
 		{
 			//console.log("sending pixels");
-			
-			//see node-red docmentation for how node.send treats arrays 
-			//node.send(output) would send one pixel to n outputs 
-			//node.send([output], true) sends the pixiels to output 1, and true to output 2 
+
+			//see node-red docmentation for how node.send treats arrays
+			//node.send(output) would send one pixel to n outputs
+			//node.send([output], true) sends the pixiels to output 1, and true to output 2
 			//
-			//node.send([output]); 
+			//node.send([output]);
 			//instead of sending it out we're not just processing it in place here to match the text node
 			/*
 			for(var i = 0; i < output.length; i++)
@@ -210,30 +210,30 @@ module.exports = function(RED) {
 			nodeRegister.add(node);
 		}
 
-		//function that takes a file, and an offset and tries to convert the file into a stream of pixels 
+		//function that takes a file, and an offset and tries to convert the file into a stream of pixels
 		function createPixelStream (file, xOffset, yOffset)
 		{
-			getPixels(file, function(err, pixels) 
+			getPixels(file, function(err, pixels)
 			{
 				if(!pixels)
 				{
 					node.error("image did not convert correctly\n please check the url or file location");
 					return;
 				}
-				//empties the array before we start 
+				//empties the array before we start
 				output = [];
 				const width  = Math.min( 128, pixels.shape[0]);
 				const height = Math.min( 64,  pixels.shape[1]);
 
-				//loop over the 2d array of pixels returned by getPixels 
-				for(let x = 0; x < width; x++) 
+				//loop over the 2d array of pixels returned by getPixels
+				for(let x = 0; x < width; x++)
 				{
 					for(let y = 0; y < height; y++)
 					{
-						//make sure the array actually contains data for this location 
+						//make sure the array actually contains data for this location
 						if(pixels.get(x,y,0))
 						{
-							//push pixels to the output buffer 
+							//push pixels to the output buffer
 							//console.log(x);
 							//console.log(y);
 							output.push({payload: { x: x + xOffset, y: y + yOffset, r:pixels.get(x,y,0), g:pixels.get(x,y,1), b:pixels.get(x,y,2)} });
@@ -241,13 +241,13 @@ module.exports = function(RED) {
 					}
 				}
 
-				//call our send function from earlier 
+				//call our send function from earlier
 				readySend();
 			})
 		}
 
 		//if we receive input
-		node.on('input', function(msg) 
+		node.on('input', function(msg)
 		{
 			if(!msg.payload)
 			{
@@ -288,34 +288,34 @@ module.exports = function(RED) {
 	}
 
 
-	//clears our internal framebuffer, doesn't clear the hardware buffer though 
-	function ClearMatrix (config) 
+	//clears our internal framebuffer, doesn't clear the hardware buffer though
+	function ClearMatrix (config)
 	{
-		RED.nodes.createNode(this, config); 
-		const node = this; 
+		RED.nodes.createNode(this, config);
+		const node = this;
 
-		node.on('input', function(msg) 
+		node.on('input', function(msg)
 		{
-			if(msg.payload) 
+			if(msg.payload)
 			{
-				led.clear(); 
+				led.clear();
 			}
-		}); 
+		});
 	}
 
 
 	/*
-	 * draws text to the buffer, if updated it tries to erease its previous drawing first 
-	 */ 
-	function Text (config) 
+	 * draws text to the buffer, if updated it tries to erease its previous drawing first
+	 */
+	function Text (config)
 	{
-		RED.nodes.createNode(this, config); 
-		var node = this; 
+		RED.nodes.createNode(this, config);
+		var node = this;
 
 		node.font		= config.font;
-		node.xOffset	= config.xOffset; 
-		node.yOffset	= config.yOffset; 
-		node.rgb		= config.rgb; 
+		node.xOffset	= config.xOffset;
+		node.yOffset	= config.yOffset;
+		node.rgb		= config.rgb;
 
 		var lastMsg;
 		var outputInfo;
@@ -325,11 +325,11 @@ module.exports = function(RED) {
 			if(outputInfo != undefined)
 			{
 				let color = eatRGBString(outputInfo.rgb);
-				led.drawText(parseInt(outputInfo.x), parseInt(outputInfo.y), outputInfo.data, node.font, parseInt(color.r), parseInt(color.g), parseInt(color.b)); 
+				led.drawText(parseInt(outputInfo.x), parseInt(outputInfo.y), outputInfo.data, node.font, parseInt(color.r), parseInt(color.g), parseInt(color.b));
 			}
 		}
 
-		node.on('input', function(msg) 
+		node.on('input', function(msg)
 		{
 			if(msg.payload)
 			{
@@ -342,68 +342,68 @@ module.exports = function(RED) {
 					}
 				}
 
-				outputInfo = 
+				outputInfo =
 				{
-					x : msg.payload.xOffset ? msg.payload.xOffset : node.xOffset, 
-					y : msg.payload.yOffset ? msg.payload.yOffset : node.yOffset, 
-					data : msg.payload.data	  || msg.payload, 
+					x : msg.payload.xOffset ? msg.payload.xOffset : node.xOffset,
+					y : msg.payload.yOffset ? msg.payload.yOffset : node.yOffset,
+					data : msg.payload.data	  || msg.payload,
 					rgb: msg.payload.rgb	  || node.rgb,
 				};
 
 				lastMsg = msg;
-				nodeRegister.add(node); 
+				nodeRegister.add(node);
 			}
-		}); 
+		});
 	}
 
 
 	/*
-	 * node to create and modify .data objects we send to different display nodes 
+	 * node to create and modify .data objects we send to different display nodes
 	 */
 	function PixelDataTransform (config)
 	{
-		RED.nodes.createNode(this, config); 
-		const node = this; 
+		RED.nodes.createNode(this, config);
+		const node = this;
 
-		node.xOffset = (config.xOffset || 0); 
-		node.yOffset = (config.yOffset || 0); 
-		node.refresh = (config.refresh || 0); 
+		node.xOffset = (config.xOffset || 0);
+		node.yOffset = (config.yOffset || 0);
+		node.refresh = (config.refresh || 0);
 		node.rgb	 = (config.rgb     || "255,255,255");
 
-		function outputFromString (msg) 
+		function outputFromString (msg)
 		{
-			const output = 
+			const output =
 			{
 				data:    msg.payload,
-				xOffset: parseInt(node.xOffset), 
-				yOffset: parseInt(node.yOffset), 
-				refresh: parseInt(node.refresh), 
+				xOffset: parseInt(node.xOffset),
+				yOffset: parseInt(node.yOffset),
+				refresh: parseInt(node.refresh),
 				rgb:	 node.rgb,
-		
-			} 
+
+			}
 
 			msg.payload = output;
-			node.send( msg); 
+			node.send( msg);
 		}
 
-		function outputFromObject (msg) 
+		function outputFromObject (msg)
 		{
-			const output = 
+			const output =
 			{
 				data:    msg.payload.data,
-				xOffset: parseInt(node.xOffset), 
-				yOffset: parseInt(node.yOffset), 
-				refresh: parseInt(node.refresh), 
+				xOffset: parseInt(node.xOffset),
+				yOffset: parseInt(node.yOffset),
+				refresh: parseInt(node.refresh),
 				rgb    : node.rgb,
 
-			} 
+			}
 
 			msg.payload = output;
-			node.send( msg); 
+			node.send( msg);
 
 		}
 
-		node.on('input', function(msg) 
+		node.on('input', function(msg)
 		{
 			if (typeof msg.payload == "string")
 			{
@@ -416,20 +416,20 @@ module.exports = function(RED) {
 
 
 	/*
-	 * node to print a circle to the matrix buffer 
+	 * node to print a circle to the matrix buffer
 	 */
 	function CircleToMatrix (config)
 	{
 		RED.nodes.createNode(this, config);
-		const node = this; 
-		var outputInfo; 
+		const node = this;
+		var outputInfo;
 
-		node.xPos	 = (config.xPos   || 0); 
-		node.yPos	 = (config.yPos	  || 0); 
-		node.radius	 = (config.radius || 0); 
+		node.xPos	 = (config.xPos   || 0);
+		node.yPos	 = (config.yPos	  || 0);
+		node.radius	 = (config.radius || 0);
 		node.rgb	 = (config.rgb    || "255,255,255");
 
-		node.draw = function() 
+		node.draw = function()
 		{
 			if (outputInfo != undefined)
 			{
@@ -437,15 +437,15 @@ module.exports = function(RED) {
 				led.drawCircle( o.xPos, o.yPos, o.radius, o.color.r, o.color.g, o.color.b);
 			}
 		}
- 
-		node.on('input', function (msg) 
+
+		node.on('input', function (msg)
 		{
 			const data   = msg.payload.data != undefined ? msg.payload.data : msg;
-			outputInfo = 
+			outputInfo =
 			{
 				color  : data.rgb	 != undefined   ? eatRGBString(data.rgb) : eatRGBString(node.rgb),
-				yPos   : data.yPos	 != undefined   ? parseInt(data.yPos)    : parseInt(node.yPos), 
-				xPos   : data.xPos	 != undefined   ? parseInt(data.xPos)    : parseInt(node.xPos), 
+				yPos   : data.yPos	 != undefined   ? parseInt(data.yPos)    : parseInt(node.yPos),
+				xPos   : data.xPos	 != undefined   ? parseInt(data.xPos)    : parseInt(node.xPos),
 				radius : data.radius != undefined   ? parseInt(data.radius)  : parseInt(node.radius),
 			};
 
@@ -454,27 +454,62 @@ module.exports = function(RED) {
 	};
 
 
-	/* 
-	 * draws a line to the matrix buffer 
-	 */ 
+	/*
+	 * draws a line to the matrix buffer
+	 */
 	function LineToMatrix (config)
 	{
-		RED.nodes.createNode(this, config); 
+		RED.nodes.createNode(this, config);
 		const node = this;
 
 		node.x0Pos = (config.x0Pos || 0);
 		node.y0Pos = (config.y0Pos || 0);
 		node.x1Pos = (config.x1Pos || 0);
 		node.y1Pos = (config.y1Pos || 0);
+		node.rgb   = (config.rgb || "255,255,255");
+
+		node.draw = function ()
+		{
+
+			var color = eatRGBString(node.rgb);
+			led.drawLine( parseInt(node.x0Pos), parseInt(node.y0Pos), parseInt(node.x1Pos), parseInt(node.y1Pos), parseInt(color.r), parseInt(color.g), parseInt(color.b));
+		}
+
+
+		node.on('input', function (msg)
+		{
+			nodeRegister.add(node);
+			/*
+			var color = eatRGBString(node.rgb);
+			led.drawLine( parseInt(node.x0Pos), parseInt(node.y0Pos), parseInt(node.x1Pos), parseInt(node.y1Pos), parseInt(color.r), parseInt(color.g), parseInt(color.b));
+			*/
+		});
+
+
+	};
+
+	function TriangleToMatrix (config)
+	{
+		RED.nodes.createNode(this, config);
+		const node = this;
+
+		node.x0Pos = (config.x0Pos || 0);
+		node.y0Pos = (config.y0Pos || 0);
+		node.x1Pos = (config.x1Pos || 0);
+		node.y1Pos = (config.y1Pos || 0);
+		node.x2Pos = (config.x2Pos || 0);
+		node.y2Pos = (config.y2Pos || 0);
 		node.rgb   = (config.rgb   || "255,255,255");
 
 		node.draw = function ()
 		{
 			const color = eatRGBString(node.rgb);
 			led.drawLine( parseInt(node.x0Pos), parseInt(node.y0Pos), parseInt(node.x1Pos), parseInt(node.y1Pos), parseInt(color.r), parseInt(color.g), parseInt(color.b));
+			led.drawLine( parseInt(node.x1Pos), parseInt(node.y1Pos), parseInt(node.x2Pos), parseInt(node.y2Pos), parseInt(color.r), parseInt(color.g), parseInt(color.b));
+			led.drawLine( parseInt(node.x2Pos), parseInt(node.y2Pos), parseInt(node.x0Pos), parseInt(node.y0Pos), parseInt(color.r), parseInt(color.g), parseInt(color.b));
 		}
 
-		node.on('input', function (msg) 
+		node.on('input', function (msg)
 		{
 			//need to update to take a csv and an .data object, see circle node
 			nodeRegister.add(node);
@@ -484,15 +519,15 @@ module.exports = function(RED) {
 	};
 
 
-	//register our functions with node-red 
+	//register our functions with node-red
 	RED.nodes.registerType("led-matrix", LedMatrix);
 //	RED.nodes.registerType("clear-matrix", ClearMatrix);
 	RED.nodes.registerType("refresh-matrix", RefreshMatrix);
 	RED.nodes.registerType("pixel", PixelNode);
 	RED.nodes.registerType("image-to-matrix", ImageToPixels);
-	RED.nodes.registerType("text-to-matrix", Text); 
+	RED.nodes.registerType("text-to-matrix", Text);
 	RED.nodes.registerType("pixel-transform", PixelDataTransform);
 	RED.nodes.registerType("circle-to-matrix", CircleToMatrix);
 	RED.nodes.registerType("line-to-matrix", LineToMatrix);
+	RED.nodes.registerType("triangle-to-matrix", TriangleToMatrix);
 }
-			
