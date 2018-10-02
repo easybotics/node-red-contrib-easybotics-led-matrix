@@ -503,15 +503,30 @@ module.exports = function(RED) {
 
 		node.draw = function ()
 		{
-			const color = eatRGBString(node.rgb);
-			led.drawLine( parseInt(node.x0Pos), parseInt(node.y0Pos), parseInt(node.x1Pos), parseInt(node.y1Pos), parseInt(color.r), parseInt(color.g), parseInt(color.b));
-			led.drawLine( parseInt(node.x1Pos), parseInt(node.y1Pos), parseInt(node.x2Pos), parseInt(node.y2Pos), parseInt(color.r), parseInt(color.g), parseInt(color.b));
-			led.drawLine( parseInt(node.x2Pos), parseInt(node.y2Pos), parseInt(node.x0Pos), parseInt(node.y0Pos), parseInt(color.r), parseInt(color.g), parseInt(color.b));
+			if (outputInfo != undefined)
+			{
+				let o = outputInfo;
+				led.drawLine( parseInt(o.x0Pos), parseInt(o.y0Pos), parseInt(o.x1Pos), parseInt(o.y1Pos), parseInt(o.color.r), parseInt(o.color.g), parseInt(o.color.b));
+				led.drawLine( parseInt(o.x1Pos), parseInt(o.y1Pos), parseInt(o.x2Pos), parseInt(o.y2Pos), parseInt(o.color.r), parseInt(o.color.g), parseInt(o.color.b));
+				led.drawLine( parseInt(o.x2Pos), parseInt(o.y2Pos), parseInt(o.x0Pos), parseInt(o.y0Pos), parseInt(o.color.r), parseInt(o.color.g), parseInt(o.color.b));
+			}
 		}
 
 		node.on('input', function (msg)
 		{
-			//need to update to take a csv and an .data object, see circle node
+			const data   = msg.payload.data != undefined ? msg.payload.data : msg;
+			outputInfo =
+			{
+				color  : data.rgb	 != undefined   ? eatRGBString(data.rgb) : eatRGBString(node.rgb),
+				x0Pos   : data.xPos	 != undefined   ? parseInt(data.x0Pos)    : parseInt(node.x0Pos),
+				y0Pos   : data.yPos	 != undefined   ? parseInt(data.y0Pos)    : parseInt(node.y0Pos),
+				x1Pos   : data.xPos	 != undefined   ? parseInt(data.x1Pos)    : parseInt(node.x1Pos),
+				y1Pos   : data.yPos	 != undefined   ? parseInt(data.y1Pos)    : parseInt(node.y1Pos),
+				x2Pos   : data.xPos	 != undefined   ? parseInt(data.x2Pos)    : parseInt(node.x2Pos),
+				y2Pos   : data.yPos	 != undefined   ? parseInt(data.y2Pos)    : parseInt(node.y2Pos),
+				radius : data.radius != undefined   ? parseInt(data.radius)  : parseInt(node.radius),
+			};
+
 			nodeRegister.add(node);
 		});
 
