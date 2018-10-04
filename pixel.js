@@ -73,7 +73,6 @@ module.exports = function(RED) {
 
 		node.refresh = function ()
 		{
-			node.log(node.autoRefresh);
 			if (!node.autoRefresh) {return;}; 
 
 			const currentMilli = Date.now();
