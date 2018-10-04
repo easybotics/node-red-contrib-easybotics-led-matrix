@@ -45,14 +45,47 @@ module.exports = function(RED) {
 	{
 		RED.nodes.createNode(this, n);
 		const node = this;
+		var lastDraw = 0;
+
 
 		//get the field settings, these inputs are defined in the html
-		node.width		= (n.width		|| 64);
-		node.height		= (n.height		|| 64);
-		node.chained	= (n.chained	|| 2);
-		node.parallel	= (n.parallel	|| 1);
-		node.brightness = (n.brightness || 100);
-		node.mapping	= (n.mapping	|| "adafruit-hat-pwm");
+		node.width		  = (n.width		|| 64);
+		node.height		  = (n.height		|| 64);
+		node.chained	  = (n.chained		|| 2);
+		node.parallel	  = (n.parallel		|| 1);
+		node.brightness   = (n.brightness	|| 100);
+		node.mapping	  = (n.mapping		|| "adafruit-hat-pwm");
+		node.refreshDelay = (n.refreshDelay || 500);
+		node.autoRefresh  = (n.autoRefresh);
+
+		node.draw = function()
+		{
+			led.clear();
+
+			for(let n of nodeRegister)
+			{
+				n.draw();
+			}
+
+			node.log(nodeRegister.size);
+			led.update();
+		}
+
+		node.refresh = function ()
+		{
+			node.log(node.autoRefresh);
+			if (!node.autoRefresh) {return;}; 
+
+			const currentTime  =  process.hrtime();
+			const currentMilli = currentTime[0] * 1000 + currentTime[1] / 1000000;
+
+			if ( currentMilli > lastDraw + node.refreshDelay)
+			{
+				node.draw(); 
+				lastDraw = currentMilli;
+			}
+		}
+
 
 		//if led is undefined we create a new one
 		if(!led)
@@ -79,6 +112,8 @@ module.exports = function(RED) {
 	{
 		RED.nodes.createNode(this, config);
 		const node = this;
+		node.matrix = RED.nodes.getNode(config.matrix); 
+
 		var outputInfo;
 
 		node.draw = function ()
@@ -141,6 +176,7 @@ module.exports = function(RED) {
 	{
 		RED.nodes.createNode(this, config);
 		const node = this;
+		node.matrix = RED.nodes.getNode(config.matrix);
 
 		node.on('input', function(msg)
 		{
@@ -166,6 +202,7 @@ module.exports = function(RED) {
 		RED.nodes.createNode(this, config);
 		const node = this;
 
+		node.matrix = RED.nodes.getNode(config.matrix); 
 		node.xOffset = config.xOffset;
 		node.yOffset = config.yOffset;
 
@@ -208,6 +245,7 @@ module.exports = function(RED) {
 			*/
 
 			nodeRegister.add(node);
+			node.matrix.refresh();
 		}
 
 		//function that takes a file, and an offset and tries to convert the file into a stream of pixels
@@ -312,6 +350,7 @@ module.exports = function(RED) {
 		RED.nodes.createNode(this, config);
 		var node = this;
 
+		node.matrix		= RED.nodes.getNode(config.matrix);
 		node.font		= config.font;
 		node.xOffset	= config.xOffset;
 		node.yOffset	= config.yOffset;
@@ -352,6 +391,7 @@ module.exports = function(RED) {
 
 				lastMsg = msg;
 				nodeRegister.add(node);
+				node.matrix.refresh();
 			}
 		});
 	}
@@ -365,6 +405,7 @@ module.exports = function(RED) {
 		RED.nodes.createNode(this, config);
 		const node = this;
 
+		node.matrix  = RED.nodes.getNode(config.matrix);
 		node.xOffset = (config.xOffset || 0);
 		node.yOffset = (config.yOffset || 0);
 		node.refresh = (config.refresh || 0);
@@ -424,6 +465,7 @@ module.exports = function(RED) {
 		const node = this;
 		var outputInfo;
 
+		node.matrix  = RED.nodes.getNode(config.matrix);
 		node.xPos	 = (config.xPos   || 0);
 		node.yPos	 = (config.yPos	  || 0);
 		node.radius	 = (config.radius || 0);
@@ -450,6 +492,8 @@ module.exports = function(RED) {
 			};
 
 			nodeRegister.add(node);
+			node.matrix.refresh();
+
 		});
 	};
 
@@ -462,11 +506,12 @@ module.exports = function(RED) {
 		RED.nodes.createNode(this, config);
 		const node = this;
 
-		node.x0Pos = (config.x0Pos || 0);
-		node.y0Pos = (config.y0Pos || 0);
-		node.x1Pos = (config.x1Pos || 0);
-		node.y1Pos = (config.y1Pos || 0);
-		node.rgb   = (config.rgb || "255,255,255");
+		node.matrix = RED.nodes.getNode(config.matrix);
+		node.x0Pos  = (config.x0Pos || 0);
+		node.y0Pos  = (config.y0Pos || 0);
+		node.x1Pos  = (config.x1Pos || 0);
+		node.y1Pos  = (config.y1Pos || 0);
+		node.rgb    = (config.rgb || "255,255,255");
 
 		node.draw = function ()
 		{
@@ -479,6 +524,7 @@ module.exports = function(RED) {
 		node.on('input', function (msg)
 		{
 			nodeRegister.add(node);
+			node.matrix.refresh();
 			/*
 			var color = eatRGBString(node.rgb);
 			led.drawLine( parseInt(node.x0Pos), parseInt(node.y0Pos), parseInt(node.x1Pos), parseInt(node.y1Pos), parseInt(color.r), parseInt(color.g), parseInt(color.b));
@@ -498,13 +544,14 @@ module.exports = function(RED) {
 		RED.nodes.createNode(this, config);
 		const node = this;
 
-		node.x0Pos = (config.x0Pos || 0);
-		node.y0Pos = (config.y0Pos || 0);
-		node.x1Pos = (config.x1Pos || 0);
-		node.y1Pos = (config.y1Pos || 0);
-		node.x2Pos = (config.x2Pos || 0);
-		node.y2Pos = (config.y2Pos || 0);
-		node.rgb   = (config.rgb   || "255,255,255");
+		node.matrix = RED.nodes.getNode(config.matrix);
+		node.x0Pos  = (config.x0Pos || 0);
+		node.y0Pos  = (config.y0Pos || 0);
+		node.x1Pos  = (config.x1Pos || 0);
+		node.y1Pos  = (config.y1Pos || 0);
+		node.x2Pos  = (config.x2Pos || 0);
+		node.y2Pos  = (config.y2Pos || 0);
+		node.rgb    = (config.rgb   || "255,255,255");
 
 		node.draw = function ()
 		{
@@ -533,6 +580,7 @@ module.exports = function(RED) {
 			};
 
 			nodeRegister.add(node);
+			node.matrix.refresh();
 		});
 	};
 

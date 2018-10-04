@@ -8,11 +8,40 @@
 			chained: {value:2, required:true},
 			parallel: {value:1, required:true},
 			brightness: {value:100, required:true},
+			refreshDelay: {value:500, required:true},
 			mapping: {value:"adafruit-hat-pwm", required:true},
+			autoRefresh: {value:true},
 		},
-		label: function() {
+
+		oneditprepare: function ()
+		{
+
+			$("#node-config-refreshCheck").change( function() 
+				{
+					const val = $("#node-config-refreshCheck").val();
+					this.autoRefresh = (val === "true");
+				});
+
+			if(this.autoRefresh)
+			{
+				$("#node-config-refreshCheck").val("true");
+			}
+			else 
+			{
+
+				$("#node-config-refreshCheck").val("false");
+			}
+
+		},
+
+		oneditsave: function ()
+		{
+		},
+
+		label: function() 
+		{
 			return "LED MATRIX";
-		}
+		},
 	});
 </script>
 
@@ -36,9 +65,22 @@
 	</div>
 
 	<div class="form-row">
-
 		<label for="node-config-input-brightness"><i class="icon-bookmark"></i> Panel Brightness</label>
 		<input type="text" id="node-config-input-brightness">
+	</div>
+
+	<div class="form-row">
+		<label for="node-config-input-refreshDelay"> <i class= "icon-bookmark"></i> Refresh Delay</label>
+		<input type="number" id="node-config-input-refreshDelay" min="0" placeholder="default: 500 milliseconds"/> 
+	</div>
+
+	<div class="form-row">
+		<label for="node-config-refreshCheck"> <i class= "icon-bookmark"></i> Auto Refresh Display</label>
+		<select id = "node-config-refreshCheck">
+			<option value="true"> auto </option>
+			<option value="false"> manual <option>
+		</select>
+
 	</div>
 
 	<div class="form-row">
