@@ -76,10 +76,10 @@ module.exports = function(RED) {
 			node.log(node.autoRefresh);
 			if (!node.autoRefresh) {return;}; 
 
-			const currentTime  =  process.hrtime();
-			const currentMilli = currentTime[0] * 1000 + currentTime[1] / 1000000;
+			const currentMilli = Date.now();
+			const passed = currentMilli - lastDraw;
 
-			if ( currentMilli > lastDraw + node.refreshDelay)
+			if (passed > node.refreshDelay)
 			{
 				node.draw(); 
 				lastDraw = currentMilli;
