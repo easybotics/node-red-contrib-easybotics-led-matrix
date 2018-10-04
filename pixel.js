@@ -67,7 +67,6 @@ module.exports = function(RED) {
 				n.draw();
 			}
 
-			node.log(nodeRegister.size);
 			led.update();
 		}
 
