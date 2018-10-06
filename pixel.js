@@ -70,18 +70,8 @@ module.exports = function(RED) {
 				const start = Date.now(); 
 				n.draw();
 				const end = Date.now(); 
-				node.log("element speed: " + parseInt(end - start));
 			}
-
-			const start = Date.now();
 			led.update();
-			const end = Date.now();
-
-			node.log("update speed" + parseInt(end - start));
-
-			const endTime = Date.now(); 
-			drawSpeed = endTime - time; 
-			node.log("drawspeed:" + drawSpeed);
 
 		}
 
