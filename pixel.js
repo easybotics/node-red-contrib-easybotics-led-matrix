@@ -8,6 +8,7 @@ module.exports = function(RED) {
 
 	var led;
 	var nodeRegister;
+	var context = 0;
 
 
 	/*
@@ -59,6 +60,8 @@ module.exports = function(RED) {
 		node.refreshDelay = (n.refreshDelay || 500);
 		node.autoRefresh  = (n.autoRefresh);
 
+		context++;
+
 		node.draw = function()
 		{
 			const time = Date.now(); 
@@ -108,18 +111,22 @@ module.exports = function(RED) {
 		{
 			node.warn("initing led");
 			led = new Matrix( parseInt(node.width), parseInt(node.height), parseInt(node.parallel), parseInt(node.chained), parseInt(node.brightness), node.mapping);
-			nodeRegister = new Set();
+			led.clear();
+			led.update();
+
+			if(!nodeRegister) nodeRegister= new Set();
+		}
+		else 
+		{
+			node.warn("reusing led");
 		}
 
 		//otherwise we clear the one we have, without these checks it can spawn new evertime we deploy
-		else if(led)
-		{
 
-			node.warn("reusing led");
-			led.clear();
-			led.update();
-			nodeRegister = new Set();
-		}
+		led.clear();
+		led.update();
+		nodeRegister.clear();
+
 	}
 
 
@@ -264,6 +271,8 @@ module.exports = function(RED) {
 			}
 			*/
 
+			node.log("ready send");
+
 			nodeRegister.add(node);
 			node.matrix.refresh();
 		}
@@ -271,7 +280,9 @@ module.exports = function(RED) {
 		//function that takes a file, and an offset and tries to convert the file into a stream of pixels
 		function createPixelStream (file, xOffset, yOffset)
 		{
-			getPixels(file, function(err, pixels)
+			const cc = context;
+
+			getPixels(file, function(err, pixels, c = cc)
 			{
 
 				output = [];
@@ -298,7 +309,7 @@ module.exports = function(RED) {
 							{ 
 								output.push({payload: { x: x + xOffset, y: y + yOffset, r: pixels.get(currentFrame,x,y,0), g: pixels.get(currentFrame,x,y,1), b: pixels.get(currentFrame,x,y,2)} });
 
-								if(currentFrame == pixels.shape[0].length-1) 
+								if(currentFrame == pixels.shape[0] -1) 
 								{
 									currentFrame = 0; //restart the gif
 								} 
@@ -312,17 +323,19 @@ module.exports = function(RED) {
 				}
 
 				//call our send function from earlier
-				readySend();
-				currentFrame++;
+				if(c == context)
+				{
+					readySend();
+					currentFrame++;
+				}
 
-			})
+			});
 		}
 
 		//if we receive input
 		node.on('input', function(msg)
 		{
 
-			node.log("frame: " + currentFrame);
 
 			if(!msg.payload)
 			{
@@ -335,6 +348,7 @@ module.exports = function(RED) {
 			{
 				if(msg.payload === lastSent && (output && output.length > 0) && lastY == node.yOffset && lastX == node.xOffset && (!currentFrame))
 				{
+
 
 					return readySend();
 				}
@@ -350,6 +364,7 @@ module.exports = function(RED) {
 			{
 				if(msg.payload.data === lastSent && (output && output.length > 0) && lastX == msg.payload.xOffset && lastY == msg.payload.yOffset && (!currentFrame))
 				{
+
 					return readySend();
 				}
 
