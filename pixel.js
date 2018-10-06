@@ -77,7 +77,7 @@ module.exports = function(RED) {
 
 		node.refresh = function ()
 		{
-			if (!node.autoRefresh) {return;}; 
+			if (!node.autoRefresh) {return;};
 
 			const currentMilli = Date.now();
 			const passed = currentMilli - lastDraw;
@@ -92,7 +92,7 @@ module.exports = function(RED) {
 
 			if (passed > actualDelay)
 			{
-				node.draw(); 
+				node.draw();
 				lastDraw = currentMilli;
 
 				if(actualDelay > node.refreshDelay)
@@ -131,7 +131,7 @@ module.exports = function(RED) {
 	{
 		RED.nodes.createNode(this, config);
 		const node = this;
-		node.matrix = RED.nodes.getNode(config.matrix); 
+		node.matrix = RED.nodes.getNode(config.matrix);
 
 		var outputInfo;
 
@@ -221,7 +221,7 @@ module.exports = function(RED) {
 		RED.nodes.createNode(this, config);
 		const node = this;
 
-		node.matrix = RED.nodes.getNode(config.matrix); 
+		node.matrix = RED.nodes.getNode(config.matrix);
 		node.xOffset = config.xOffset;
 		node.yOffset = config.yOffset;
 
@@ -231,6 +231,7 @@ module.exports = function(RED) {
 		var lastSent;
 		var lastX;
 		var lastY;
+		var currentFrame = 0;
 
 		node.draw = function ()
 		{
@@ -279,8 +280,13 @@ module.exports = function(RED) {
 				}
 				//empties the array before we start
 				output = [];
-				const width  = Math.min( 128, pixels.shape[0]);
-				const height = Math.min( 64,  pixels.shape[1]);
+				if(pixels.shape.length == 4) { //gif
+					const width  = Math.min( 128, pixels.shape[1]);
+					const height = Math.min( 64,  pixels.shape[2]);
+				} else { //still image
+					const width  = Math.min( 128, pixels.shape[0]);
+					const height = Math.min( 64,  pixels.shape[1]);
+				}
 
 				//loop over the 2d array of pixels returned by getPixels
 				for(let x = 0; x < width; x++)
@@ -288,12 +294,21 @@ module.exports = function(RED) {
 					for(let y = 0; y < height; y++)
 					{
 						//make sure the array actually contains data for this location
-						if(pixels.get(x,y,0))
+						if(pixels.get(x,y,0) || pixels.get(currentFrame,x,y,0))
 						{
 							//push pixels to the output buffer
 							//console.log(x);
 							//console.log(y);
-							output.push({payload: { x: x + xOffset, y: y + yOffset, r:pixels.get(x,y,0), g:pixels.get(x,y,1), b:pixels.get(x,y,2)} });
+							if(pixels.shape.length == 4) { //gif
+								output.push({payload: { x: x + xOffset, y: y + yOffset, r:pixels.get(currentFrame,x,y,0), g:pixels.get(currentFrame,x,y,1), b:pixels.get(currentFrame,x,y,2)} });
+								if(currentFrame == pixels.shape[0].length-1) {
+									currentFrame = 0; //restart the gif
+								} else {
+									currentFrame++;
+								}
+							} else { //still image
+								output.push({payload: { x: x + xOffset, y: y + yOffset, r:pixels.get(x,y,0), g:pixels.get(x,y,1), b:pixels.get(x,y,2)} });
+							}
 						}
 					}
 				}
@@ -555,8 +570,8 @@ module.exports = function(RED) {
 
 
 	/*
-	 * node that draws a triangle to the screen 
-	 */ 
+	 * node that draws a triangle to the screen
+	 */
 
 	function TriangleToMatrix (config)
 	{
