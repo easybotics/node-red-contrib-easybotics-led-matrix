@@ -278,15 +278,9 @@ module.exports = function(RED) {
 					node.error("image did not convert correctly\n please check the url or file location");
 					return;
 				}
-				//empties the array before we start
-				output = [];
-				if(pixels.shape.length == 4) { //gif
-					const width  = Math.min( 128, pixels.shape[1]);
-					const height = Math.min( 64,  pixels.shape[2]);
-				} else { //still image
-					const width  = Math.min( 128, pixels.shape[0]);
-					const height = Math.min( 64,  pixels.shape[1]);
-				}
+				const width = pixels.shape.length == 4 ?  Math.min( 128, pixels.shape[1]) :  Math.min( 128, pixels.shape[0]);
+				const height = pixels.shape.length == 4 ?  Math.min( 128, pixels.shape[2]) :  Math.min( 128, pixels.shape[1]);
+
 
 				//loop over the 2d array of pixels returned by getPixels
 				for(let x = 0; x < width; x++)
