@@ -273,7 +273,9 @@ module.exports = function(RED) {
 		{
 			getPixels(file, function(err, pixels)
 			{
+
 				output = [];
+
 				if(!pixels)
 				{
 					node.error("image did not convert correctly\n please check the url or file location");
@@ -292,16 +294,17 @@ module.exports = function(RED) {
 						if(pixels.get(x,y,0) || pixels.get(currentFrame,x,y,0))
 						{
 							//push pixels to the output buffer
-							//console.log(x);
-							//console.log(y);
-							if(pixels.shape.length == 4) { //gif
-								output.push({payload: { x: x + xOffset, y: y + yOffset, r:pixels.get(currentFrame,x,y,0), g:pixels.get(currentFrame,x,y,1), b:pixels.get(currentFrame,x,y,2)} });
-								if(currentFrame == pixels.shape[0].length-1) {
+							if(pixels.shape.length == 4)  //gif
+							{ 
+								output.push({payload: { x: x + xOffset, y: y + yOffset, r: pixels.get(currentFrame,x,y,0), g: pixels.get(currentFrame,x,y,1), b: pixels.get(currentFrame,x,y,2)} });
+
+								if(currentFrame == pixels.shape[0].length-1) 
+								{
 									currentFrame = 0; //restart the gif
-								} else {
-									currentFrame++;
-								}
-							} else { //still image
+								} 
+							} 
+							else 
+							{ //still image
 								output.push({payload: { x: x + xOffset, y: y + yOffset, r:pixels.get(x,y,0), g:pixels.get(x,y,1), b:pixels.get(x,y,2)} });
 							}
 						}
@@ -310,12 +313,17 @@ module.exports = function(RED) {
 
 				//call our send function from earlier
 				readySend();
+				currentFrame++;
+
 			})
 		}
 
 		//if we receive input
 		node.on('input', function(msg)
 		{
+
+			node.log("frame: " + currentFrame);
+
 			if(!msg.payload)
 			{
 				node.error("empty payload");
@@ -325,7 +333,7 @@ module.exports = function(RED) {
 			//set the url var
 			if( typeof msg.payload === "string")
 			{
-				if(msg.payload === lastSent && (output && output.length > 0) && lastY == node.yOffset && lastX == node.xOffset)
+				if(msg.payload === lastSent && (output && output.length > 0) && lastY == node.yOffset && lastX == node.xOffset && (!currentFrame))
 				{
 
 					return readySend();
@@ -340,7 +348,7 @@ module.exports = function(RED) {
 
 			if( msg.payload.data)
 			{
-				if(msg.payload.data === lastSent && (output && output.length > 0) && lastX == msg.payload.xOffset && lastY == msg.payload.yOffset)
+				if(msg.payload.data === lastSent && (output && output.length > 0) && lastX == msg.payload.xOffset && lastY == msg.payload.yOffset && (!currentFrame))
 				{
 					return readySend();
 				}
