@@ -273,6 +273,7 @@ module.exports = function(RED) {
 		{
 			getPixels(file, function(err, pixels)
 			{
+				output = [];
 				if(!pixels)
 				{
 					node.error("image did not convert correctly\n please check the url or file location");
