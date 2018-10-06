@@ -46,6 +46,7 @@ module.exports = function(RED) {
 		RED.nodes.createNode(this, n);
 		const node = this;
 		var lastDraw = 0;
+		var drawSpeed = 0;
 
 
 		//get the field settings, these inputs are defined in the html
@@ -60,14 +61,18 @@ module.exports = function(RED) {
 
 		node.draw = function()
 		{
+			const time = Date.now(); 
+
 			led.clear();
 
 			for(let n of nodeRegister)
 			{
+				const start = Date.now(); 
 				n.draw();
+				const end = Date.now(); 
 			}
-
 			led.update();
+
 		}
 
 		node.refresh = function ()
@@ -76,11 +81,24 @@ module.exports = function(RED) {
 
 			const currentMilli = Date.now();
 			const passed = currentMilli - lastDraw;
+			var actualDelay = node.refreshDelay; 
 
-			if (passed > node.refreshDelay)
+			if(node.refreshDelay < (drawSpeed))
+			{
+				actualDelay = parseInt(node.refreshDelay) + parseInt(drawSpeed); 
+			}
+
+
+
+			if (passed > actualDelay)
 			{
 				node.draw();
 				lastDraw = currentMilli;
+
+				if(actualDelay > node.refreshDelay)
+				{
+					node.log("using delay " + actualDelay);
+				}
 			}
 		}
 
@@ -88,13 +106,16 @@ module.exports = function(RED) {
 		//if led is undefined we create a new one
 		if(!led)
 		{
+			node.warn("initing led");
 			led = new Matrix( parseInt(node.width), parseInt(node.height), parseInt(node.parallel), parseInt(node.chained), parseInt(node.brightness), node.mapping);
 			nodeRegister = new Set();
 		}
 
 		//otherwise we clear the one we have, without these checks it can spawn new evertime we deploy
-		if(led)
+		else if(led)
 		{
+
+			node.warn("reusing led");
 			led.clear();
 			led.update();
 			nodeRegister = new Set();
@@ -389,8 +410,8 @@ module.exports = function(RED) {
 				{
 					if(lastMsg != msg)
 					{
-						outputInfo.rgb = "000,000,000";
-						node.draw();
+						//outputInfo.rgb = "000,000,000";
+						//node.draw();
 					}
 				}
 
@@ -582,20 +603,33 @@ module.exports = function(RED) {
 			const data   = msg.payload.data != undefined ? msg.payload.data : msg;
 			outputInfo =
 			{
-				color  : data.rgb	 != undefined   ? eatRGBString(data.rgb) : eatRGBString(node.rgb),
-				x0Pos   : data.xPos	 != undefined   ? parseInt(data.x0Pos)    : parseInt(node.x0Pos),
-				y0Pos   : data.yPos	 != undefined   ? parseInt(data.y0Pos)    : parseInt(node.y0Pos),
-				x1Pos   : data.xPos	 != undefined   ? parseInt(data.x1Pos)    : parseInt(node.x1Pos),
-				y1Pos   : data.yPos	 != undefined   ? parseInt(data.y1Pos)    : parseInt(node.y1Pos),
-				x2Pos   : data.xPos	 != undefined   ? parseInt(data.x2Pos)    : parseInt(node.x2Pos),
-				y2Pos   : data.yPos	 != undefined   ? parseInt(data.y2Pos)    : parseInt(node.y2Pos),
-				radius : data.radius != undefined   ? parseInt(data.radius)  : parseInt(node.radius),
+				color   : data.rgb	  != undefined   ? eatRGBString(data.rgb)  : eatRGBString(node.rgb),
+				x0Pos   : data.xPos	  != undefined   ? parseInt(data.x0Pos)    : parseInt(node.x0Pos),
+				y0Pos   : data.yPos	  != undefined   ? parseInt(data.y0Pos)    : parseInt(node.y0Pos),
+				x1Pos   : data.xPos	  != undefined   ? parseInt(data.x1Pos)    : parseInt(node.x1Pos),
+				y1Pos   : data.yPos	  != undefined   ? parseInt(data.y1Pos)    : parseInt(node.y1Pos),
+				x2Pos   : data.xPos	  != undefined   ? parseInt(data.x2Pos)    : parseInt(node.x2Pos),
+				y2Pos   : data.yPos	  != undefined   ? parseInt(data.y2Pos)    : parseInt(node.y2Pos),
+				radius  : data.radius != undefined   ? parseInt(data.radius)   : parseInt(node.radius),
 			};
 
 			nodeRegister.add(node);
 			node.matrix.refresh();
 		});
 	};
+
+	function ClearNode (config) 
+	{
+		RED.nodes.createNode(this, config); 
+		const node = this; 
+
+		node.on('input', function (msg)
+		{
+			msg.payload = "_clear";
+			node.send(msg);
+		});
+	};
+
 
 
 	//register our functions with node-red
@@ -609,4 +643,5 @@ module.exports = function(RED) {
 	RED.nodes.registerType("circle-to-matrix", CircleToMatrix);
 	RED.nodes.registerType("line-to-matrix", LineToMatrix);
 	RED.nodes.registerType("triangle-to-matrix", TriangleToMatrix);
+	RED.nodes.registerType("clear-node", ClearNode);
 }

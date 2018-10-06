@@ -70,7 +70,7 @@
 	</div>
 
 	<div class="form-row">
-		<label for="node-config-input-refreshDelay"> <i class= "icon-bookmark"></i> Refresh Delay</label>
+		<label for="node-config-input-refreshDelay"> <i class= "icon-bookmark"></i> Refresh Delay milliseconds</label>
 		<input type="number" id="node-config-input-refreshDelay" min="0" placeholder="default: 500 milliseconds"/> 
 	</div>
 
@@ -392,10 +392,7 @@
 		<input type="number" id="node-input-yOffset" min="0" placeholder="0" />
 	<div>
 
-	<div class='form-row'>
-		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
-		<input type='text' id='node-input-matrix'/>
-	</div>
+
 
 	<div class = "form-row">
 		<label for="node-config-input-rgb"><i class="icon-tag"></i>RGB color </label>
@@ -405,6 +402,11 @@
 	<div class = "form-row">
 		<label for="node-config-input-rgb2"><i class="icon-tag"></i>Color picker</label>
 		<input type="color" id="node-input-rgb2" placeholder="#43DB2D">
+	</div>
+
+	<div class='form-row'>
+		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
+		<input type='text' id='node-input-matrix'/>
 	</div>
 
 
@@ -843,3 +845,21 @@
 	</div>
 
 </script>
+
+<script type="text/javascript"> 
+	RED.nodes.registerType("clear-node", 
+	{
+		category: 'LED Matrix', 
+		color: '#a6bbcf', 
+		inputs:  1, 
+		outputs: 1, 
+		icon: "refresh-matrix.png", 
+		label: function ()
+		{
+			return "clear node->";
+		}
+
+	});
+</script>
+
+
