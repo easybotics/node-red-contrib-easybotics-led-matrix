@@ -314,6 +314,7 @@
 			yOffset:	  {value:0, required: true},
 			rgb:		  {value:"0,255,41"},
 			font: {value:"/home/pi/node-red-contrib-led-matrix/9x18B.bdf", required:true},
+			source:		  {value:"msg.payload", required: true}, 
 			matrix: { type:'led-matrix', required:true},
         },
 
@@ -350,7 +351,13 @@
 					this.font = $("#node-config-input-font").val();
 				});
 
+			$("#node-input-source").change(function()
+				{
+					this.source = $("#node-input-source").val();
+				});
 
+
+			$("#node-input-source").val(this.source);
 			$("#node-config-input-font").val(this.font);
 
         },
@@ -415,6 +422,10 @@
 		<input type="number" id="node-input-yOffset" min="0" placeholder="0" />
 	<div>
 
+	<div class= "form-row">
+		<label for="node-config-input-source"> <i class="fa fa-tag"></i> Source~</label> 
+		<input type="text" id="node-input-source" />
+	</div>
 
 
 	<div class = "form-row">
@@ -426,6 +437,7 @@
 		<label for="node-config-input-rgb2"><i class="icon-tag"></i>Color picker</label>
 		<input type="color" id="node-input-rgb2" placeholder="#43DB2D">
 	</div>
+
 
 	<div class='form-row'>
 		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
