@@ -314,7 +314,7 @@
 			yOffset:	  {value:0, required: true},
 			rgb:		  {value:"0,255,41"},
 			font: {value:"/home/pi/node-red-contrib-led-matrix/9x18B.bdf", required:true},
-			source:		  {value:"msg.payload", required: true}, 
+			source:		  {value:"msg.payload"}, 
 			matrix: { type:'led-matrix', required:true},
         },
 
@@ -322,7 +322,7 @@
         outputs:0,
         icon: "text-matrix.png",
         label: function() {
-            return this.name||"text to matrix";
+            return this.name ||"text to matrix";
         },
 
 		oneditprepare: function ()
@@ -357,7 +357,7 @@
 				});
 
 
-			$("#node-input-source").val(this.source);
+			$("#node-input-source").val(this.source || "msg.payload");
 			$("#node-config-input-font").val(this.font);
 
         },

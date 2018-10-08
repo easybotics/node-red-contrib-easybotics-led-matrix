@@ -402,7 +402,7 @@ module.exports = function(RED) {
 		var node = this;
 
 		node.matrix		= RED.nodes.getNode(config.matrix);
- 		node.source		= config.source; 		
+ 		node.source		= config.source || "msg.payload"; 		
 		node.font		= config.font;
 		node.xOffset	= config.xOffset;
 		node.yOffset	= config.yOffset;
@@ -422,31 +422,18 @@ module.exports = function(RED) {
 
 		node.on('input', function(msg)
 		{
-			var outputString = undefined; 
+			var outputData = eval( node.source);
+			if(typeof outputData == "number") outputData = parseInt(outputData);
 
-			if(node.source)
-			{
-				const source = eval( node.source); 
-				if(typeof source == "number")
-				{
-					outputString = parseInt(source);
-				}
-
-				if(typeof soruce == "string")
-				{
-					outputString = source; 
-				}
-			}
-
-			if(msg.payload)
+			if(outputData)
 			{
 
 				outputInfo =
 				{
-					x : msg.payload.xOffset ? msg.payload.xOffset : node.xOffset,
-					y : msg.payload.yOffset ? msg.payload.yOffset : node.yOffset,
-					data: outputString      ? outputString		  : msg.payload.data || msg.payload,
-					rgb: msg.payload.rgb	  || node.rgb,
+					x : outputData.xOffset ? outputData.xOffset : node.xOffset,
+					y : outputData.yOffset ? outputData.yOffset : node.yOffset,
+					data: outputData.data  ? outputData.data    : outputData,
+					rgb: outputData.rgb	  || node.rgb,
 				};
 
 				lastMsg = msg;
