@@ -16,6 +16,7 @@
 		oneditprepare: function ()
 		{
 
+
 			$("#node-config-refreshCheck").change( function() 
 				{
 					const val = $("#node-config-refreshCheck").val();
@@ -31,6 +32,15 @@
 
 				$("#node-config-refreshCheck").val("false");
 			}
+
+			$("#node-config-input-mapping").change(function() 
+			{
+				this.mapping = $("#node-config-input-mapping").val(); 
+			});
+
+			$("#node-config-input-mapping").val(this.mapping);
+
+
 
 		},
 
@@ -83,10 +93,23 @@
 
 	</div>
 
+<!--
 	<div class="form-row">
 		<label for="node-config-input-mapping"><i class="icon-bookmark"></i> Hardware Mapping</label>
 		<input type="text" id="node-config-input-mapping">
 	</div>
+-->
+
+	<div class="form-row"> 
+		<label for="node-config-input-mapping"><i class="icon-tag"></i> Hardware Mapping </label> 
+		<select id= "node-config-input-mapping"> 
+			<option value="adafruit-hat-pwm"> Easybotics</option> 
+			<option value="regular">Regular</option> 
+			<option value="adafruit-hat">Adafruit Hat</option>
+			<option value="adafruit-hat-pwm">Adafruit Hat Pwm</option> 
+		</select> 
+	</div>
+		
 
 
 
@@ -529,8 +552,8 @@
 			defaults:
 			{
 				name:	{value:""},
-				xPos:	{value:0, required: true},
-				yPos:	{value:0, required: true},
+				x:	{value:0, required: true},
+				y:	{value:0, required: true},
 				radius: {value:0, required: true},
 				rgb:	{value:"0,255,41"},
 
@@ -577,13 +600,13 @@
 	</div>
 
 	<div class="form-row">
-		<label for="node-config-input-xPos"> <i class="fa fa-tag"></i> X Position </label>
-		<input type="number" id="node-input-xPos" min = "0" placeholder="0" />
+		<label for="node-config-input-x"> <i class="fa fa-tag"></i> X Position </label>
+		<input type="number" id="node-input-x" min = "0" placeholder="0" />
 	<div>
 
 	<div class="form-row">
-		<label for="node-config-input-yPos"> <i class="fa fa-tag"></i> Y Position </label>
-		<input type="number" id="node-input-yPos" min = "0" placeholder="0" />
+		<label for="node-config-input-y"> <i class="fa fa-tag"></i> Y Position </label>
+		<input type="number" id="node-input-y" min = "0" placeholder="0" />
 	<div>
 
 	<div class="form-row">
