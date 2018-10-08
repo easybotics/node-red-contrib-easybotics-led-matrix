@@ -314,6 +314,7 @@
 			yOffset:	  {value:0, required: true},
 			rgb:		  {value:"0,255,41"},
 			font: {value:"/home/pi/node-red-contrib-led-matrix/9x18B.bdf", required:true},
+			prefix:		  {value:""},
 			source:		  {value:"msg.payload"}, 
 			matrix: { type:'led-matrix', required:true},
         },
@@ -359,6 +360,7 @@
 
 			$("#node-input-source").val(this.source || "msg.payload");
 			$("#node-config-input-font").val(this.font);
+
 
         },
 
@@ -421,6 +423,11 @@
 		<label for="node-config-input-yOffset"> <i class="fa fa-tag"></i> Y position</label>
 		<input type="number" id="node-input-yOffset" min="0" placeholder="0" />
 	<div>
+
+	<div class= "form-row">
+		<label for="node-config-input-prefix"> <i class="fa fa-tag"></i> Prefix~</label> 
+		<input type="text" id="node-input-prefix" />
+	</div>
 
 	<div class= "form-row">
 		<label for="node-config-input-source"> <i class="fa fa-tag"></i> Source~</label> 

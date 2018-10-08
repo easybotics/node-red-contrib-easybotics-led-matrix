@@ -402,6 +402,7 @@ module.exports = function(RED) {
 		var node = this;
 
 		node.matrix		= RED.nodes.getNode(config.matrix);
+		node.prefix		= config.prefix || "";
  		node.source		= config.source || "msg.payload"; 		
 		node.font		= config.font;
 		node.xOffset	= config.xOffset;
@@ -422,8 +423,7 @@ module.exports = function(RED) {
 
 		node.on('input', function(msg)
 		{
-			var outputData = eval( node.source);
-			if(typeof outputData == "number") outputData = parseInt(outputData);
+			const outputData = node.prefix + eval( node.source);
 
 			if(outputData)
 			{
