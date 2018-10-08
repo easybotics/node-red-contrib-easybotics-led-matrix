@@ -271,7 +271,6 @@ module.exports = function(RED) {
 			}
 			*/
 
-			node.log("ready send");
 
 			nodeRegister.add(node);
 			node.matrix.refresh();
@@ -403,7 +402,7 @@ module.exports = function(RED) {
 		var node = this;
 
 		node.matrix		= RED.nodes.getNode(config.matrix);
-		node.source		= config.source; 		
+ 		node.source		= config.source; 		
 		node.font		= config.font;
 		node.xOffset	= config.xOffset;
 		node.yOffset	= config.yOffset;
@@ -446,7 +445,7 @@ module.exports = function(RED) {
 				{
 					x : msg.payload.xOffset ? msg.payload.xOffset : node.xOffset,
 					y : msg.payload.yOffset ? msg.payload.yOffset : node.yOffset,
-					data: outputString      ? outputString		  : msg.payload.data || msg.payload;
+					data: outputString      ? outputString		  : msg.payload.data || msg.payload,
 					rgb: msg.payload.rgb	  || node.rgb,
 				};
 
