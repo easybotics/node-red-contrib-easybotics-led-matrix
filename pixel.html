@@ -17,7 +17,7 @@
 		{
 
 
-			$("#node-config-refreshCheck").change( function() 
+			$("#node-config-refreshCheck").change( function()
 				{
 					const val = $("#node-config-refreshCheck").val();
 					this.autoRefresh = (val === "true");
@@ -27,15 +27,15 @@
 			{
 				$("#node-config-refreshCheck").val("true");
 			}
-			else 
+			else
 			{
 
 				$("#node-config-refreshCheck").val("false");
 			}
 
-			$("#node-config-input-mapping").change(function() 
+			$("#node-config-input-mapping").change(function()
 			{
-				this.mapping = $("#node-config-input-mapping").val(); 
+				this.mapping = $("#node-config-input-mapping").val();
 			});
 
 			$("#node-config-input-mapping").val(this.mapping);
@@ -48,7 +48,7 @@
 		{
 		},
 
-		label: function() 
+		label: function()
 		{
 			return "LED MATRIX";
 		},
@@ -77,7 +77,7 @@
 
 	<div class="form-row">
 		<label for="node-config-input-refreshDelay"> <i class= "icon-bookmark"></i> Refresh Delay milliseconds</label>
-		<input type="number" id="node-config-input-refreshDelay" min="0" placeholder="default: 500 milliseconds"/> 
+		<input type="number" id="node-config-input-refreshDelay" min="0" placeholder="default: 500 milliseconds"/>
 
 		<label for="node-config-refreshCheck"> <i class= "icon-bookmark"></i> Auto Refresh Display</label>
 		<select id = "node-config-refreshCheck">
@@ -95,22 +95,22 @@
 	</div>
 -->
 
-	<div class="form-row"> 
-		<label for="node-config-input-mapping"><i class="icon-tag"></i> Hardware Mapping </label> 
-		<select id= "node-config-input-mapping"> 
-			<option value="adafruit-hat-pwm"> Easybotics</option> 
-			<option value="regular">Regular</option> 
+	<div class="form-row">
+		<label for="node-config-input-mapping"><i class="icon-tag"></i> Hardware Mapping </label>
+		<select id= "node-config-input-mapping">
+			<option value="adafruit-hat-pwm"> Easybotics</option>
+			<option value="regular">Regular</option>
 			<option value="adafruit-hat">Adafruit Hat</option>
-			<option value="adafruit-hat-pwm">Adafruit Hat Pwm</option> 
-		</select> 
+			<option value="adafruit-hat-pwm">Adafruit Hat Pwm</option>
+		</select>
 	</div>
-		
+
 
 <p>
 	<b> warning:</b> <br>
 	due to quirks with node-red, most of these settings won't apply <br>
 	unless you restart node-red (not the browser client),<br>
-	or delete this config node and make another one 
+	or delete this config node and make another one
 </p>
 
 
@@ -316,7 +316,7 @@
 			rgb:		  {value:"0,255,41"},
 			font: {value:"/home/pi/node-red-contrib-led-matrix/9x18B.bdf", required:true},
 			prefix:		  {value:""},
-			source:		  {value:"msg.payload"}, 
+			source:		  {value:"msg.payload"},
 			matrix: { type:'led-matrix', required:true},
         },
 
@@ -424,9 +424,9 @@
 
 
 	<div class= "form-row">
-		<label for="node-config-input-prefix"> <i class="fa fa-tag"></i> Prefix text</label> 
+		<label for="node-config-input-prefix"> <i class="fa fa-tag"></i> Prefix text</label>
 		<input type="text" id="node-input-prefix" />
-		<label for="node-config-input-source"> <i class="fa fa-tag"></i> Source</label> 
+		<label for="node-config-input-source"> <i class="fa fa-tag"></i> Source</label>
 		<input type="text" id="node-input-source" />
 	</div>
 
@@ -667,10 +667,10 @@
 		defaults:
 		{
 			name:	{value:""},
-			x0Pos:	{value:0, required: true},
-			y0Pos:  {value:0, required: true},
-			x1Pos:  {value:0, required: true},
-			y1Pos:  {value:0, required: true},
+			x0:	{value:0, required: true},
+			y0:  {value:0, required: true},
+			x1:  {value:0, required: true},
+			y1:  {value:0, required: true},
 			rgb:	{value:"0, 255, 41"},
 
 			matrix:	{type: 'led-matrix', required: true},
@@ -721,23 +721,23 @@
 
 	<div class="form-row">
 		<div class ="col">
-			<label for="node-config-input-x0Pos"> <i class="fa fa-tag"></i> X0 Position </label>
-			<input type="number" id="node-input-x0Pos" min = "0" placeholder="0" />
+			<label for="node-config-input-x0"> <i class="fa fa-tag"></i> X0 Position </label>
+			<input type="number" id="node-input-x0" min = "0" placeholder="0" />
 		</div>
 		<div class ="col">
-			<label for="node-config-input-y0Pos"> <i class="fa fa-tag"></i> Y0 Position </label>
-			<input type="number" id="node-input-y0Pos" min = "0" placeholder="0" />
+			<label for="node-config-input-y0"> <i class="fa fa-tag"></i> Y0 Position </label>
+			<input type="number" id="node-input-y0" min = "0" placeholder="0" />
 		</div>
 	<div>
 
 	<div class="form-row">
 		<div class="col">
-			<label for="node-config-input-x1Pos"> <i class="fa fa-tag"></i> X Position </label>
-			<input type="number" id="node-input-x1Pos" min = "0" placeholder="0" />
+			<label for="node-config-input-x1"> <i class="fa fa-tag"></i> X Position </label>
+			<input type="number" id="node-input-x1" min = "0" placeholder="0" />
 		<div>
 		<div class="col">
-			<label for="node-config-input-y1Pos"> <i class="fa fa-tag"></i> Y Position </label>
-			<input type="number" id="node-input-y1Pos" min = "0" placeholder="0" />
+			<label for="node-config-input-y1"> <i class="fa fa-tag"></i> Y Position </label>
+			<input type="number" id="node-input-y1" min = "0" placeholder="0" />
 		<div>
 	</div>
 
@@ -782,12 +782,12 @@
 		defaults:
 		{
 			name:	{value:""},
-			x0Pos:	{value:0, required: true},
-			y0Pos:  {value:0, required: true},
-			x1Pos:  {value:0, required: true},
-			y1Pos:  {value:0, required: true},
-			x2Pos:  {value:0, required: true},
-			y2Pos:  {value:0, required: true},
+			x0:	{value:0, required: true},
+			y0:  {value:0, required: true},
+			x1:  {value:0, required: true},
+			y1:  {value:0, required: true},
+			x2:  {value:0, required: true},
+			y2:  {value:0, required: true},
 			rgb:	{value:"0, 255, 41"},
 
 			matrix:	{type: 'led-matrix', required: true},
@@ -835,33 +835,33 @@
 	</div>
 
 	<div class="form-row">
-		<label for="node-config-input-x0Pos"> <i class="fa fa-tag"></i> Point 1: X Position </label>
-		<input type="number" id="node-input-x0Pos" min = "0" placeholder="0" />
+		<label for="node-config-input-x0"> <i class="fa fa-tag"></i> Point 1: X Position </label>
+		<input type="number" id="node-input-x0" min = "0" placeholder="0" />
 	<div>
 
 	<div class="form-row">
-		<label for="node-config-input-y0Pos"> <i class="fa fa-tag"></i> Point 1: Y Position </label>
-		<input type="number" id="node-input-y0Pos" min = "0" placeholder="0" />
+		<label for="node-config-input-y0"> <i class="fa fa-tag"></i> Point 1: Y Position </label>
+		<input type="number" id="node-input-y0" min = "0" placeholder="0" />
 	<div>
 
 	<div class="form-row">
-		<label for="node-config-input-x1Pos"> <i class="fa fa-tag"></i> Point 2: X Position </label>
-		<input type="number" id="node-input-x1Pos" min = "0" placeholder="0" />
+		<label for="node-config-input-x1"> <i class="fa fa-tag"></i> Point 2: X Position </label>
+		<input type="number" id="node-input-x1" min = "0" placeholder="0" />
 	<div>
 
 	<div class="form-row">
-		<label for="node-config-input-y1Pos"> <i class="fa fa-tag"></i> Point 2: Y Position </label>
-		<input type="number" id="node-input-y1Pos" min = "0" placeholder="0" />
+		<label for="node-config-input-y1"> <i class="fa fa-tag"></i> Point 2: Y Position </label>
+		<input type="number" id="node-input-y1" min = "0" placeholder="0" />
 	<div>
 
 	<div class="form-row">
-		<label for="node-config-input-x2Pos"> <i class="fa fa-tag"></i> Point 3: X Position </label>
-		<input type="number" id="node-input-x2Pos" min = "0" placeholder="0" />
+		<label for="node-config-input-x2"> <i class="fa fa-tag"></i> Point 3: X Position </label>
+		<input type="number" id="node-input-x2" min = "0" placeholder="0" />
 	<div>
 
 	<div class="form-row">
-		<label for="node-config-input-y2Pos"> <i class="fa fa-tag"></i> Point 3: Y Position </label>
-		<input type="number" id="node-input-y2Pos" min = "0" placeholder="0" />
+		<label for="node-config-input-y2"> <i class="fa fa-tag"></i> Point 3: Y Position </label>
+		<input type="number" id="node-input-y2" min = "0" placeholder="0" />
 	<div>
 
 	<div class = "form-row">
@@ -881,14 +881,14 @@
 
 </script>
 
-<script type="text/javascript"> 
-	RED.nodes.registerType("clear-node", 
+<script type="text/javascript">
+	RED.nodes.registerType("clear-node",
 	{
-		category: 'LED Matrix', 
-		color: '#a6bbcf', 
-		inputs:  1, 
-		outputs: 1, 
-		icon: "refresh-matrix.png", 
+		category: 'LED Matrix',
+		color: '#a6bbcf',
+		inputs:  1,
+		outputs: 1,
+		icon: "refresh-matrix.png",
 		label: function ()
 		{
 			return "clear node->";
@@ -896,5 +896,3 @@
 
 	});
 </script>
-
-
