@@ -562,14 +562,25 @@ module.exports = function(RED) {
 
 		node.draw = function ()
 		{
-
-			var color = eatRGBString(node.rgb);
-			led.drawLine( parseInt(node.x0), parseInt(node.y0), parseInt(node.x1), parseInt(node.y1), parseInt(color.r), parseInt(color.g), parseInt(color.b));
+			if (outputInfo != undefined)
+			{
+				let o = outputInfo;
+				led.drawLine( parseInt(o.x0), parseInt(o.y0), parseInt(o.x1), parseInt(o.y1), parseInt(o.color.r), parseInt(o.color.g), parseInt(o.color.b));
+			}
 		}
 
 
 		node.on('input', function (msg)
 		{
+			const data   = msg.payload.data != undefined ? msg.payload.data : msg;
+			outputInfo =
+			{
+				color   : data.rgb	  != undefined   ? eatRGBString(data.rgb)	: eatRGBString(node.rgb),
+				x0		: data.x0	  != undefined   ? parseInt(data.x0)		: parseInt(node.x0),
+				y0		: data.y0	  != undefined   ? parseInt(data.y0)		: parseInt(node.y0),
+				x1		: data.x1	  != undefined   ? parseInt(data.x1)		: parseInt(node.x1),
+				y1		: data.y1	  != undefined   ? parseInt(data.y1)		: parseInt(node.y1),
+			};
 			nodeRegister.add(node);
 			node.matrix.refresh();
 			/*
@@ -623,7 +634,6 @@ module.exports = function(RED) {
 				y1		: data.y1	  != undefined   ? parseInt(data.y1)		: parseInt(node.y1),
 				x2		: data.x2	  != undefined   ? parseInt(data.x2)		: parseInt(node.x2),
 				y2		: data.y2	  != undefined   ? parseInt(data.y2)		: parseInt(node.y2),
-				radius  : data.radius != undefined   ? parseInt(data.radius)	: parseInt(node.radius),
 			};
 
 			nodeRegister.add(node);
