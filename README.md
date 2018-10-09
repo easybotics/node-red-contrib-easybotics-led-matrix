@@ -11,4 +11,4 @@ Node Red binding of: https://github.com/keptan/node-rpi-rgb-led-matrix/
 
 ![Example Flow](https://sr.ht/VMdX.png)
 
-![](https://u.teknik.io/HldPr.gif)
+![Example Output](https://u.teknik.io/YZXZB.gif)
