@@ -1,4 +1,4 @@
-var Matrix		= require('node-rpi-rgb-led-matrix')
+var Matrix		= require('easybotics-rpi-rgb-led-matrix')
 var getPixels	= require('get-pixels');
 
 
