@@ -518,8 +518,8 @@ module.exports = function(RED) {
 		var outputInfo;
 
 		node.matrix  = RED.nodes.getNode(config.matrix);
-		node.x	 = (config.x   || 0);
-		node.y	 = (config.y	  || 0);
+		node.xPos	 = (config.xPos   || 0);
+		node.yXpos	 = (config.yPos	  || 0);
 		node.radius	 = (config.radius || 0);
 		node.rgb	 = (config.rgb    || "255,255,255");
 
@@ -538,8 +538,8 @@ module.exports = function(RED) {
 			outputInfo =
 			{
 				color  : data.rgb	 != undefined   ? eatRGBString(data.rgb) : eatRGBString(node.rgb),
-				y   : data.y	 != undefined   ? parseInt(data.y)    : parseInt(node.y),
-				x   : data.x	 != undefined   ? parseInt(data.x)    : parseInt(node.x),
+				y   : data.y	 != undefined   ? parseInt(data.y)    : parseInt(node.yPos),
+				x   : data.x	 != undefined   ? parseInt(data.x)    : parseInt(node.xPos),
 				radius : data.radius != undefined   ? parseInt(data.radius)  : parseInt(node.radius),
 			};
 
@@ -579,7 +579,7 @@ module.exports = function(RED) {
 			node.matrix.refresh();
 			/*
 			var color = eatRGBString(node.rgb);
-			led.drawLine( parseInt(node.x0Pos), parseInt(node.y0Pos), parseInt(node.x1Pos), parseInt(node.y1Pos), parseInt(color.r), parseInt(color.g), parseInt(color.b));
+			led.drawLine( parseInt(node.x0Pos), parseInt(node.y0Pos), parseInt(Posnode.x1Pos), parseInt(node.y1Pos), parseInt(color.r), parseInt(color.g), parseInt(color.b));
 			*/
 		});
 
