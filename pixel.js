@@ -119,6 +119,8 @@ module.exports = function(RED) {
 		else
 		{
 			node.warn("reusing led");
+				led.brightness( node.brightness);
+				node.log("set brightness");
 		}
 
 		//otherwise we clear the one we have, without these checks it can spawn new evertime we deploy
@@ -126,6 +128,9 @@ module.exports = function(RED) {
 		led.clear();
 		led.update();
 		nodeRegister.clear();
+
+	
+
 
 	}
 
