@@ -9,6 +9,6 @@ Node Red binding of: https://github.com/keptan/node-rpi-rgb-led-matrix/
 
 
 
-![Example Flow](https://u.teknik.io/WFuMk.png)
+![Example Flow](https://sr.ht/VMdX.png)
 
-![Example Output](https://u.teknik.io/ZY9K2.jpg)
+![Example Output](https://u.teknik.io/HldPr.gif)
