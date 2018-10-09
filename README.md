@@ -1,6 +1,6 @@
 # node-red-contrib-easybotics-led-matrix
 set of node-red nodes binding to node-rpi-rgb-led-matrix library
-Node Red binding of: https://github.com/keptan/node-rpi-rgb-led-matrix/
+Node Red binding of: https://github.com/easybotics/node-rpi-rgb-led-matrix/
 
 **In Order for the HZELLER back end to function, node-red must be running as root!**
 
