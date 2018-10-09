@@ -1,4 +1,4 @@
-# node-red-contrib-led-matrix
+# node-red-contrib-easybotics-led-matrix
 set of node-red nodes binding to node-rpi-rgb-led-matrix library
 Node Red binding of: https://github.com/keptan/node-rpi-rgb-led-matrix/
 
