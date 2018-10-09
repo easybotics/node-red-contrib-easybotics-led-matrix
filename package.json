@@ -19,8 +19,8 @@
   },
 
 
-  "homepage": "https://github.com/easybotics/node-red-contrib-led-matrix",
-  "bugs": "https://github.com/easybotics/node-red-contrib-led-matrix/issues",
+  "homepage": "https://github.com/easybotics/node-red-contrib-easybotics-led-matrix",
+  "bugs": "https://github.com/easybotics/node-red-contrib-easybotics-led-matrix/issues",
   "author": {
 	  "name": "Ben", 
 	  "email": "keptan@protonmail.com", 
@@ -28,7 +28,7 @@
   },
   "repository": {
 	  "type": "git", 
-	  "url": "https://github.com/easybotics/node-red-contrib-led-matrix"
+	  "url": "https://github.com/easybotics/node-red-contrib-easybotics-led-matrix"
   },
 
   "main": "index.js",
