@@ -15,7 +15,7 @@
 	  "node-red"],
   "dependencies": {
     "get-pixels": "3.3.2", 
-	"easybotics-rpi-rgb-led-matrix": "0.2.3"
+	"easybotics-rpi-rgb-led-matrix": "0.2.4"
   },
 
 
