@@ -617,12 +617,12 @@ module.exports = function(RED) {
 			outputInfo =
 			{
 				color   : data.rgb	  != undefined   ? eatRGBString(data.rgb)	: eatRGBString(node.rgb),
-				x0		: data.x	  != undefined   ? parseInt(data.x0)		: parseInt(node.x0),
-				y0		: data.y	  != undefined   ? parseInt(data.y0)		: parseInt(node.y0),
-				x1		: data.x	  != undefined   ? parseInt(data.x1)		: parseInt(node.x1),
-				y1		: data.y	  != undefined   ? parseInt(data.y1)		: parseInt(node.y1),
-				x2		: data.x	  != undefined   ? parseInt(data.x2)		: parseInt(node.x2),
-				y2		: data.y	  != undefined   ? parseInt(data.y2)		: parseInt(node.y2),
+				x0		: data.x0	  != undefined   ? parseInt(data.x0)		: parseInt(node.x0),
+				y0		: data.y0	  != undefined   ? parseInt(data.y0)		: parseInt(node.y0),
+				x1		: data.x1	  != undefined   ? parseInt(data.x1)		: parseInt(node.x1),
+				y1		: data.y1	  != undefined   ? parseInt(data.y1)		: parseInt(node.y1),
+				x2		: data.x2	  != undefined   ? parseInt(data.x2)		: parseInt(node.x2),
+				y2		: data.y2	  != undefined   ? parseInt(data.y2)		: parseInt(node.y2),
 				radius  : data.radius != undefined   ? parseInt(data.radius)	: parseInt(node.radius),
 			};
 
