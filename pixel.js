@@ -156,8 +156,20 @@ module.exports = function(RED) {
 			}
 		}
 
+		node.clear = function ()
+		{
+				nodeRegister.delete(node);
+				node.matrix.refresh();
+		}
+
+
 		node.on('input', function (msg)
 		{
+			if(msg.payload === "_clear")
+			{
+				node.clear();
+				return;
+			}
 			//if someone injects a string then split it on comas and try and feat it to the matrix
 			if(typeof msg.payload == "string")
 			{
@@ -176,6 +188,8 @@ module.exports = function(RED) {
 						b: parseInt(vals[4]),
 					};
 
+				nodeRegister.add(node);
+				node.matrix.refresh();
 				return;
 			}
 
@@ -192,6 +206,8 @@ module.exports = function(RED) {
 						b: parseInt(msg.payload.b),
 					};
 
+				nodeRegister.add(node);
+				node.matrix.refresh();
 				return;
 			}
 
@@ -255,6 +271,12 @@ module.exports = function(RED) {
 					led.setPixel( parseInt(payload.x), parseInt(payload.y), parseInt(payload.r), parseInt(payload.g), parseInt(payload.b));
 				}
 			}
+		}
+
+		node.clear = function ()
+		{
+				nodeRegister.delete(node);
+				node.matrix.refresh();
 		}
 
 		//function to actually send the output to the next node
@@ -340,6 +362,11 @@ module.exports = function(RED) {
 		node.on('input', function(msg)
 		{
 
+			if(msg.payload === "_clear")
+			{
+				node.clear();
+				return;
+			}
 
 			if(!msg.payload)
 			{
@@ -427,8 +454,20 @@ module.exports = function(RED) {
 			}
 		}
 
+		node.clear = function ()
+		{
+				nodeRegister.delete(node);
+				node.matrix.refresh();
+		}
+
 		node.on('input', function(msg)
 		{
+			if(msg.payload === "_clear")
+			{
+				node.clear();
+				return;
+			}
+
 			const outputData = node.prefix + eval( node.source);
 
 			if(outputData)
@@ -533,8 +572,20 @@ module.exports = function(RED) {
 			}
 		}
 
+		node.clear = function ()
+		{
+				nodeRegister.delete(node);
+				node.matrix.refresh();
+		}
+
 		node.on('input', function (msg)
 		{
+			if(msg.payload === "_clear")
+			{
+				node.clear();
+				return;
+			}
+
 			const data   = msg.payload.data != undefined ? msg.payload.data : msg;
 			outputInfo =
 			{
@@ -573,9 +624,20 @@ module.exports = function(RED) {
 			led.drawLine( parseInt(node.x0Pos), parseInt(node.y0Pos), parseInt(node.x1Pos), parseInt(node.y1Pos), parseInt(color.r), parseInt(color.g), parseInt(color.b));
 		}
 
+		node.clear = function ()
+		{
+				nodeRegister.delete(node);
+				node.matrix.refresh();
+		}
 
 		node.on('input', function (msg)
 		{
+			if(msg.payload === "_clear")
+			{
+				node.clear();
+				return;
+			}
+
 			nodeRegister.add(node);
 			node.matrix.refresh();
 			/*
@@ -617,8 +679,20 @@ module.exports = function(RED) {
 			}
 		}
 
+		node.clear = function ()
+		{
+				nodeRegister.delete(node);
+				node.matrix.refresh();
+		}
+
 		node.on('input', function (msg)
 		{
+			if(msg.payload === "_clear")
+			{
+				node.clear();
+				return;
+			}
+
 			const data   = msg.payload.data != undefined ? msg.payload.data : msg;
 			outputInfo =
 			{
