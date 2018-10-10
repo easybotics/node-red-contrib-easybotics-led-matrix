@@ -163,6 +163,7 @@
 
 <script type="text/x-red" data-help-name="pixel">
     <p>prints a pixel on the matrix buffer, refresh the matrix to see the result </p>
+	<p>Takes an object with properties x, y, r, g, b <b> rgb defines the color </p>
 </script>
 
 <script type="text/javascript">
@@ -329,6 +330,46 @@
 
 		oneditprepare: function ()
 		{
+			const fontDropdown = $("#node-config-input-font");
+		//	fontDropdown.append('<option value="_msg_">- set from msg.deviceid -</option>');
+
+
+			const fonts = ["10x20.bdf", "5x8.bdf",   "6x13B.bdf",  "6x9.bdf",    "7x13O.bdf",  "8x13B.bdf",  "9x15B.bdf",  "9x18.bdf",     "helvR12.bdf",  "tom-thumb.bdf",
+"4x6.bdf",    "6x10.bdf",  "6x13.bdf",   "7x13B.bdf",  "7x14B.bdf",  "8x13.bdf",   "9x15.bdf",    "5x7.bdf",    "6x12.bdf",  "6x13O.bdf",  "7x13.bdf",   "7x14.bdf",   "8x13O.bdf",  "9x18B.bdf",  "clR6x12.bdf"] 
+			for(var i = 0; i < fonts.length; i++)
+			{
+				const f = fonts[i];
+				const text = f;
+				const value = f;
+
+
+				//fontDropdown.append('<option value="_msg_">- set from msg.deviceid -</option>');
+				fontDropdown.append('<option value="' + value + '"> ' + text + '</option>');
+				console.log('<option value="' + value + '">- ' + text + ' -</option>');
+
+
+			};
+
+
+
+
+
+			fontDropdown.change(function()
+				{
+					this.font = fontDropdown.val();
+				});
+
+			fontDropdown.val(this.font);
+
+			$("#node-input-source").change(function()
+				{
+					this.source = $("#node-input-source").val();
+				});
+
+
+			$("#node-input-source").val(this.source || "msg.payload");
+
+
 			$("#node-input-rgb2").change(function()
 			{
 				var hex = $("#node-input-rgb2").val();
@@ -347,22 +388,6 @@
 			var split = tr.split(',');
 
 			$("#node-input-rgb2").val( rgbToHex( parseInt(split[0]), parseInt(split[1]), parseInt(split[2])));
-
-			$("#node-config-input-font").change(function()
-				{
-					this.font = $("#node-config-input-font").val();
-				});
-
-			$("#node-input-source").change(function()
-				{
-					this.source = $("#node-input-source").val();
-				});
-
-
-			$("#node-input-source").val(this.source || "msg.payload");
-			$("#node-config-input-font").val(this.font);
-
-
         },
 
 		oneditsave: function ()
@@ -387,31 +412,6 @@
 		<label for='node-config-input-font'><i class='icon-tag'></i> Font</label>
 
 		<select id="node-config-input-font">
-				<option value="fonts/clR6x12.bdf">clR6x12</option>
-				<option value="fonts/helvR12.bdf">helvR12</option>
-				<option value="fonts/tom-thumb.bdf">tom-thumb</option>
-				<option value="fonts/4x6.bdf">4x6</option>
-				<option value="fonts/5x7.bdf">5x7</option>
-				<option value="fonts/5x8.bdf">5x8</option>
-				<option value="fonts/6x9.bdf">6x9</option>
-				<option value="fonts/6x10.bdf">6x10</option>
-				<option value="fonts/6x12.bdf">6x12</option>
-				<option value="fonts/6x13.bdf">6x13</option>
-				<option value="fonts/6x13B.bdf">6x13B</option>
-				<option value="fonts/6x13O.bdf">6x13O</option>
-				<option value="fonts/7x13.bdf">7x13</option>
-				<option value="fonts/7x13B.bdf">7x13B</option>
-				<option value="fonts/7x13O.bdf">7x13O</option>
-				<option value="fonts/7x14.bdf">7x14</option>
-				<option value="fonts/7x14B.bdf">7x14B</option>
-				<option value="fonts/8x13.bdf">8x13</option>
-				<option value="fonts/8x13B.bdf">8x13B</option>
-				<option value="fonts/8x13O.bdf">8x13O</option>
-				<option value="fonts/9x15.bdf">9x15</option>
-				<option value="fonts/9x15B.bdf">9x15B</option>
-				<option value="fonts/9x18.bdf">9x18</option>
-				<option value="fonts/9x18B.bdf">9x18B</option>
-				<option value="fonts/10x20.bdf">10x20</option>
 		</select>
 	</div>
 

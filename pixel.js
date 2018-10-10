@@ -421,8 +421,9 @@ module.exports = function(RED) {
 		{
 			if(outputInfo != undefined)
 			{
-				let color = eatRGBString(outputInfo.rgb);
-				led.drawText(parseInt(outputInfo.x), parseInt(outputInfo.y), outputInfo.data, node.font, parseInt(color.r), parseInt(color.g), parseInt(color.b));
+				const color = eatRGBString(outputInfo.rgb);
+				const fontDir = __dirname + '/fonts/' + node.font;
+				led.drawText(parseInt(outputInfo.x), parseInt(outputInfo.y), outputInfo.data, fontDir, parseInt(color.r), parseInt(color.g), parseInt(color.b));
 			}
 		}
 
