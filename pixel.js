@@ -165,7 +165,7 @@ module.exports = function(RED) {
 
 		node.on('input', function (msg)
 		{
-			if(msg.payload === "_clear")
+			if(msg.payload.clear)
 			{
 				node.clear();
 				return;
@@ -362,7 +362,7 @@ module.exports = function(RED) {
 		node.on('input', function(msg)
 		{
 
-			if(msg.payload === "_clear")
+			if(msg.payload.clear)
 			{
 				node.clear();
 				return;
@@ -462,7 +462,7 @@ module.exports = function(RED) {
 
 		node.on('input', function(msg)
 		{
-			if(msg.payload === "_clear")
+			if(msg.payload.clear)
 			{
 				node.clear();
 				return;
@@ -580,7 +580,7 @@ module.exports = function(RED) {
 
 		node.on('input', function (msg)
 		{
-			if(msg.payload === "_clear")
+			if(msg.payload.clear)
 			{
 				node.clear();
 				return;
@@ -632,7 +632,7 @@ module.exports = function(RED) {
 
 		node.on('input', function (msg)
 		{
-			if(msg.payload === "_clear")
+			if(msg.payload.clear)
 			{
 				node.clear();
 				return;
@@ -687,7 +687,7 @@ module.exports = function(RED) {
 
 		node.on('input', function (msg)
 		{
-			if(msg.payload === "_clear")
+			if(msg.payload.clear)
 			{
 				node.clear();
 				return;
@@ -718,7 +718,7 @@ module.exports = function(RED) {
 
 		node.on('input', function (msg)
 		{
-			msg.payload = "_clear";
+			msg.payload.clear = true;
 			node.send(msg);
 		});
 	};
