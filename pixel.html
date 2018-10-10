@@ -336,6 +336,7 @@
 
 			const fonts = ["10x20.bdf", "5x8.bdf",   "6x13B.bdf",  "6x9.bdf",    "7x13O.bdf",  "8x13B.bdf",  "9x15B.bdf",  "9x18.bdf",     "helvR12.bdf",  "tom-thumb.bdf",
 "4x6.bdf",    "6x10.bdf",  "6x13.bdf",   "7x13B.bdf",  "7x14B.bdf",  "8x13.bdf",   "9x15.bdf",    "5x7.bdf",    "6x12.bdf",  "6x13O.bdf",  "7x13.bdf",   "7x14.bdf",   "8x13O.bdf",  "9x18B.bdf",  "clR6x12.bdf"] 
+			fonts.sort();
 			for(var i = 0; i < fonts.length; i++)
 			{
 				const f = fonts[i];
@@ -891,7 +892,7 @@
 		icon: "refresh-matrix.png", 
 		label: function ()
 		{
-			return "clear node->";
+			return "clear node";
 		}
 
 	});
