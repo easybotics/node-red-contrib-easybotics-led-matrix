@@ -586,13 +586,13 @@ module.exports = function(RED) {
 				return;
 			}
 
-			const data   = msg.payload.data != undefined ? msg.payload.data : msg;
+			const data   = msg.payload.data != undefined ? msg.payload.data : msg.payload;
 			outputInfo =
 			{
-				color  : data.rgb	 != undefined   ? eatRGBString(data.rgb) : eatRGBString(node.rgb),
-				y   : data.y	 != undefined   ? parseInt(data.y)    : parseInt(node.yPos),
-				x   : data.x	 != undefined   ? parseInt(data.x)    : parseInt(node.xPos),
-				radius : data.radius != undefined   ? parseInt(data.radius)  : parseInt(node.radius),
+				color	: data.rgb		!= undefined   ? eatRGBString(data.rgb) : eatRGBString(node.rgb),
+				y		: data.y		!= undefined   ? parseInt(data.y)		: parseInt(node.yPos),
+				x		: data.x		!= undefined   ? parseInt(data.x)		: parseInt(node.xPos),
+				radius	: data.radius	!= undefined   ? parseInt(data.radius)  : parseInt(node.radius),
 			};
 
 			nodeRegister.add(node);
