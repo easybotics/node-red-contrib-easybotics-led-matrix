@@ -393,17 +393,17 @@ module.exports = function(RED) {
 
 			if( msg.payload.data)
 			{
-				if(msg.payload.data === lastSent && (output && output.length > 0) && lastX == msg.payload.xOffset && lastY == msg.payload.yOffset && (!currentFrame))
+				if(msg.payload.data === lastSent && (output && output.length > 0) && lastX == msg.payload.x && lastY == msg.payload.y && (!currentFrame))
 				{
 
 					return readySend();
 				}
 
 				lastSent = msg.payload.data;
-				lastX = msg.payload.xOffset;
-				lastY = msg.payload.yOffset;
+				lastX = msg.payload.x;
+				lastY = msg.payload.y;
 
-				return createPixelStream(msg.payload.data, msg.payload.xOffset, msg.payload.yOffset);
+				return createPixelStream(msg.payload.data, msg.payload.x, msg.payload.y);
 			}
 		});
 	}
@@ -468,16 +468,16 @@ module.exports = function(RED) {
 				return;
 			}
 
-			const outputData = node.prefix + eval( node.source);
+			const outputData =  eval( node.source);
 
 			if(outputData)
 			{
 
 				outputInfo =
 				{
-					x : outputData.xOffset ? outputData.xOffset : node.xOffset,
-					y : outputData.yOffset ? outputData.yOffset : node.yOffset,
-					data: outputData.data  ? outputData.data    : outputData,
+					x : outputData.x ? outputData.x : node.xOffset,
+					y : outputData.y ? outputData.y : node.yOffset,
+					data: node.prefix + (outputData.data  ? outputData.data    : outputData),
 					rgb: outputData.rgb	  || node.rgb,
 				};
 
@@ -508,8 +508,8 @@ module.exports = function(RED) {
 			const output =
 			{
 				data:    msg.payload,
-				xOffset: parseInt(node.xOffset),
-				yOffset: parseInt(node.yOffset),
+				x: parseInt(node.xOffset),
+				y: parseInt(node.yOffset),
 				refresh: parseInt(node.refresh),
 				rgb:	 node.rgb,
 
@@ -524,8 +524,8 @@ module.exports = function(RED) {
 			const output =
 			{
 				data:    msg.payload.data,
-				xOffset: parseInt(node.xOffset),
-				yOffset: parseInt(node.yOffset),
+				x		: parseInt(node.xOffset),
+				y		: parseInt(node.yOffset),
 				refresh: parseInt(node.refresh),
 				rgb    : node.rgb,
 
