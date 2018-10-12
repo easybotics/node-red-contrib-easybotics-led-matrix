@@ -838,6 +838,33 @@
 
 </script>
 
+<script type="text/x-red" data-help-name="text-to-matrix">
+	<p> Prints a line to the matrix buffer, refresh the matrix to see the result  <br>
+		When injected it will add itself to the buffer, and will continue to be printed until a msg.clear property is injected into it <br> 
+		Will use the location and color from the settings, or can be injected with an object with the following preoperties: <br> 
+	<b> x0:</b> X location of the start of the line <br>
+	<b> y0</b> Y location <br> 
+	<b> x1:</b> X location of the end of the line <br>
+	<b> y1</b> Y location <br> 
+	<b> rgb:</b> rgb color, as a CSV string. Example: "255,0,0" (RED) <br>
+
+	<b> object example: </b> <br> 
+	<i> 
+	msg.payload = { <br>
+			&emsp;&emsp;x0: 0, <br>
+			&emsp;&emsp;y0: 0, <br>
+			&emsp;&emsp;x1: 25, <br>
+			&emsp;&emsp;y1: 25, <br>
+			&emsp;&emsp;rgb: "255,0,0" <br>
+		}; <br>
+
+	<br<br> <b> warning: source is evalulated with eval() </b>
+
+	</p>
+
+		
+	
+
 
 <script type="text/javascript">
 
