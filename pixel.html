@@ -116,6 +116,19 @@
 
 </script>
 
+<script type="text/x-red" data-help-name="led-matrix">
+	<p>
+		<br> <b> height: </b>  height of the led panel 
+		<br> <b> width: </b>   width of the led panel, use the width of one panel if you are chaining them 
+		<br> <b> chained panels: </b> amount of panels chained  
+		<br> <b> parallel:</b> amount of panels wired in parallel  
+		<br> <b> brightness:</b> brightness as a percentage, 1 - 100 
+		<br> <b> mapping: </b> type of hardware mapping, what pins hzeller will output too 
+		<br> <b> autoRefresh: </b> if true flow will try and keep the display updated, otherwise use the refresh node manually 
+		<br> <b> refresh delay: </b> when autorefresh is turned on, the flow will never update the screen faster than this delay 
+	</p> 
+</script>
+		
 
 <!--
 	this block describes  the appearance of the node itself
@@ -515,7 +528,6 @@
 	<br<br> <b> warning: source is evalulated with eval() </b>
 
 	</p>
-	
 	
 </script>
 
