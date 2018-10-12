@@ -607,8 +607,18 @@
 </script>
 
 <script type="text/x-red" data-help-name="pixel-transform">
-    <p>modifies properties of a display object, or spawns one from a string <br>
-	   if you inject a string, and then modify the x,y in the coordinates the output will be an object as described in the 'text-to-matrix' node or the 'image-to-matrix' node</p>
+	<p>modifies properties of a display object, or spawns one from a string <br> <br> 
+	   if input is a string will output an object with the following properties: <br><br> 
+	<b> data: </b> original string input <br> 
+	<b> x:</b> X location <br>
+	<b> y:</b> Y location <br> 
+	<b> rgb:</b> rgb color, as a CSV string. Example: "255,0,0" (RED) <br><br>
+
+	if input is an object, those properties will be modified 
+		
+
+
+	</p>
 </script>
 
 <script type="text/javascript">
@@ -838,15 +848,15 @@
 
 </script>
 
-<script type="text/x-red" data-help-name="text-to-matrix">
+<script type="text/x-red" data-help-name="line-to-matrix">
 	<p> Prints a line to the matrix buffer, refresh the matrix to see the result  <br>
 		When injected it will add itself to the buffer, and will continue to be printed until a msg.clear property is injected into it <br> 
-		Will use the location and color from the settings, or can be injected with an object with the following preoperties: <br> 
+		Will use the location and color from the settings, or can be injected with an object with the following preoperties: <br><br>
 	<b> x0:</b> X location of the start of the line <br>
 	<b> y0</b> Y location <br> 
 	<b> x1:</b> X location of the end of the line <br>
 	<b> y1</b> Y location <br> 
-	<b> rgb:</b> rgb color, as a CSV string. Example: "255,0,0" (RED) <br>
+	<b> rgb:</b> rgb color, as a CSV string. Example: "255,0,0" (RED) <br><br>
 
 	<b> object example: </b> <br> 
 	<i> 
@@ -858,10 +868,9 @@
 			&emsp;&emsp;rgb: "255,0,0" <br>
 		}; <br>
 
-	<br<br> <b> warning: source is evalulated with eval() </b>
-
 	</p>
 
+</script>
 		
 	
 
