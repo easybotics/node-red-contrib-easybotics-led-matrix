@@ -620,9 +620,12 @@ module.exports = function(RED) {
 		node.draw = function ()
 		{
 
-			var color = eatRGBString(node.rgb);
-			led.drawLine( parseInt(node.x0Pos), parseInt(node.y0Pos), parseInt(node.x1Pos), parseInt(node.y1Pos), parseInt(color.r), parseInt(color.g), parseInt(color.b));
+			const color = outputInfo.color;
+
+			led.drawLine( outputInfo.x0Pos, outputInfo.y0Pos, outputInfo.x1Pos, outputInfo.y1Pos, parseInt(color.r), parseInt(color.g), parseInt(color.b));
+
 		}
+
 
 		node.clear = function ()
 		{
@@ -637,6 +640,18 @@ module.exports = function(RED) {
 				node.clear();
 				return;
 			}
+
+			const data = msg.payload; 
+			outputInfo = 
+			{
+				color : data.rgb	!= undefined ? eatRGBString(data.rgb) : eatRGBString(node.rgb), 
+				x0Pos : parseInt(data.x0	!= undefined ? data.x0	: node.x01Pos), 
+				y0Pos : parseInt(data.y0	!= undefined ? data.y0	: node.y0Pos), 
+				x1Pos : parseInt(data.x1	!= undefined ? data.x1	: node.x1Pos), 
+				y1Pos : parseInt(data.y1	!= undefined ? data.y1	: node.y1Pos), 
+			};
+
+
 
 			nodeRegister.add(node);
 			node.matrix.refresh();
