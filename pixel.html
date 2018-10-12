@@ -163,7 +163,23 @@
 
 <script type="text/x-red" data-help-name="pixel">
     <p>prints a pixel on the matrix buffer, refresh the matrix to see the result </p>
-	<p>Takes an object with properties x, y, r, g, b <b> rgb defines the color </p>
+	<p>Takes an object with properties x, y, r, g, b <b> rgb defines the color </b></p>
+	<p>When injected it will add itself to the buffer, and will continue to be printed until a msg.clear property is injected into it
+
+		<br> <b>object example: </b> <br> 
+		<i>
+		msg.payload = { <br>
+			&emsp;&emsp;x: 10, <br>
+			&emsp;&emsp;y: 10, <br><br>
+
+			&emsp;&emsp;r: 255, <br>
+			&emsp;&emsp;g: 0, <br>
+			&emsp;&emsp;b: 0, <br>
+		}; <br>
+		</i> 
+
+
+</p>
 </script>
 
 <script type="text/javascript">
@@ -198,8 +214,12 @@
 	</div>
 </script>
 
-<script type="text/x-red" data-help-name="pixel">
-	<p> updates the display with vysnc </p>
+<script type="text/x-red" data-help-name="refresh-matrix">
+	<p> updates the display with vysnc <br><br>
+		nodes usually modify a in-memory buffer rather than pushing to the screen frame buffer itself, this node pushes the in memory buffer to the frame buffer when injected 
+
+</p>
+		
 </script>
 
 <script type="text/javascript">
@@ -227,6 +247,7 @@
 	});
 </script>
 
+
 <script type="text/x-red" data-template-name="image-to-matrix">
 	<div class="form-row">
 		<label for="node-config-input-name"> <i class="icon-tag"></i> Name </label>
@@ -250,6 +271,29 @@
 	</div>
 
 
+</script>
+
+<script type="text/x-red" data-help-name="image-to-matrix">
+	<p> Takes a url, or a file path  as a payload, and uses the x,y in the settings <br> 
+		If a gif is injected, the frame displayed will advance on each inject <br><br>
+		
+		Also takes an object with the following properties: <br>
+		<b>x:</b> x location<br>
+		<b>y:</b>y location<br>
+		<b>data</b>: the url or file path to a valid image <br> 
+
+		<br> <b>object example: </b> <br> 
+		<i>
+		msg.payload = { <br>
+			&emsp;&emsp;x: 10, <br>
+			&emsp;&emsp;y: 10, <br>
+			&emsp;&emsp;data: "https://media.giphy.com/media/UaoxTrl8z1wre/giphy.gif" <br>
+		}; <br>
+		</i> 
+	
+		
+		
+		</p>
 </script>
 
 
@@ -448,8 +492,31 @@
 
 </script>
 
-<script type="text/x-red" data-help-name="text">
-    <p>prints text to the matrix buffer, refresh the matrix to see the result </p>
+<script type="text/x-red" data-help-name="text-to-matrix">
+    <p>prints text to the matrix buffer <br>
+	If <i> source </i> is a string it uses the x and y coordinates from the settings. <br>
+	<i> source </i> can also be an object with the following properties: <br>
+	<b> x:</b> X location <br>
+	<b> y:</b> Y location <br> 
+	<b> rgb:</b> rgb color, as a CSV string. Example: "255,0,0" (RED) <br>
+	<b> data:</b> text to print <br><br>
+
+	The prefix setting prefixes a string to the output text<br> <br>
+
+	<b> object example: </b> <br> 
+	<i> 
+	msg.payload = { <br>
+			&emsp;&emsp;x: 10, <br>
+			&emsp;&emsp;y: 10, <br>
+			&emsp;&emsp;data: "hello world", <br>
+			&emsp;&emsp;rgb: "255,0,0" <br>
+		}; <br>
+
+	<br<br> <b> warning: source is evalulated with eval() </b>
+
+	</p>
+	
+	
 </script>
 
 <script type="text/javascript">
@@ -540,7 +607,8 @@
 </script>
 
 <script type="text/x-red" data-help-name="pixel-transform">
-    <p>modifies properties of a display object, or spawns one from a string </p>
+    <p>modifies properties of a display object, or spawns one from a string <br>
+	   if you inject a string, and then modify the x,y in the coordinates the output will be an object as described in the 'text-to-matrix' node or the 'image-to-matrix' node</p>
 </script>
 
 <script type="text/javascript">
@@ -644,6 +712,16 @@
 	</div>
 
 
+</script>
+
+<script type="text/x-red" data-help-name="circle-to-matrix">
+	<p> Prints a circle to the matrix buffer <br> 
+		<i> msg.payload </i> can be an object with the following properties: <br> 
+		<b> x: </b> X location <br> 
+		<b> y: </b> Y location <br> 
+		<b> radius: </b> radius <br> 
+		<b> rgb: </b> an rgb CSV string, example : "255,0,0," (red) <br><br>
+		otherwise the settings from the node itself are used </p> 
 </script>
 
 <script type="text/javascript">
@@ -896,6 +974,11 @@
 		}
 
 	});
+</script>
+
+<script type="text/x-red" data-help-name="clear-node">
+	<p> Clears a shape, text, or image node from the display <br> 
+		Note that these nodes usually re-impose themselves when injected, so if you are injecting on a loop it might just reappear on the display after you clear it </p> 
 </script>
 
 
