@@ -1,6 +1,6 @@
 {
-  "name": "node-red-contrib-easybotics-pixel-matrix",
-  "version": "0.2.1",
+  "name": "node-red-contrib-easybotics-led-matrix",
+  "version": "0.2.9",
   "description": "control led matrix with node-red on a raspberryPI, node-red binding of: https://www.npmjs.com/package/easybotics-rpi-rgb-led-matrix",
   "keywords": [
 	  "raspberry", 
@@ -15,12 +15,12 @@
 	  "node-red"],
   "dependencies": {
     "get-pixels": "3.3.2", 
-	"easybotics-rpi-rgb-led-matrix": "0.2.2"
+	"easybotics-rpi-rgb-led-matrix": "0.2.5"
   },
 
 
-  "homepage": "https://github.com/keptan/node-red-contrib-led-matrix",
-  "bugs": "https://github.com/keptan/node-red-contrib-led-matrix/issues",
+  "homepage": "https://github.com/easybotics/node-red-contrib-easybotics-led-matrix",
+  "bugs": "https://github.com/easybotics/node-red-contrib-easybotics-led-matrix/issues",
   "author": {
 	  "name": "Ben", 
 	  "email": "keptan@protonmail.com", 
@@ -28,14 +28,14 @@
   },
   "repository": {
 	  "type": "git", 
-	  "url": "https://github.com/keptan/node-red-contrib-led-matrix"
+	  "url": "https://github.com/easybotics/node-red-contrib-easybotics-led-matrix"
   },
 
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "license": "ISC",
+  "license": "GPL2",
 
   "node-red": {
     "nodes": {
