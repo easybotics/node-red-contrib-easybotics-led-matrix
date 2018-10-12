@@ -64,15 +64,15 @@ module.exports = function(RED) {
 
 		node.draw = function()
 		{
-			const time = Date.now(); 
+			const time = Date.now();
 
 			led.clear();
 
 			for(let n of nodeRegister)
 			{
-				const start = Date.now(); 
+				const start = Date.now();
 				n.draw();
-				const end = Date.now(); 
+				const end = Date.now();
 			}
 			led.update();
 
@@ -84,11 +84,11 @@ module.exports = function(RED) {
 
 			const currentMilli = Date.now();
 			const passed = currentMilli - lastDraw;
-			var actualDelay = node.refreshDelay; 
+			var actualDelay = node.refreshDelay;
 
 			if(node.refreshDelay < (drawSpeed))
 			{
-				actualDelay = parseInt(node.refreshDelay) + parseInt(drawSpeed); 
+				actualDelay = parseInt(node.refreshDelay) + parseInt(drawSpeed);
 			}
 
 
@@ -116,7 +116,7 @@ module.exports = function(RED) {
 
 			if(!nodeRegister) nodeRegister= new Set();
 		}
-		else 
+		else
 		{
 			node.warn("reusing led");
 				led.brightness( node.brightness);
@@ -332,15 +332,15 @@ module.exports = function(RED) {
 						{
 							//push pixels to the output buffer
 							if(pixels.shape.length == 4)  //gif
-							{ 
+							{
 								output.push({payload: { x: x + xOffset, y: y + yOffset, r: pixels.get(currentFrame,x,y,0), g: pixels.get(currentFrame,x,y,1), b: pixels.get(currentFrame,x,y,2)} });
 
-								if(currentFrame == pixels.shape[0] -1) 
+								if(currentFrame == pixels.shape[0] -1)
 								{
 									currentFrame = 0; //restart the gif
-								} 
-							} 
-							else 
+								}
+							}
+							else
 							{ //still image
 								output.push({payload: { x: x + xOffset, y: y + yOffset, r:pixels.get(x,y,0), g:pixels.get(x,y,1), b:pixels.get(x,y,2)} });
 							}
@@ -435,7 +435,7 @@ module.exports = function(RED) {
 
 		node.matrix		= RED.nodes.getNode(config.matrix);
 		node.prefix		= config.prefix || "";
- 		node.source		= config.source || "msg.payload"; 		
+ 		node.source		= config.source || "msg.payload";
 		node.font		= config.font;
 		node.xOffset	= config.xOffset;
 		node.yOffset	= config.yOffset;
@@ -611,19 +611,17 @@ module.exports = function(RED) {
 		const node = this;
 
 		node.matrix = RED.nodes.getNode(config.matrix);
-		node.x0Pos  = (config.x0Pos || 0);
-		node.y0Pos  = (config.y0Pos || 0);
-		node.x1Pos  = (config.x1Pos || 0);
-		node.y1Pos  = (config.y1Pos || 0);
+		node.x0		= (config.x0 || 0);
+		node.y0		= (config.y0 || 0);
+		node.x1		= (config.x1 || 0);
+		node.y1		= (config.y1 || 0);
 		node.rgb    = (config.rgb || "255,255,255");
 
 		node.draw = function ()
 		{
-
 			const color = outputInfo.color;
 
 			led.drawLine( outputInfo.x0Pos, outputInfo.y0Pos, outputInfo.x1Pos, outputInfo.y1Pos, parseInt(color.r), parseInt(color.g), parseInt(color.b));
-
 		}
 
 
@@ -635,6 +633,7 @@ module.exports = function(RED) {
 
 		node.on('input', function (msg)
 		{
+
 			if(msg.clear)
 			{
 				node.clear();
@@ -650,15 +649,9 @@ module.exports = function(RED) {
 				x1Pos : parseInt(data.x1	!= undefined ? data.x1	: node.x1Pos), 
 				y1Pos : parseInt(data.y1	!= undefined ? data.y1	: node.y1Pos), 
 			};
-
-
-
+      
 			nodeRegister.add(node);
 			node.matrix.refresh();
-			/*
-			var color = eatRGBString(node.rgb);
-			led.drawLine( parseInt(node.x0Pos), parseInt(node.y0Pos), parseInt(Posnode.x1Pos), parseInt(node.y1Pos), parseInt(color.r), parseInt(color.g), parseInt(color.b));
-			*/
 		});
 
 
@@ -675,22 +668,22 @@ module.exports = function(RED) {
 		const node = this;
 
 		node.matrix = RED.nodes.getNode(config.matrix);
-		node.x0Pos  = (config.x0Pos || 0);
-		node.y0Pos  = (config.y0Pos || 0);
-		node.x1Pos  = (config.x1Pos || 0);
-		node.y1Pos  = (config.y1Pos || 0);
-		node.x2Pos  = (config.x2Pos || 0);
-		node.y2Pos  = (config.y2Pos || 0);
-		node.rgb    = (config.rgb   || "255,255,255");
+		node.x0		= (config.x0 || 0);
+		node.y0		= (config.y0 || 0);
+		node.x1		= (config.x1 || 0);
+		node.y1		= (config.y1 || 0);
+		node.x2		= (config.x2 || 0);
+		node.y2		= (config.y2 || 0);
+		node.rgb    = (config.rgb || "255,255,255");
 
 		node.draw = function ()
 		{
 			if (outputInfo != undefined)
 			{
 				let o = outputInfo;
-				led.drawLine( parseInt(o.x0Pos), parseInt(o.y0Pos), parseInt(o.x1Pos), parseInt(o.y1Pos), parseInt(o.color.r), parseInt(o.color.g), parseInt(o.color.b));
-				led.drawLine( parseInt(o.x1Pos), parseInt(o.y1Pos), parseInt(o.x2Pos), parseInt(o.y2Pos), parseInt(o.color.r), parseInt(o.color.g), parseInt(o.color.b));
-				led.drawLine( parseInt(o.x2Pos), parseInt(o.y2Pos), parseInt(o.x0Pos), parseInt(o.y0Pos), parseInt(o.color.r), parseInt(o.color.g), parseInt(o.color.b));
+				led.drawLine( parseInt(o.x0), parseInt(o.y0), parseInt(o.x1), parseInt(o.y1), parseInt(o.color.r), parseInt(o.color.g), parseInt(o.color.b));
+				led.drawLine( parseInt(o.x1), parseInt(o.y1), parseInt(o.x2), parseInt(o.y2), parseInt(o.color.r), parseInt(o.color.g), parseInt(o.color.b));
+				led.drawLine( parseInt(o.x2), parseInt(o.y2), parseInt(o.x0), parseInt(o.y0), parseInt(o.color.r), parseInt(o.color.g), parseInt(o.color.b));
 			}
 		}
 
@@ -711,14 +704,13 @@ module.exports = function(RED) {
 			const data   = msg.payload.data != undefined ? msg.payload.data : msg;
 			outputInfo =
 			{
-				color   : data.rgb	  != undefined   ? eatRGBString(data.rgb)  : eatRGBString(node.rgb),
-				x0Pos   : data.x	  != undefined   ? parseInt(data.x0Pos)    : parseInt(node.x0Pos),
-				y0Pos   : data.y	  != undefined   ? parseInt(data.y0Pos)    : parseInt(node.y0Pos),
-				x1Pos   : data.x	  != undefined   ? parseInt(data.x1Pos)    : parseInt(node.x1Pos),
-				y1Pos   : data.y	  != undefined   ? parseInt(data.y1Pos)    : parseInt(node.y1Pos),
-				x2Pos   : data.x	  != undefined   ? parseInt(data.x2Pos)    : parseInt(node.x2Pos),
-				y2Pos   : data.y	  != undefined   ? parseInt(data.y2Pos)    : parseInt(node.y2Pos),
-				radius  : data.radius != undefined   ? parseInt(data.radius)   : parseInt(node.radius),
+				color   : data.rgb	  != undefined   ? eatRGBString(data.rgb)	: eatRGBString(node.rgb),
+				x0		: data.x0	  != undefined   ? parseInt(data.x0)		: parseInt(node.x0),
+				y0		: data.y0	  != undefined   ? parseInt(data.y0)		: parseInt(node.y0),
+				x1		: data.x1	  != undefined   ? parseInt(data.x1)		: parseInt(node.x1),
+				y1		: data.y1	  != undefined   ? parseInt(data.y1)		: parseInt(node.y1),
+				x2		: data.x2	  != undefined   ? parseInt(data.x2)		: parseInt(node.x2),
+				y2		: data.y2	  != undefined   ? parseInt(data.y2)		: parseInt(node.y2),
 			};
 
 			nodeRegister.add(node);
@@ -726,10 +718,10 @@ module.exports = function(RED) {
 		});
 	};
 
-	function ClearNode (config) 
+	function ClearNode (config)
 	{
-		RED.nodes.createNode(this, config); 
-		const node = this; 
+		RED.nodes.createNode(this, config);
+		const node = this;
 
 		node.on('input', function (msg)
 		{
