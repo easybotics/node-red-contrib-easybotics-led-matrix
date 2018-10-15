@@ -118,17 +118,17 @@
 
 <script type="text/x-red" data-help-name="led-matrix">
 	<p>
-		<br> <b> height: </b>  height of the led panel 
-		<br> <b> width: </b>   width of the led panel, use the width of one panel if you are chaining them 
-		<br> <b> chained panels: </b> amount of panels chained  
-		<br> <b> parallel:</b> amount of panels wired in parallel  
-		<br> <b> brightness:</b> brightness as a percentage, 1 - 100 
-		<br> <b> mapping: </b> type of hardware mapping, what pins hzeller will output too 
-		<br> <b> autoRefresh: </b> if true flow will try and keep the display updated, otherwise use the refresh node manually 
-		<br> <b> refresh delay: </b> when autorefresh is turned on, the flow will never update the screen faster than this delay 
-	</p> 
+		<br> <b> height: </b>  height of the led panel
+		<br> <b> width: </b>   width of the led panel, use the width of one panel if you are chaining them
+		<br> <b> chained panels: </b> amount of panels chained
+		<br> <b> parallel:</b> amount of panels wired in parallel
+		<br> <b> brightness:</b> brightness as a percentage, 1 - 100
+		<br> <b> mapping: </b> type of hardware mapping, what pins hzeller will output too
+		<br> <b> autoRefresh: </b> if true flow will try and keep the display updated, otherwise use the refresh node manually
+		<br> <b> refresh delay: </b> when autorefresh is turned on, the flow will never update the screen faster than this delay
+	</p>
 </script>
-		
+
 
 <!--
 	this block describes  the appearance of the node itself
@@ -179,7 +179,7 @@
 	<p>Takes an object with properties x, y, r, g, b <b> rgb defines the color </b></p>
 	<p>When injected it will add itself to the buffer, and will continue to be printed until a msg.clear property is injected into it
 
-		<br> <b>object example: </b> <br> 
+		<br> <b>object example: </b> <br>
 		<i>
 		msg.payload = { <br>
 			&emsp;&emsp;x: 10, <br>
@@ -189,7 +189,7 @@
 			&emsp;&emsp;g: 0, <br>
 			&emsp;&emsp;b: 0, <br>
 		}; <br>
-		</i> 
+		</i>
 
 
 </p>
@@ -229,10 +229,10 @@
 
 <script type="text/x-red" data-help-name="refresh-matrix">
 	<p> updates the display with vysnc <br><br>
-		nodes usually modify a in-memory buffer rather than pushing to the screen frame buffer itself, this node pushes the in memory buffer to the frame buffer when injected 
+		nodes usually modify a in-memory buffer rather than pushing to the screen frame buffer itself, this node pushes the in memory buffer to the frame buffer when injected
 
 </p>
-		
+
 </script>
 
 <script type="text/javascript">
@@ -287,25 +287,25 @@
 </script>
 
 <script type="text/x-red" data-help-name="image-to-matrix">
-	<p> Takes a url, or a file path  as a payload, and uses the x,y in the settings <br> 
+	<p> Takes a url, or a file path  as a payload, and uses the x,y in the settings <br>
 		If a gif is injected, the frame displayed will advance on each inject <br><br>
-		
+
 		Also takes an object with the following properties: <br>
 		<b>x:</b> x location<br>
 		<b>y:</b>y location<br>
-		<b>data</b>: the url or file path to a valid image <br> 
+		<b>data</b>: the url or file path to a valid image <br>
 
-		<br> <b>object example: </b> <br> 
+		<br> <b>object example: </b> <br>
 		<i>
 		msg.payload = { <br>
 			&emsp;&emsp;x: 10, <br>
 			&emsp;&emsp;y: 10, <br>
 			&emsp;&emsp;data: "https://media.giphy.com/media/UaoxTrl8z1wre/giphy.gif" <br>
 		}; <br>
-		</i> 
-	
-		
-		
+		</i>
+
+
+
 		</p>
 </script>
 
@@ -392,7 +392,7 @@
 
 
 			const fonts = ["10x20.bdf", "5x8.bdf",   "6x13B.bdf",  "6x9.bdf",    "7x13O.bdf",  "8x13B.bdf",  "9x15B.bdf",  "9x18.bdf",     "helvR12.bdf",  "tom-thumb.bdf",
-"4x6.bdf",    "6x10.bdf",  "6x13.bdf",   "7x13B.bdf",  "7x14B.bdf",  "8x13.bdf",   "9x15.bdf",    "5x7.bdf",    "6x12.bdf",  "6x13O.bdf",  "7x13.bdf",   "7x14.bdf",   "8x13O.bdf",  "9x18B.bdf",  "clR6x12.bdf"] 
+"4x6.bdf",    "6x10.bdf",  "6x13.bdf",   "7x13B.bdf",  "7x14B.bdf",  "8x13.bdf",   "9x15.bdf",    "5x7.bdf",    "6x12.bdf",  "6x13O.bdf",  "7x13.bdf",   "7x14.bdf",   "8x13O.bdf",  "9x18B.bdf",  "clR6x12.bdf"]
 			fonts.sort();
 			for(var i = 0; i < fonts.length; i++)
 			{
@@ -510,14 +510,14 @@
 	If <i> source </i> is a string it uses the x and y coordinates from the settings. <br>
 	<i> source </i> can also be an object with the following properties: <br>
 	<b> x:</b> X location <br>
-	<b> y:</b> Y location <br> 
+	<b> y:</b> Y location <br>
 	<b> rgb:</b> rgb color, as a CSV string. Example: "255,0,0" (RED) <br>
 	<b> data:</b> text to print <br><br>
 
 	The prefix setting prefixes a string to the output text<br> <br>
 
-	<b> object example: </b> <br> 
-	<i> 
+	<b> object example: </b> <br>
+	<i>
 	msg.payload = { <br>
 			&emsp;&emsp;x: 10, <br>
 			&emsp;&emsp;y: 10, <br>
@@ -528,7 +528,7 @@
 	<br<br> <b> warning: source is evalulated with eval() </b>
 
 	</p>
-	
+
 </script>
 
 <script type="text/javascript">
@@ -619,15 +619,15 @@
 </script>
 
 <script type="text/x-red" data-help-name="pixel-transform">
-	<p>modifies properties of a display object, or spawns one from a string <br> <br> 
-	   if input is a string will output an object with the following properties: <br><br> 
-	<b> data: </b> original string input <br> 
+	<p>modifies properties of a display object, or spawns one from a string <br> <br>
+	   if input is a string will output an object with the following properties: <br><br>
+	<b> data: </b> original string input <br>
 	<b> x:</b> X location <br>
-	<b> y:</b> Y location <br> 
+	<b> y:</b> Y location <br>
 	<b> rgb:</b> rgb color, as a CSV string. Example: "255,0,0" (RED) <br><br>
 
-	if input is an object, those properties will be modified 
-		
+	if input is an object, those properties will be modified
+
 
 
 	</p>
@@ -737,13 +737,13 @@
 </script>
 
 <script type="text/x-red" data-help-name="circle-to-matrix">
-	<p> Prints a circle to the matrix buffer <br> 
-		<i> msg.payload </i> can be an object with the following properties: <br> 
-		<b> x: </b> X location <br> 
-		<b> y: </b> Y location <br> 
-		<b> radius: </b> radius <br> 
+	<p> Prints a circle to the matrix buffer <br>
+		<i> msg.payload </i> can be an object with the following properties: <br>
+		<b> x: </b> X location <br>
+		<b> y: </b> Y location <br>
+		<b> radius: </b> radius <br>
 		<b> rgb: </b> an rgb CSV string, example : "255,0,0," (red) <br><br>
-		otherwise the settings from the node itself are used </p> 
+		otherwise the settings from the node itself are used </p>
 </script>
 
 <script type="text/javascript">
@@ -862,16 +862,16 @@
 
 <script type="text/x-red" data-help-name="line-to-matrix">
 	<p> Prints a line to the matrix buffer, refresh the matrix to see the result  <br>
-		When injected it will add itself to the buffer, and will continue to be printed until a msg.clear property is injected into it <br> 
+		When injected it will add itself to the buffer, and will continue to be printed until a msg.clear property is injected into it <br>
 		Will use the location and color from the settings, or can be injected with an object with the following preoperties: <br><br>
 	<b> x0:</b> X location of the start of the line <br>
-	<b> y0</b> Y location <br> 
+	<b> y0</b> Y location <br>
 	<b> x1:</b> X location of the end of the line <br>
-	<b> y1</b> Y location <br> 
+	<b> y1</b> Y location <br>
 	<b> rgb:</b> rgb color, as a CSV string. Example: "255,0,0" (RED) <br><br>
 
-	<b> object example: </b> <br> 
-	<i> 
+	<b> object example: </b> <br>
+	<i>
 	msg.payload = { <br>
 			&emsp;&emsp;x0: 0, <br>
 			&emsp;&emsp;y0: 0, <br>
@@ -883,8 +883,8 @@
 	</p>
 
 </script>
-		
-	
+
+
 
 
 <script type="text/javascript">
@@ -1008,6 +1008,34 @@
 
 </script>
 
+<script type="text/x-red" data-help-name="triangle-to-matrix">
+	<p> Prints a triangle to the matrix buffer, refresh the matrix to see the result  <br>
+		When injected it will add itself to the buffer, and will continue to be printed until a msg.clear property is injected into it <br>
+		Will use the location and color from the settings, or can be injected with an object with the following preoperties: <br><br>
+	<b> x0:</b> X location of the first point <br>
+	<b> y0:</b> Y location <br>
+	<b> x1:</b> X location of the second point <br>
+	<b> y1:</b> Y location <br>
+	<b> x2:</b> X location of the third point <br>
+	<b> y2:</b> Y location <br>
+	<b> rgb:</b> rgb color, as a CSV string. Example: "255,0,0" (RED) <br><br>
+
+	<b> object example: </b> <br>
+	<i>
+	msg.payload = { <br>
+			&emsp;&emsp;x0: 0, <br>
+			&emsp;&emsp;y0: 0, <br>
+			&emsp;&emsp;x1: 25, <br>
+			&emsp;&emsp;y1: 25, <br>
+			&emsp;&emsp;x2: 10, <br>
+			&emsp;&emsp;y2: 10, <br>
+			&emsp;&emsp;rgb: "255,0,0" <br>
+		}; <br>
+
+	</p>
+
+</script>
+
 <script type="text/javascript">
 	RED.nodes.registerType("clear-node",
 	{
@@ -1025,6 +1053,6 @@
 </script>
 
 <script type="text/x-red" data-help-name="clear-node">
-	<p> Clears a shape, text, or image node from the display <br> 
-		Note that these nodes usually re-impose themselves when injected, so if you are injecting on a loop it might just reappear on the display after you clear it </p> 
+	<p> Clears a shape, text, or image node from the display <br>
+		Note that these nodes usually re-impose themselves when injected, so if you are injecting on a loop it might just reappear on the display after you clear it </p>
 </script>
