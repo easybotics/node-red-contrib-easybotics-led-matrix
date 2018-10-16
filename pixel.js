@@ -470,6 +470,16 @@ module.exports = function(RED) {
 
 			const outputData =  eval( node.source);
 
+			const handleFloat = function (i) 
+			{
+				if( !isNaN(i))
+				{
+					return Math.round(i * 100) / 100;
+				}
+
+				return i;
+			}
+
 			if(outputData)
 			{
 
@@ -477,7 +487,7 @@ module.exports = function(RED) {
 				{
 					x : outputData.x ? outputData.x : node.xOffset,
 					y : outputData.y ? outputData.y : node.yOffset,
-					data: node.prefix + (outputData.data  ? outputData.data    : outputData),
+					data: node.prefix + handleFloat((outputData.data  ? outputData.data    : outputData)),
 					rgb: outputData.rgb	  || node.rgb,
 				};
 
