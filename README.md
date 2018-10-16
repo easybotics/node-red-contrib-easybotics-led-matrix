@@ -2,7 +2,8 @@
 set of node-red nodes binding to node-rpi-rgb-led-matrix library
 Node Red binding of: https://github.com/easybotics/node-rpi-rgb-led-matrix/
 
-[**In Order for the HZELLER back end to function, node-red must be running as root!**](https://t3alliance.org/node-red-root/)
+**In Order for the HZELLER back end to function, node-red must be running as root!**
+see here for a tutorial -> https://t3alliance.org/node-red-root/
 
 
 **You can configure the node-red service on rpi to run as root, with the pi users home-dir**

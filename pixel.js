@@ -730,6 +730,61 @@ module.exports = function(RED) {
 		});
 	};
 
+	/*
+	 * Realtime versions of nodes, will print to the matrix immedietly and skip double buffering? 
+	 * or will they just print to the buffer immedietly, who knows 
+	 */ 
+
+	function RealTimeCircle (config) 
+	{
+		RED.nodes.createNode(this, config); 
+		const node = this; 
+		var outputInfo;
+
+		node.matrix  = RED.nodes.getNode(config.matrix);
+		node.xPos	 = (config.xPos   || 0);
+		node.yXpos	 = (config.yPos	  || 0);
+		node.radius	 = (config.radius || 0);
+		node.rgb	 = (config.rgb    || "255,255,255");
+
+
+		node.draw = function()
+		{
+			if (outputInfo != undefined)
+			{
+				let o = outputInfo;
+				led.drawCircle( o.x, o.y, o.radius, o.color.r, o.color.g, o.color.b);
+			}
+		}
+
+		node.clear = function ()
+		{
+				node.matrix.refresh();
+		}
+
+		node.on('input', function (msg)
+		{
+			if(msg.clear)
+			{
+				node.clear();
+				return;
+			}
+
+			const data   = msg.payload.data != undefined ? msg.payload.data : msg.payload;
+			outputInfo =
+			{
+				color	: data.rgb		!= undefined   ? eatRGBString(data.rgb) : eatRGBString(node.rgb),
+				y		: data.y		!= undefined   ? parseInt(data.y)		: parseInt(node.yPos),
+				x		: data.x		!= undefined   ? parseInt(data.x)		: parseInt(node.xPos),
+				radius	: data.radius	!= undefined   ? parseInt(data.radius)  : parseInt(node.radius),
+			};
+
+			node.draw();
+
+		});
+	};
+
+		
 
 
 	//register our functions with node-red
