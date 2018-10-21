@@ -569,7 +569,7 @@ module.exports = function(RED) {
 
 		node.matrix  = RED.nodes.getNode(config.matrix);
 		node.xPos	 = (config.xPos   || 0);
-		node.yXpos	 = (config.yPos	  || 0);
+		node.yPos	 = (config.yPos	  || 0);
 		node.radius	 = (config.radius || 0);
 		node.rgb	 = (config.rgb    || "255,255,255");
 
