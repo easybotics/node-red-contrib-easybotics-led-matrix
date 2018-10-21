@@ -678,6 +678,7 @@ module.exports = function(RED) {
 	{
 		RED.nodes.createNode(this, config);
 		const node = this;
+		var outputInfo;
 
 		node.matrix = RED.nodes.getNode(config.matrix);
 		node.x0		= (config.x0 || 0);
