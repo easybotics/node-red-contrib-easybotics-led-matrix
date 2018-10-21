@@ -619,6 +619,7 @@ module.exports = function(RED) {
 	{
 		RED.nodes.createNode(this, config);
 		const node = this;
+		var outputInfo;
 
 		node.matrix = RED.nodes.getNode(config.matrix);
 		node.x0		= (config.x0 || 0);
@@ -631,7 +632,8 @@ module.exports = function(RED) {
 		{
 			const color = outputInfo.color;
 
-			led.drawLine( outputInfo.x0Pos, outputInfo.y0Pos, outputInfo.x1Pos, outputInfo.y1Pos, parseInt(color.r), parseInt(color.g), parseInt(color.b));
+
+			led.drawLine( outputInfo.x0, outputInfo.y0, outputInfo.x1, outputInfo.y1, parseInt(color.r), parseInt(color.g), parseInt(color.b));
 		}
 
 
@@ -654,10 +656,10 @@ module.exports = function(RED) {
 			outputInfo = 
 			{
 				color : data.rgb	!= undefined ? eatRGBString(data.rgb) : eatRGBString(node.rgb), 
-				x0Pos : parseInt(data.x0	!= undefined ? data.x0	: node.x01Pos), 
-				y0Pos : parseInt(data.y0	!= undefined ? data.y0	: node.y0Pos), 
-				x1Pos : parseInt(data.x1	!= undefined ? data.x1	: node.x1Pos), 
-				y1Pos : parseInt(data.y1	!= undefined ? data.y1	: node.y1Pos), 
+				x0 : parseInt(data.x0	!= undefined ? data.x0	: node.x0), 
+				y0 : parseInt(data.y0	!= undefined ? data.y0	: node.y0), 
+				x1 : parseInt(data.x1	!= undefined ? data.x1	: node.x1), 
+				y1 : parseInt(data.y1	!= undefined ? data.y1	: node.y1), 
 			};
       
 			nodeRegister.add(node);
