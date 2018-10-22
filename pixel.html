@@ -703,12 +703,12 @@
 	</div>
 
 	<div class="form-row">
-		<label for="node-config-input-x"> <i class="fa fa-tag"></i> X Position </label>
+		<label for="node-config-input-xPos"> <i class="fa fa-tag"></i> X Position </label>
 		<input type="number" id="node-input-xPos" min = "0" placeholder="0" />
 	<div>
 
 	<div class="form-row">
-		<label for="node-config-input-y"> <i class="fa fa-tag"></i> Y Position </label>
+		<label for="node-config-input-yPos"> <i class="fa fa-tag"></i> Y Position </label>
 		<input type="number" id="node-input-yPos" min = "0" placeholder="0" />
 	<div>
 
@@ -1168,4 +1168,29 @@
 		<b> radius: </b> radius <br>
 		<b> rgb: </b> an rgb CSV string, example : "255,0,0," (red) <br><br>
 		otherwise the settings from the node itself are used </p>
+</script>
+
+<script type="text/javascript">
+	RED.nodes.registerType('PMS5003-decode',
+	{
+		category: 'LED Matrix',
+		color: '#D7A1D1',
+		defaults:
+		{
+			name: {value:""},
+		},
+		inputs: 1,
+		outputs: 3,
+		icon: "arrow-in.png",
+		label: function()
+		{
+			return this.name || "PMS5003 Decoder";
+		},
+	});
+</script>
+
+<script type="text/x-red" data-template-name="PMS5003-decode">
+	<div class = "form-row">
+		<label for="node-config-input-name"><i class="icon-tag"></i> Name </label>
+	</div>
 </script>

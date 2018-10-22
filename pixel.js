@@ -470,6 +470,16 @@ module.exports = function(RED) {
 
 			const outputData =  eval( node.source);
 
+			const handleFloat = function (i) 
+			{
+				if( !isNaN(i))
+				{
+					return Math.round(i * 100) / 100;
+				}
+
+				return i;
+			}
+
 			if(outputData)
 			{
 
@@ -477,7 +487,7 @@ module.exports = function(RED) {
 				{
 					x : outputData.x ? outputData.x : node.xOffset,
 					y : outputData.y ? outputData.y : node.yOffset,
-					data: node.prefix + (outputData.data  ? outputData.data    : outputData),
+					data: node.prefix + handleFloat((outputData.data  ? outputData.data    : outputData)),
 					rgb: outputData.rgb	  || node.rgb,
 				};
 
@@ -559,7 +569,7 @@ module.exports = function(RED) {
 
 		node.matrix  = RED.nodes.getNode(config.matrix);
 		node.xPos	 = (config.xPos   || 0);
-		node.yXpos	 = (config.yPos	  || 0);
+		node.yPos	 = (config.yPos	  || 0);
 		node.radius	 = (config.radius || 0);
 		node.rgb	 = (config.rgb    || "255,255,255");
 
@@ -609,6 +619,7 @@ module.exports = function(RED) {
 	{
 		RED.nodes.createNode(this, config);
 		const node = this;
+		var outputInfo;
 
 		node.matrix = RED.nodes.getNode(config.matrix);
 		node.x0		= (config.x0 || 0);
@@ -621,7 +632,8 @@ module.exports = function(RED) {
 		{
 			const color = outputInfo.color;
 
-			led.drawLine( outputInfo.x0Pos, outputInfo.y0Pos, outputInfo.x1Pos, outputInfo.y1Pos, parseInt(color.r), parseInt(color.g), parseInt(color.b));
+
+			led.drawLine( outputInfo.x0, outputInfo.y0, outputInfo.x1, outputInfo.y1, parseInt(color.r), parseInt(color.g), parseInt(color.b));
 		}
 
 
@@ -644,10 +656,10 @@ module.exports = function(RED) {
 			outputInfo = 
 			{
 				color : data.rgb	!= undefined ? eatRGBString(data.rgb) : eatRGBString(node.rgb), 
-				x0Pos : parseInt(data.x0	!= undefined ? data.x0	: node.x01Pos), 
-				y0Pos : parseInt(data.y0	!= undefined ? data.y0	: node.y0Pos), 
-				x1Pos : parseInt(data.x1	!= undefined ? data.x1	: node.x1Pos), 
-				y1Pos : parseInt(data.y1	!= undefined ? data.y1	: node.y1Pos), 
+				x0 : parseInt(data.x0	!= undefined ? data.x0	: node.x0), 
+				y0 : parseInt(data.y0	!= undefined ? data.y0	: node.y0), 
+				x1 : parseInt(data.x1	!= undefined ? data.x1	: node.x1), 
+				y1 : parseInt(data.y1	!= undefined ? data.y1	: node.y1), 
 			};
       
 			nodeRegister.add(node);
@@ -666,6 +678,7 @@ module.exports = function(RED) {
 	{
 		RED.nodes.createNode(this, config);
 		const node = this;
+		var outputInfo;
 
 		node.matrix = RED.nodes.getNode(config.matrix);
 		node.x0		= (config.x0 || 0);
@@ -784,7 +797,23 @@ module.exports = function(RED) {
 		});
 	};
 
-		
+	function PMS5003Decode (config)
+	{
+		RED.nodes.createNode(this, config);
+		const node = this; 
+
+		node.on('input', function (msg)
+		{
+
+			const pm10  =	{payload: msg.payload[10] * 256 + msg.payload[11]}; 
+			const pm25  =	{payload: msg.payload[12] * 256 + msg.payload[13]};
+			const pm100 =	{payload: msg.payload[14] * 255 + msg.payload[15]};
+
+
+			node.send([pm10, pm25, pm100]);
+		});
+	};
+
 
 
 	//register our functions with node-red
@@ -799,4 +828,5 @@ module.exports = function(RED) {
 	RED.nodes.registerType("line-to-matrix", LineToMatrix);
 	RED.nodes.registerType("triangle-to-matrix", TriangleToMatrix);
 	RED.nodes.registerType("clear-node", ClearNode);
+	RED.nodes.registerType("PMS5003-decode", PMS5003Decode);
 }
