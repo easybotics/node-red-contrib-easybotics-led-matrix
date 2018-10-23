@@ -1,5 +1,69 @@
 
 <script type="text/javascript">
+	//script to draw a grid on the canvas for the pixel selector and give the coordinates of the selected pixel
+	function pixelSelector(numPoints, pixelSelector){ //number of points to have the user select and which canvas to use as the pixel selector
+		function getMousePos(canvas, evt) {
+			var rect = canvas.getBoundingClientRect();
+			return {
+				x: Math.floor((evt.clientX - rect.left) / 4), //mouse x pos - how far rect is from edge of page / num of screen pixels per "pixel" in the canvas (finds what canvas pixel the mouse is in)
+				y: Math.floor((evt.clientY - rect.top) / 4)
+			};
+		}
+		var canvas = document.getElementById(pixelSelector);
+		var context = canvas.getContext("2d");
+		function drawGrid(canvas, context) {
+			for (var x = 0.5; x < canvas.width; x += 4) {
+				context.moveTo(x, 0);
+				context.lineTo(x, 256);
+			}
+
+			for (var y = 0.5; y < canvas.height; y += 4) {
+				context.moveTo(0, y);
+				context.lineTo(512, y);
+			}
+
+			context.lineWidth = 1;
+			context.strokeStyle = "#ddd";
+			context.stroke();
+		}
+
+		drawGrid(canvas, context);
+
+		var currentPoint = 0;
+		var points = {
+			x: [],
+			y: []
+		};
+		canvas.addEventListener('click', function(evt) {
+			var mousePos = getMousePos(canvas, evt);
+			points.x.push(mousePos.x);
+			points.y.push(mousePos.y);
+
+			if(points.x.length == numPoints+1) { //if the number of points is one too many
+				context.rect(points.x[0]*4, points.y[0]*4, 4, 4);
+				context.fillStyle="#fff";
+				context.fill(); //erase the first point before deleting from arrays
+				points.x.splice(0, 1); //removes the first value from x & y arrays
+				points.y.splice(0, 1);
+			}
+
+			for(i = 0; i < points.x.length; i++) {
+				document.getElementById("node-input-x"+i).value = points.x[i]; //set input fields to the coordinates of each pixel
+				document.getElementById("node-input-y"+i).value = points.y[i];
+			}
+
+			context.rect(points.x[points.x.length-1]*4, points.y[points.y.length-1]*4, 4, 4);
+			context.fillStyle="#555";
+			context.fill();
+
+			console.log(points.x);
+
+		}, false);
+	}
+
+</script>
+
+<script type="text/javascript">
 	RED.nodes.registerType('led-matrix', {
 		category: 'config',
 		defaults: {
@@ -108,7 +172,7 @@
 
 <p>
 	<b> warning:</b> <br>
-	due to quirks with node-red, most of these settings won't apply <br>
+	due to quirks with node-red, most of these settings wont apply <br>
 	unless you restart node-red (not the browser client),<br>
 	or delete this config node and make another one
 </p>
@@ -806,6 +870,8 @@
 				var split = tr.split(',');
 
 				$("#node-input-rgb2").val( rgbToHex( parseInt(split[0]), parseInt(split[1]), parseInt(split[2])));
+
+				pixelSelector(2, "linePixelSelect");
 		},
 	});
 </script>
@@ -858,6 +924,7 @@
 		<input type='text' id='node-input-matrix'/>
 	</div>
 
+	<canvas id="linePixelSelect" style="outline: 1px solid black;" width="512" height="256"></canvas>
 </script>
 
 <script type="text/x-red" data-help-name="line-to-matrix">
@@ -949,6 +1016,8 @@
 				var split = tr.split(',');
 
 				$("#node-input-rgb2").val( rgbToHex( parseInt(split[0]), parseInt(split[1]), parseInt(split[2])));
+
+				pixelSelector(3, "trianglePixelSelect");
 		},
 	});
 </script>
@@ -1006,6 +1075,7 @@
 		<input type='text' id='node-input-matrix'/>
 	</div>
 
+	<canvas id="trianglePixelSelect" style="outline: 1px solid black;" width="512" height="256"></canvas>
 </script>
 
 <script type="text/x-red" data-help-name="triangle-to-matrix">
