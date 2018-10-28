@@ -480,7 +480,7 @@ module.exports = function(RED) {
 				return i;
 			}
 
-			if(outputData)
+			if(outputData != undefined)
 			{
 
 				outputInfo =
