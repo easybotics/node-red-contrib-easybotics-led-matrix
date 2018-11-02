@@ -110,7 +110,7 @@ module.exports = function(RED) {
 		if(!led)
 		{
 			node.warn("initing led");
-			led = new Matrix( parseInt(node.width), parseInt(node.height), parseInt(node.parallel), parseInt(node.chained), parseInt(node.brightness), node.mapping);
+			led = new Matrix( parseInt(node.height), parseInt(node.width), parseInt(node.parallel), parseInt(node.chained), parseInt(node.brightness), node.mapping);
 			led.clear();
 			led.update();
 
@@ -480,7 +480,7 @@ module.exports = function(RED) {
 				return i;
 			}
 
-			if(outputData)
+			if(outputData != undefined)
 			{
 
 				outputInfo =

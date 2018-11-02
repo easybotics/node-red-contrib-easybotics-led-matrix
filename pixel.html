@@ -224,14 +224,15 @@
 -->
 
 <script type="text/x-red" data-template-name="pixel">
-    <div class="form-row">
-        <label for="node-config-input-name"><i class="icon-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
 	<div class='form-row'>
 		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
 		<input type='text' id='node-input-matrix'/>
 	</div>
+    <div class="form-row">
+        <label for="node-config-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+
 </script>
 
 <!--
@@ -281,13 +282,13 @@
 
 <script type="text/x-red" data-template-name="refresh-matrix">
 	<div class="form-row">
-		<label for="node-config-input-name"> <i class="icon-tag"></i> Name </label>
-		<input type="text" id="node-input-name" placeholder="Name">
+		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display </label>
+		<input type="text" id="node-input-matrix"/>
 	</div>
 
 	<div class="form-row">
-		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display </label>
-		<input type="text" id="node-input-matrix"/>
+		<label for="node-config-input-name"> <i class="icon-tag"></i> Name </label>
+		<input type="text" id="node-input-name" placeholder="Name">
 	</div>
 </script>
 
@@ -326,6 +327,11 @@
 
 
 <script type="text/x-red" data-template-name="image-to-matrix">
+	<div class='form-row'>
+		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
+		<input type='text' id='node-input-matrix'/>
+	</div>
+
 	<div class="form-row">
 		<label for="node-config-input-name"> <i class="icon-tag"></i> Name </label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -340,14 +346,6 @@
 		<label for="node-config-input-yOffset"> <i class="fa fa-tag"></i> Y position</label>
 		<input type="number" id="node-input-yOffset" min="0" placeholder="0" />
 	<div>
-
-
-	<div class='form-row'>
-		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
-		<input type='text' id='node-input-matrix'/>
-	</div>
-
-
 </script>
 
 <script type="text/x-red" data-help-name="image-to-matrix">
@@ -525,6 +523,12 @@
 
 
 <script type="text/x-red" data-template-name="text-to-matrix">
+
+	<div class='form-row'>
+		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
+		<input type='text' id='node-input-matrix'/>
+	</div>
+
     <div class="form-row">
         <label for="node-config-input-name"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -559,14 +563,6 @@
 		<label for="node-config-input-rgb2"><i class="icon-tag"></i>Color picker</label>
 		<input type="color" id="node-input-rgb2" placeholder="#43DB2D">
 	</div>
-
-
-	<div class='form-row'>
-		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
-		<input type='text' id='node-input-matrix'/>
-	</div>
-
-
 </script>
 
 <script type="text/x-red" data-help-name="text-to-matrix">
@@ -761,6 +757,11 @@
 
 <script type="text/x-red" data-template-name="circle-to-matrix">
 
+	<div class='form-row'>
+		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
+		<input type='text' id='node-input-matrix'/>
+	</div>
+
 	<div class="form-row">
 		<label for="node-config-input-name"><i class="icon-tag"></i> Name </label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -791,12 +792,6 @@
 		<label for="node-config-input-rgb2"><i class="icon-tag"></i>Color picker</label>
 		<input type="color" id="node-input-rgb2" placeholder="#43DB2D">
 	</div>
-
-	<div class='form-row'>
-		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
-		<input type='text' id='node-input-matrix'/>
-	</div>
-
 
 </script>
 
@@ -879,6 +874,11 @@
 
 <script type="text/x-red" data-template-name="line-to-matrix">
 
+	<div class='form-row'>
+		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
+		<input type='text' id='node-input-matrix'/>
+	</div>
+
 <!--
 	<div class="form-row">
 		<label for="node-config-input-name"><i class="icon-tag"></i> Name </label>
@@ -919,12 +919,8 @@
 		<input type="color" id="node-input-rgb2" placeholder="#43DB2D">
 	</div>
 
-	<div class='form-row'>
-		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
-		<input type='text' id='node-input-matrix'/>
-	</div>
-
 	<canvas id="linePixelSelect" style="outline: 1px solid black;" width="512" height="256"></canvas>
+
 </script>
 
 <script type="text/x-red" data-help-name="line-to-matrix">
@@ -1025,6 +1021,11 @@
 
 <script type="text/x-red" data-template-name="triangle-to-matrix">
 
+	<div class='form-row'>
+		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
+		<input type='text' id='node-input-matrix'/>
+	</div>
+
 	<div class="form-row">
 		<label for="node-config-input-name"><i class="icon-tag"></i> Name </label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -1070,11 +1071,6 @@
 		<input type="color" id="node-input-rgb2" placeholder="#43DB2D">
 	</div>
 
-	<div class='form-row'>
-		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
-		<input type='text' id='node-input-matrix'/>
-	</div>
-
 	<canvas id="trianglePixelSelect" style="outline: 1px solid black;" width="512" height="256"></canvas>
 </script>
 
@@ -1103,7 +1099,6 @@
 		}; <br>
 
 	</p>
-
 </script>
 
 <script type="text/javascript">
@@ -1191,6 +1186,12 @@
 
 <script type="text/x-red" data-template-name="realtime-circle-to-matrix">
 
+	<div class='form-row'>
+		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
+		<input type='text' id='node-input-matrix'/>
+	</div>
+
+
 	<div class="form-row">
 		<label for="node-config-input-name"><i class="icon-tag"></i> Name </label>
 		<input type="text" id="node-input-name" placeholder="Name">
@@ -1221,12 +1222,6 @@
 		<label for="node-config-input-rgb2"><i class="icon-tag"></i>Color picker</label>
 		<input type="color" id="node-input-rgb2" placeholder="#43DB2D">
 	</div>
-
-	<div class='form-row'>
-		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
-		<input type='text' id='node-input-matrix'/>
-	</div>
-
 
 </script>
 
