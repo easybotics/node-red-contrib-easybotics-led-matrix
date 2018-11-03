@@ -1,6 +1,6 @@
 <script type="text/javascript">
 	//script to draw a grid on the canvas for the pixel selector and give the coordinates of the selected pixel
-	function pixelSelector(numPoints, pixelSelector){ //number of points to have the user select and which canvas to use as the pixel selector
+	function pixelSelector(numPoints, pixelSelector, drawLines=true){ //number of points to have the user select, which canvas to use, whether or not to draw the final shape
 		function getMousePos(canvas, evt) {
 			var rect = canvas.getBoundingClientRect();
 			return {
@@ -11,6 +11,7 @@
 		var canvas = document.getElementById(pixelSelector);
 		var context = canvas.getContext("2d");
 		function drawGrid(canvas, context) {
+			context.beginPath();
 			for (var x = 0.5; x < canvas.width; x += 4) {
 				context.moveTo(x, 0);
 				context.lineTo(x, 256);
@@ -23,6 +24,7 @@
 
 			context.lineWidth = 1;
 			context.strokeStyle = "#ddd";
+			context.closePath();
 			context.stroke();
 		}
 
@@ -38,8 +40,10 @@
 			points.x.push(mousePos.x);
 			points.y.push(mousePos.y);
 
+			context.clearRect(0, 0, canvas.width, canvas.height);
+			drawGrid(canvas, context);
+
 			if(points.x.length == numPoints+1) { //if the number of points is one too many
-				context.clearRect(points.x[0]*4+1, points.y[0]*4+1, 3, 3); //clear point about to be deleted
 				points.x.splice(0, 1); //removes the first value from x & y arrays
 				points.y.splice(0, 1);
 			}
@@ -51,6 +55,20 @@
 				context.rect(points.x[i]*4+1, points.y[i]*4+1, 3, 3); //draw each pixel
 				context.fillStyle="#555";
 				context.fill();
+			}
+			context.closePath();
+
+			//draw the final shape
+			context.beginPath();
+			if(drawLines && points.x.length == numPoints) {
+				context.moveTo(points.x[0]*4+2.5, points.y[0]*4+2.5);
+				for(i = 1; i < numPoints; i++) {
+					context.lineTo(points.x[i]*4+2.5, points.y[i]*4+2.5);
+				}
+				context.lineTo(points.x[0]*4+2.5, points.y[0]*4+2.5);
+				context.lineWidth=1;
+				context.strokeStyle = "#555";
+				context.stroke();
 			}
 			context.closePath();
 
