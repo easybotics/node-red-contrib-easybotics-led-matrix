@@ -1,4 +1,3 @@
-
 <script type="text/javascript">
 	//script to draw a grid on the canvas for the pixel selector and give the coordinates of the selected pixel
 	function pixelSelector(numPoints, pixelSelector){ //number of points to have the user select and which canvas to use as the pixel selector
@@ -40,27 +39,23 @@
 			points.y.push(mousePos.y);
 
 			if(points.x.length == numPoints+1) { //if the number of points is one too many
-				context.rect(points.x[0]*4, points.y[0]*4, 4, 4);
-				context.fillStyle="#fff";
-				context.fill(); //erase the first point before deleting from arrays
+				context.clearRect(points.x[0]*4+1, points.y[0]*4+1, 3, 3); //clear point about to be deleted
 				points.x.splice(0, 1); //removes the first value from x & y arrays
 				points.y.splice(0, 1);
 			}
 
+			context.beginPath();
 			for(i = 0; i < points.x.length; i++) {
 				document.getElementById("node-input-x"+i).value = points.x[i]; //set input fields to the coordinates of each pixel
 				document.getElementById("node-input-y"+i).value = points.y[i];
+				context.rect(points.x[i]*4+1, points.y[i]*4+1, 3, 3); //draw each pixel
+				context.fillStyle="#555";
+				context.fill();
 			}
+			context.closePath();
 
-			context.rect(points.x[points.x.length-1]*4, points.y[points.y.length-1]*4, 4, 4);
-			context.fillStyle="#555";
-			context.fill();
-
-			console.log(points.x);
-
-		}, false);
+		});
 	}
-
 </script>
 
 <script type="text/javascript">
@@ -172,7 +167,7 @@
 
 <p>
 	<b> warning:</b> <br>
-	due to quirks with node-red, most of these settings wont apply <br>
+	due to quirks with node-red, most of these settings won't apply <br>
 	unless you restart node-red (not the browser client),<br>
 	or delete this config node and make another one
 </p>
