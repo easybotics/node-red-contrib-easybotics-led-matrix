@@ -68,12 +68,28 @@ module.exports = function(RED) {
 
 			led.clear();
 
+			var nArray = [];
+
 			for(let n of nodeRegister)
 			{
-				const start = Date.now();
-				n.draw();
-				const end = Date.now();
+				nArray.push(n);
 			}
+
+			nArray.sort(function(a, b)
+				{ 
+					const aa = a.zLevel != undefined ? a.zLevel : -99; 
+					const bb = b.zLevel != undefined ? b.zLevel : -99;
+
+					return aa > bb;
+				});
+
+
+			node.log('start draw');
+			for(let n of nArray)
+			{
+				n.draw();
+			}
+
 			led.update();
 
 		}
@@ -252,6 +268,7 @@ module.exports = function(RED) {
 		node.matrix = RED.nodes.getNode(config.matrix);
 		node.xOffset = config.xOffset;
 		node.yOffset = config.yOffset;
+		node.zLevel = 0;
 
 		//filename or URL to look for an image
 		//and an array we will will with pixels
@@ -263,6 +280,7 @@ module.exports = function(RED) {
 
 		node.draw = function ()
 		{
+			node.log("drawing image");
 			if(output != undefined)
 			{
 				for(let i = 0; i < output.length; i++)
@@ -352,7 +370,7 @@ module.exports = function(RED) {
 				if(c == context)
 				{
 					readySend();
-					currentFrame++;
+					if(pixels.shape[0] > 1) currentFrame++;
 				}
 
 			});
@@ -440,6 +458,7 @@ module.exports = function(RED) {
 		node.xOffset	= config.xOffset;
 		node.yOffset	= config.yOffset;
 		node.rgb		= config.rgb;
+		node.zLevel = 2;
 
 		var lastMsg;
 		var outputInfo;
@@ -688,9 +707,12 @@ module.exports = function(RED) {
 		node.x2		= (config.x2 || 0);
 		node.y2		= (config.y2 || 0);
 		node.rgb    = (config.rgb || "255,255,255");
+		node.zLevel = 1;
 
 		node.draw = function ()
 		{
+			node.log("drawing triangle");
+
 			if (outputInfo != undefined)
 			{
 				let o = outputInfo;
