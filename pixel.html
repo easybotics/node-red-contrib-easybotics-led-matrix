@@ -140,9 +140,6 @@
 		});
 	}
 
-
-
-
 </script>
 
 <script type="text/javascript">
@@ -290,6 +287,7 @@
             name: {value:""},
             color: {value:"haa"},
             matrix: { type:'led-matrix', required:true},
+			zLevel: {value: undefined},
         },
         inputs:1,
         outputs:0,
@@ -313,6 +311,10 @@
     <div class="form-row">
         <label for="node-config-input-name"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-zLevel"><i class="icon-tag"></i> z level</label>
+        <input type="number" id="node-input-zLevel" placeholder="-">
     </div>
 
 </script>
@@ -395,6 +397,7 @@
 			xOffset: {value:0, required:true},
 			yOffset: {value:0, required:true},
 			matrix: { type:'led-matrix', required:true},
+			zLevel: {value: undefined},
 		},
 
 		inputs:1,
@@ -428,6 +431,10 @@
 		<label for="node-config-input-yOffset"> <i class="fa fa-tag"></i> Y position</label>
 		<input type="number" id="node-input-yOffset" min="0" placeholder="0" />
 	<div>
+    <div class="form-row">
+        <label for="node-config-input-zLevel"><i class="icon-tag"></i> z level</label>
+        <input type="number" id="node-input-zLevel" placeholder="-">
+    </div>
 </script>
 
 <script type="text/x-red" data-help-name="image-to-matrix">
@@ -520,6 +527,7 @@
 			prefix:		  {value:""},
 			source:		  {value:"msg.payload"},
 			matrix: { type:'led-matrix', required:true},
+			zLevel: {value: undefined},
         },
 
         inputs:1,
@@ -645,6 +653,11 @@
 		<label for="node-config-input-rgb2"><i class="icon-tag"></i>Color picker</label>
 		<input type="color" id="node-input-rgb2" placeholder="#43DB2D">
 	</div>
+
+    <div class="form-row">
+        <label for="node-config-input-zLevel"><i class="icon-tag"></i> z level</label>
+        <input type="number" id="node-input-zLevel" placeholder="-">
+    </div>
 </script>
 
 <script type="text/x-red" data-help-name="text-to-matrix">
@@ -685,7 +698,6 @@
 			yOffset:	{value:0},
 			refresh:	{value:0},
 			rgb:		{value:"0,255,41"},
-
 		},
 		inputs: 1,
 		outputs: 1,
@@ -803,6 +815,7 @@
 				rgb:	{value:"0,255,41"},
 
 				matrix: {type: 'led-matrix', required:true},
+				zLevel: {value: undefined},
 			},
 
 			inputs: 1,
@@ -874,6 +887,10 @@
 		<label for="node-config-input-rgb2"><i class="icon-tag"></i>Color picker</label>
 		<input type="color" id="node-input-rgb2" placeholder="#43DB2D">
 	</div>
+    <div class="form-row">
+        <label for="node-config-input-zLevel"><i class="icon-tag"></i> z level</label>
+        <input type="number" id="node-input-zLevel" placeholder="-">
+    </div>
 
 </script>
 
@@ -916,6 +933,7 @@
 			rgb:	{value:"0, 255, 41"},
 
 			matrix:	{type: 'led-matrix', required: true},
+			zLevel: {value: undefined},
 		},
 
 		inputs: 1,
@@ -1003,6 +1021,11 @@
 
 	<canvas id="linePixelSelect" style="outline: 1px solid black;" width="512" height="256"></canvas>
 
+    <div class="form-row">
+        <label for="node-config-input-zLevel"><i class="icon-tag"></i> z level</label>
+        <input type="number" id="node-input-zLevel" placeholder="-">
+    </div>
+
 </script>
 
 <script type="text/x-red" data-help-name="line-to-matrix">
@@ -1063,6 +1086,7 @@
 			rgb:	{value:"0, 255, 41"},
 
 			matrix:	{type: 'led-matrix', required: true},
+			zLevel: {value: undefined},
 		},
 
 		inputs: 1,
@@ -1155,6 +1179,11 @@
 	</div>
 
 	<canvas id="trianglePixelSelect" style="outline: 1px solid black;" width="512" height="256"></canvas>
+
+    <div class="form-row">
+        <label for="node-config-input-zLevel"><i class="icon-tag"></i> z level</label>
+        <input type="number" id="node-input-zLevel" placeholder="-">
+    </div>
 </script>
 
 <script type="text/x-red" data-help-name="triangle-to-matrix">

@@ -84,7 +84,6 @@ module.exports = function(RED) {
 				});
 
 
-			node.log('start draw');
 			for(let n of nArray)
 			{
 				n.draw();
@@ -144,10 +143,6 @@ module.exports = function(RED) {
 		led.clear();
 		led.update();
 		nodeRegister.clear();
-
-	
-
-
 	}
 
 
@@ -160,6 +155,7 @@ module.exports = function(RED) {
 		RED.nodes.createNode(this, config);
 		const node = this;
 		node.matrix = RED.nodes.getNode(config.matrix);
+		node.zLevel = config.zLevel != undefined ? config.zLevel : 0;
 
 		var outputInfo;
 
@@ -268,7 +264,7 @@ module.exports = function(RED) {
 		node.matrix = RED.nodes.getNode(config.matrix);
 		node.xOffset = config.xOffset;
 		node.yOffset = config.yOffset;
-		node.zLevel = 0;
+		node.zLevel = config.zLevel != undefined ? config.zLevel : 0;
 
 		//filename or URL to look for an image
 		//and an array we will will with pixels
@@ -280,7 +276,6 @@ module.exports = function(RED) {
 
 		node.draw = function ()
 		{
-			node.log("drawing image");
 			if(output != undefined)
 			{
 				for(let i = 0; i < output.length; i++)
@@ -458,7 +453,7 @@ module.exports = function(RED) {
 		node.xOffset	= config.xOffset;
 		node.yOffset	= config.yOffset;
 		node.rgb		= config.rgb;
-		node.zLevel = 2;
+		node.zLevel = config.zLevel != undefined ? config.zLevel : 2;
 
 		var lastMsg;
 		var outputInfo;
@@ -591,6 +586,7 @@ module.exports = function(RED) {
 		node.yPos	 = (config.yPos	  || 0);
 		node.radius	 = (config.radius || 0);
 		node.rgb	 = (config.rgb    || "255,255,255");
+		node.zLevel = config.zLevel != undefined ? config.zLevel : 1;
 
 		node.draw = function()
 		{
@@ -646,6 +642,7 @@ module.exports = function(RED) {
 		node.x1		= (config.x1 || 0);
 		node.y1		= (config.y1 || 0);
 		node.rgb    = (config.rgb || "255,255,255");
+		node.zLevel = config.zLevel != undefined ? config.zLevel : 1;
 
 		node.draw = function ()
 		{
@@ -684,8 +681,6 @@ module.exports = function(RED) {
 			nodeRegister.add(node);
 			node.matrix.refresh();
 		});
-
-
 	};
 
 
@@ -707,12 +702,10 @@ module.exports = function(RED) {
 		node.x2		= (config.x2 || 0);
 		node.y2		= (config.y2 || 0);
 		node.rgb    = (config.rgb || "255,255,255");
-		node.zLevel = 1;
+		node.zLevel = config.zLevel != undefined ? config.zLevel : 1;
 
 		node.draw = function ()
 		{
-			node.log("drawing triangle");
-
 			if (outputInfo != undefined)
 			{
 				let o = outputInfo;
