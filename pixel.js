@@ -84,7 +84,6 @@ module.exports = function(RED) {
 				});
 
 
-			node.log('start draw');
 			for(let n of nArray)
 			{
 				n.draw();
@@ -277,7 +276,6 @@ module.exports = function(RED) {
 
 		node.draw = function ()
 		{
-			node.log("drawing image");
 			if(output != undefined)
 			{
 				for(let i = 0; i < output.length; i++)
@@ -708,8 +706,6 @@ module.exports = function(RED) {
 
 		node.draw = function ()
 		{
-			node.log("drawing triangle");
-
 			if (outputInfo != undefined)
 			{
 				let o = outputInfo;
