@@ -1,6 +1,6 @@
 <script type="text/javascript">
 
-	function pixelReDraw (numPoints, pixelSelector)
+	function pixelReDraw (numPoints, pixelSelector, drawLines = true, updateFields = true)
 	{
 		var xPoints = []; 
 		var yPoints = []; 
@@ -11,8 +11,11 @@
 		context.beginPath();
 		for(i = 0; i < numPoints; i++)
 		{
-			xPoints[i] = document.getElementById("node-input-x"+i).value;
-			yPoints[i] = document.getElementById("node-input-y"+i).value; 
+			if(updateFields)
+			{
+				xPoints[i] = document.getElementById("node-input-x"+i).value;
+				yPoints[i] = document.getElementById("node-input-y"+i).value; 
+			}
 			context.rect( xPoints[i] * 4+1, yPoints[i] * $+1, 3, 3); 
 			context.fillStyle = "#555";
 			context.fill();
@@ -39,7 +42,7 @@
 	 * function to draw a grid on the canvas for the pixel selector and give the coordinates of the selected pixel
 	 * numPoints: number of points in the polygon, pixelSelector: canvas to use, drawlines: draw the resulting shape or not 
 	 */
-	function pixelSelector (numPoints, pixelSelector, drawLines = true)
+	function pixelSelector (numPoints, pixelSelector, drawLines = true, updateFields=true)
 	{ 
 		function getMousePos(canvas, evt) 
 		{
@@ -76,8 +79,8 @@
 		var canvas = document.getElementById(pixelSelector);
 		var context = canvas.getContext("2d");
 
-		drawGrid(canvas, context);
-		pixelReDraw(numPoints, pixelSelector);
+		//drawGrid(canvas, context);
+		pixelReDraw(numPoints, pixelSelector, drawLines, updateFields);
 
 		var currentPoint = 0;
 		var points = { x: [], y: [] };
@@ -89,7 +92,7 @@
 			points.y.push(mousePos.y);
 
 			context.clearRect(0, 0, canvas.width, canvas.height);
-			drawGrid(canvas, context);
+		//	drawGrid(canvas, context);
 
 			if(points.x.length == numPoints+1) 
 			{ //if the number of points is one too many
@@ -101,8 +104,11 @@
 
 			for(i = 0; i < points.x.length; i++)
 			{
+				if(updateFields)
+				{
 				document.getElementById("node-input-x"+i).value = points.x[i]; //set input fields to the coordinates of each pixel
 				document.getElementById("node-input-y"+i).value = points.y[i];
+				}
 				context.rect(points.x[i]*4+1, points.y[i]*4+1, 3, 3); //draw each pixel
 				context.fillStyle="#555";
 				context.fill();
@@ -1112,6 +1118,11 @@
 				//pixelReDraw(3, "trianglePixelSelect");
 				pixelSelector(3, "trianglePixelSelect");
 		},
+		
+		oneditsave: function ()
+		{
+		},
+			
 	});
 </script>
 
@@ -1361,3 +1372,75 @@
 		<label for="node-config-input-name"><i class="icon-tag"></i> Name </label>
 	</div>
 </script>
+
+<script type="text/javascript">
+	RED.nodes.registerType('canvas-to-matrix', 
+	{
+		category: 'LED Matrix', 
+		color: '#a6bbcf', 
+
+		defaults: 
+		{
+			name:		{value:""}, 
+
+			matrix:		{type: 'led-matrix', required: true}, 
+			zLevel:		{value: undefined}, 
+			imageUrl:	{value: undefined}, 
+		}, 
+
+		input: 1, 
+		outputs: 0, 
+		icon: "image-matrix.png",
+		label: function ()
+		{
+			return this.name || "canvas to matrix";
+		},
+
+		oneditprepare: function ()
+		{
+			pixelSelector(3, "canvasPixelSelect", true, false);
+		},
+
+		oneditsave: function ()
+		{
+			const canvas = document.getElementById("canvasPixelSelect");
+
+			var scaledCanvas = document.createElement('canvas');
+			var scaledContext = scaledCanvas.getContext('2d');
+
+			scaledCanvas.width=canvas.width   * 0.25;
+			scaledCanvas.height=canvas.height * 0.25;
+
+			scaledContext.scale(0.25,0.25);
+			scaledContext.drawImage(canvas,0,0);
+
+
+			const img    = scaledCanvas.toDataURL("image/png");
+			console.log(img);
+
+			this.imageUrl =	img;
+		},
+	});
+</script>
+
+<script type="text/x-red" data-template-name="canvas-to-matrix">
+
+	<div class='form-row'>
+		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
+		<input type='text' id='node-input-matrix'/>
+	</div>
+
+	<div class="form-row">
+		<label for="node-config-input-name"><i class="icon-tag"></i> Name </label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+
+	<canvas id="canvasPixelSelect" style="outline: 1px solid black;" width="512" height="256"></canvas>
+
+    <div class="form-row">
+        <label for="node-config-input-zLevel"><i class="icon-tag"></i> z level</label>
+        <input type="number" id="node-input-zLevel" placeholder="-">
+    </div>
+</script>
+
+
