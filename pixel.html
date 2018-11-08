@@ -1,6 +1,6 @@
 <script type="text/javascript">
 
-	function pixelReDraw (numPoints, pixelSelector, drawLines = true, updateFields = true)
+	function pixelReDraw (points, pixelSelector, drawLines = true, updateFields = true)
 	{
 		var canvas  = document.getElementById(pixelSelector);
 		var context = canvas.getContext("2d");
@@ -38,7 +38,7 @@
 	 * function to draw a grid on the canvas for the pixel selector and give the coordinates of the selected pixel
 	 * numPoints: number of points in the polygon, pixelSelector: canvas to use, drawlines: draw the resulting shape or not
 	 */
-	function pixelSelector (numPoints, pixelSelector, drawLines = true, updateFields=true)
+	function pixelSelector (numPoints, pixelSelector, drawLines = true, updateFields = true)
 	{
 		function getMousePos(canvas, evt)
 		{
@@ -122,7 +122,7 @@
 			}
 
 			context.clearRect(0, 0, canvas.width, canvas.height);
-		//	drawGrid(canvas, context);
+			drawGrid(canvas, context);
 
 			if(points.x.length == numPoints+1)
 			{ //if the number of points is one too many
@@ -132,14 +132,14 @@
 
 			for(i = 0; i < points.x.length; i++)
 			{
-				if(updateFields)
+				if(updateFields) //should be outside of for loop
 				{
-				document.getElementById("node-input-x"+i).value = points.x[i]; //set input fields to the coordinates of each pixel
-				document.getElementById("node-input-y"+i).value = points.y[i];
+					document.getElementById("node-input-x"+i).value = points.x[i]; //set input fields to the coordinates of each pixel
+					document.getElementById("node-input-y"+i).value = points.y[i];
 				}
 			}
 
-			pixelReDraw(points, pixelSelector, drawLines);
+			pixelReDraw(points, pixelSelector, drawLines, updateFields);
 		});
 	}
 
