@@ -34,55 +34,57 @@
 
 	}
 
-	/*
-	 * function to draw a grid on the canvas for the pixel selector and give the coordinates of the selected pixel
-	 * numPoints: number of points in the polygon, pixelSelector: canvas to use, drawlines: draw the resulting shape or not
-	 */
-	function pixelSelector (numPoints, pixelSelector, drawLines = true, updateFields = true)
+	function getMousePos(canvas, evt)
 	{
-		function getMousePos(canvas, evt)
-		{
-			var rect = canvas.getBoundingClientRect();
+		var rect = canvas.getBoundingClientRect();
 
-			return {	//mouse x pos - how far rect is from edge of page / num of screen pixels per "pixel" in the canvas (finds what canvas pixel the mouse is in)
-						x: Math.floor((evt.clientX - rect.left) / 4),
-						y: Math.floor((evt.clientY - rect.top) / 4)
-				   };
+		return {	//mouse x pos - how far rect is from edge of page / num of screen pixels per "pixel" in the canvas (finds what canvas pixel the mouse is in)
+					x: Math.floor((evt.clientX - rect.left) / 4),
+					y: Math.floor((evt.clientY - rect.top) / 4)
+			   };
+	}
+
+	function drawGrid (canvas, context)
+	{
+		context.beginPath();
+
+		for (var x = 0.5; x < canvas.width; x += 4)
+		{
+			context.moveTo(x, 0);
+			context.lineTo(x, 256);
 		}
 
-		function drawGrid (canvas, context)
+		for (var y = 0.5; y < canvas.height; y += 4)
 		{
-			context.beginPath();
-
-			for (var x = 0.5; x < canvas.width; x += 4)
-			{
-				context.moveTo(x, 0);
-				context.lineTo(x, 256);
-			}
-
-			for (var y = 0.5; y < canvas.height; y += 4)
-			{
-				context.moveTo(0, y);
-				context.lineTo(512, y);
-			}
-
-			context.lineWidth = 1;
-			context.strokeStyle = "#ddd";
-			context.closePath();
-			context.stroke();
+			context.moveTo(0, y);
+			context.lineTo(512, y);
 		}
 
-		function ptNear(coord, range = 2) //coord: coordinate of point to check as object with format {x: x-coord, y: y-coord}, range: how far from the clicked pt to search for points
-		{
-			for(i = coord.x-range; i <= coord.x+range; i++) {
-				for(j = coord.y-range; j <= coord.y+range; j++) {
-					if(points.x.includes(i) && points.y[points.x.indexOf(i)] == j) {
-						return points.x.indexOf(i); //returns index of x and y coordinates
-					}
+		context.lineWidth = 1;
+		context.strokeStyle = "#ddd";
+		context.closePath();
+		context.stroke();
+	}
+
+	function ptNear(points, coord, range = 2) //coord: coordinate of point to check as object with format {x: x-coord, y: y-coord}, range: how far from the clicked pt to search for points
+	{
+		for(i = coord.x-range; i <= coord.x+range; i++) {
+			for(j = coord.y-range; j <= coord.y+range; j++) {
+				if(points.x.includes(i) && points.y[points.x.indexOf(i)] == j) {
+					return points.x.indexOf(i); //returns index of x and y coordinates
 				}
 			}
-			return false; //if no pts within range of clicked pt
 		}
+		return false; //if no pts within range of clicked pt
+	}
+
+	/*
+	 * function to draw a grid on the canvas for the pixel selector and give the coordinates of the selected pixel
+	 * numPoints: number of points in the polygon, pixelSelector: canvas to use, drawLines: draw the resulting shape or not,
+	 * updateFields: whether or not to change input text fields, outputCanvas: canvas to send the scaled down version of the pixelSelector canvas to (used for exporting as image, input as string id of canvas)
+	 */
+	function pixelSelector (numPoints, pixelSelector, drawLines = true, updateFields = true, outputCanvas = false)
+	{
 
 		var canvas = document.getElementById(pixelSelector);
 		var context = canvas.getContext("2d");
@@ -90,10 +92,16 @@
 		var currentPoint = {};
 		var points = { x: [], y: [] };
 
-		for(i = 0; i < numPoints; i++)
-		{
-			points.x.push(parseInt(document.getElementById("node-input-x"+i).value));
-			points.y.push(parseInt(document.getElementById("node-input-y"+i).value));
+		if(outputCanvas != false) {
+			var outCanvas = document.getElementById(outputCanvas);
+			var outContext = outCanvas.getContext("2d");
+		}
+
+		if(updateFields) { //get the numbers in the input fields
+			for(i = 0; i < numPoints; i++) {
+				points.x.push(parseInt(document.getElementById("node-input-x"+i).value));
+				points.y.push(parseInt(document.getElementById("node-input-y"+i).value));
+			}
 		}
 
 		drawGrid(canvas, context);
@@ -111,9 +119,9 @@
 			if(currentPoint.down.x == currentPoint.up.x && currentPoint.down.y == currentPoint.up.y) { //if mouse not dragged
 				points.x.push(currentPoint.up.x);
 				points.y.push(currentPoint.up.y);
-			} else if (ptNear(currentPoint.down) !== false) { //mouse dragged and starting on/near a point
+			} else if (ptNear(points, currentPoint.down) !== false) { //mouse dragged and starting on/near a point
 				//update the selected point
-				ptIndex = ptNear(currentPoint.down)
+				ptIndex = ptNear(points, currentPoint.down)
 				points.x[ptIndex] = currentPoint.up.x;
 				points.y[ptIndex] = currentPoint.up.y;
 			} else { //if mouse dragged, not starting on a point
@@ -132,10 +140,28 @@
 
 			for(i = 0; i < points.x.length; i++)
 			{
-				if(updateFields) //should be outside of for loop
+				if(updateFields)
 				{
 					document.getElementById("node-input-x"+i).value = points.x[i]; //set input fields to the coordinates of each pixel
 					document.getElementById("node-input-y"+i).value = points.y[i];
+				} else if (i == 0) {
+					//if pt is first point(i == 0): move to there
+					//else draw line to pt
+				}
+				if(outputCanvas != false)
+				{
+					if(i == 0) { //first pt
+						outContext.moveTo(points.x[i], points.y[i]);
+					} else if(i == points.x.length-1) { //last pt
+						outContext.lineTo(points.x[i], points.y[i]);
+						outContext.lineTo(points.x[0], points.y[0]);
+
+						outContext.lineWidth = 1;
+						outContext.strokeStyle = "#555";
+						outContext.stroke();
+					} else {
+						outContext.lineTo(points.x[i], points.y[i]);
+					}
 				}
 			}
 
@@ -1405,12 +1431,12 @@
 
 		oneditprepare: function ()
 		{
-			pixelSelector(3, "canvasPixelSelect", true, false);
+			pixelSelector(3, "canvasPixelSelect", true, false, "outputCanvas");
 		},
 
 		oneditsave: function ()
 		{
-			const canvas = document.getElementById("canvasPixelSelect");
+			const canvas = document.getElementById("outputCanvas");
 
 			var scaledCanvas = document.createElement('canvas');
 			var scaledContext = scaledCanvas.getContext('2d');
@@ -1443,6 +1469,7 @@
 	</div>
 
 	<canvas id="canvasPixelSelect" style="outline: 1px solid black;" width="512" height="256"></canvas>
+	<canvas id="outputCanvas" style="outline: 1px solid black;" width="128" height="64"></canvas>
 
     <div class="form-row">
         <label for="node-config-input-zLevel"><i class="icon-tag"></i> z level</label>
