@@ -704,6 +704,8 @@ module.exports = function(RED) {
 		node.rgb    = (config.rgb || "255,255,255");
 		node.zLevel = config.zLevel != undefined ? config.zLevel : 1;
 
+		node.log(config.urlTest);
+
 		node.draw = function ()
 		{
 			if (outputInfo != undefined)
@@ -829,6 +831,88 @@ module.exports = function(RED) {
 		});
 	};
 
+	function CanvasToMatrix (config)
+	{
+		RED.nodes.createNode(this, config); 
+		const node = this; 
+
+		node.matrix = RED.nodes.getNode(config.matrix); 
+		node.zLevel = config.zLevel != undefined ? config.zLevel : 1; 
+		node.url	= config.imageUrl; 
+		var output = undefined;
+
+		node.draw = function ()
+		{
+			if(output == undefined) return;
+
+			for(let b of output)
+			{
+				const payload = b.payload; 
+
+				led.setPixel( parseInt(payload.x), parseInt(payload.y), parseInt(payload.r), parseInt(payload.g), parseInt(payload.b));
+			}
+		}
+
+		node.clear = function ()
+		{
+			nodeRegister.delete(node);
+			node.matrix.refresh();
+		}
+
+
+		function createPixelStream ()
+		{
+			const cc = context; 
+			if(!node.url) return;
+
+			getPixels( node.url, function( err, pixels, c = cc)
+			{
+				outArray = []; 
+
+				if(!pixels) return; 
+				const width = pixels.shape.length == 4 ?  Math.min( 128, pixels.shape[1]) :  Math.min( 128, pixels.shape[0]);
+				const height = pixels.shape.length == 4 ?  Math.min( 128, pixels.shape[2]) :  Math.min( 128, pixels.shape[1]);
+
+				//loop over the 2d array of pixels returned by getPixels
+				for(let x = 0; x < width; x++)
+				{
+					for(let y = 0; y < height; y++)
+					{
+						//make sure the array actually contains data for this location
+						if(pixels.get(x,y,0))
+						{
+							outArray.push({payload: { x: x, y: y,  r:pixels.get(x,y,0), g:pixels.get(x,y,1), b:pixels.get(x,y,2)} });
+						}
+					}
+				}
+
+				if(c == context)
+				{
+					output = outArray
+					readySend();
+				}
+			});
+		}
+
+		function readySend ()
+		{
+			nodeRegister.add(node); 
+			node.matrix.refresh();
+		}
+
+		createPixelStream();
+	}
+
+		
+
+
+
+
+
+
+
+
+
 
 
 	//register our functions with node-red
@@ -844,4 +928,5 @@ module.exports = function(RED) {
 	RED.nodes.registerType("triangle-to-matrix", TriangleToMatrix);
 	RED.nodes.registerType("clear-node", ClearNode);
 	RED.nodes.registerType("PMS5003-decode", PMS5003Decode);
+	RED.nodes.registerType("canvas-to-matrix", CanvasToMatrix);
 }
