@@ -1382,31 +1382,6 @@
 </script>
 
 <script type="text/javascript">
-	RED.nodes.registerType('PMS5003-decode',
-	{
-		category: 'LED Matrix',
-		color: '#D7A1D1',
-		defaults:
-		{
-			name: {value:""},
-		},
-		inputs: 1,
-		outputs: 3,
-		icon: "arrow-in.png",
-		label: function()
-		{
-			return this.name || "PMS5003 Decoder";
-		},
-	});
-</script>
-
-<script type="text/x-red" data-template-name="PMS5003-decode">
-	<div class = "form-row">
-		<label for="node-config-input-name"><i class="icon-tag"></i> Name </label>
-	</div>
-</script>
-
-<script type="text/javascript">
 	RED.nodes.registerType('canvas-to-matrix',
 	{
 		category: 'LED Matrix',
