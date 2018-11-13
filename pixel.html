@@ -1,6 +1,6 @@
 <script type="text/javascript">
 
-	function pixelReDraw (points, pixelSelector, drawLines = true, updateFields = true)
+	function pixelReDraw (points, numPoints, pixelSelector, drawLines = true, updateFields = true)
 	{
 		var canvas  = document.getElementById(pixelSelector);
 		var context = canvas.getContext("2d");
@@ -23,7 +23,9 @@
 				context.lineTo(points.x[i] * 4 + 2.5, points.y[i] * 4 + 2.5);
 			}
 
-			context.lineTo(points.x[0] * 4 + 2.5, points.y[0] * 4 + 2.5);
+			if(points.x.length == numPoints) { //only close the shape if all points are there
+				context.lineTo(points.x[0] * 4 + 2.5, points.y[0] * 4 + 2.5);
+			}
 
 			context.lineWidth = 1;
 			context.strokeStyle = "#555";
@@ -112,7 +114,7 @@
 		}
 
 		drawGrid(canvas, context);
-		pixelReDraw(points, pixelSelector, drawLines, updateFields);
+		pixelReDraw(points, numPoints, pixelSelector, drawLines, updateFields);
 
 		canvas.addEventListener('mousedown', function(evt)
 		{
@@ -167,7 +169,7 @@
 					outContext.beginPath();
 					outContext.moveTo(points.x[0], points.y[0]);
 
-					for(i = 0; i < points.x.length; i++) {
+					for(i = 1; i < points.x.length; i++) {
 						outContext.lineTo(points.x[i], points.y[i]);
 					}
 					outContext.lineTo(points.x[0], points.y[0]);
@@ -179,7 +181,7 @@
 				}
 			}
 
-			pixelReDraw(points, pixelSelector, drawLines, updateFields);
+			pixelReDraw(points, numPoints, pixelSelector, drawLines, updateFields);
 		});
 	}
 
