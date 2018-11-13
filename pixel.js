@@ -76,8 +76,8 @@ module.exports = function(RED) {
 			}
 
 			nArray.sort(function(a, b)
-				{ 
-					const aa = a.zLevel != undefined ? a.zLevel : -99; 
+				{
+					const aa = a.zLevel != undefined ? a.zLevel : -99;
 					const bb = b.zLevel != undefined ? b.zLevel : -99;
 
 					return aa > bb;
@@ -484,7 +484,7 @@ module.exports = function(RED) {
 
 			const outputData =  eval( node.source);
 
-			const handleFloat = function (i) 
+			const handleFloat = function (i)
 			{
 				if( !isNaN(i))
 				{
@@ -668,16 +668,16 @@ module.exports = function(RED) {
 				return;
 			}
 
-			const data = msg.payload; 
-			outputInfo = 
+			const data = msg.payload;
+			outputInfo =
 			{
-				color : data.rgb	!= undefined ? eatRGBString(data.rgb) : eatRGBString(node.rgb), 
-				x0 : parseInt(data.x0	!= undefined ? data.x0	: node.x0), 
-				y0 : parseInt(data.y0	!= undefined ? data.y0	: node.y0), 
-				x1 : parseInt(data.x1	!= undefined ? data.x1	: node.x1), 
-				y1 : parseInt(data.y1	!= undefined ? data.y1	: node.y1), 
+				color : data.rgb	!= undefined ? eatRGBString(data.rgb) : eatRGBString(node.rgb),
+				x0 : parseInt(data.x0	!= undefined ? data.x0	: node.x0),
+				y0 : parseInt(data.y0	!= undefined ? data.y0	: node.y0),
+				x1 : parseInt(data.x1	!= undefined ? data.x1	: node.x1),
+				y1 : parseInt(data.y1	!= undefined ? data.y1	: node.y1),
 			};
-      
+
 			nodeRegister.add(node);
 			node.matrix.refresh();
 		});
@@ -761,14 +761,14 @@ module.exports = function(RED) {
 	};
 
 	/*
-	 * Realtime versions of nodes, will print to the matrix immedietly and skip double buffering? 
-	 * or will they just print to the buffer immedietly, who knows 
-	 */ 
+	 * Realtime versions of nodes, will print to the matrix immedietly and skip double buffering?
+	 * or will they just print to the buffer immedietly, who knows
+	 */
 
-	function RealTimeCircle (config) 
+	function RealTimeCircle (config)
 	{
-		RED.nodes.createNode(this, config); 
-		const node = this; 
+		RED.nodes.createNode(this, config);
+		const node = this;
 		var outputInfo;
 
 		node.matrix  = RED.nodes.getNode(config.matrix);
@@ -817,12 +817,12 @@ module.exports = function(RED) {
 
 	function CanvasToMatrix (config)
 	{
-		RED.nodes.createNode(this, config); 
-		const node = this; 
+		RED.nodes.createNode(this, config);
+		const node = this;
 
-		node.matrix = RED.nodes.getNode(config.matrix); 
-		node.zLevel = config.zLevel != undefined ? config.zLevel : 1; 
-		node.url	= config.imageUrl; 
+		node.matrix = RED.nodes.getNode(config.matrix);
+		node.zLevel = config.zLevel != undefined ? config.zLevel : 1;
+		node.url	= config.imageUrl;
 		var output = undefined;
 
 		node.draw = function ()
@@ -831,7 +831,7 @@ module.exports = function(RED) {
 
 			for(let b of output)
 			{
-				const payload = b.payload; 
+				const payload = b.payload;
 
 				led.setPixel( parseInt(payload.x), parseInt(payload.y), parseInt(payload.r), parseInt(payload.g), parseInt(payload.b));
 			}
@@ -846,14 +846,14 @@ module.exports = function(RED) {
 
 		function createPixelStream ()
 		{
-			const cc = context; 
+			const cc = context;
 			if(!node.url) return;
 
 			getPixels( node.url, function( err, pixels, c = cc)
 			{
-				outArray = []; 
+				outArray = [];
 
-				if(!pixels) return; 
+				if(!pixels) return;
 				const width = pixels.shape.length == 4 ?  Math.min( 128, pixels.shape[1]) :  Math.min( 128, pixels.shape[0]);
 				const height = pixels.shape.length == 4 ?  Math.min( 128, pixels.shape[2]) :  Math.min( 128, pixels.shape[1]);
 
@@ -880,7 +880,7 @@ module.exports = function(RED) {
 
 		function readySend ()
 		{
-			nodeRegister.add(node); 
+			nodeRegister.add(node);
 			node.matrix.refresh();
 		}
 

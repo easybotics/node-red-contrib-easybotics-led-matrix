@@ -95,6 +95,7 @@
 		if(outputCanvas != false) {
 			var outCanvas = document.getElementById(outputCanvas);
 			var outContext = outCanvas.getContext("2d");
+			outContext.translate(0.5, 0.5);
 		}
 
 		if(updateFields) { //get the numbers in the input fields
@@ -144,24 +145,26 @@
 				{
 					document.getElementById("node-input-x"+i).value = points.x[i]; //set input fields to the coordinates of each pixel
 					document.getElementById("node-input-y"+i).value = points.y[i];
-				} else if (i == 0) {
-					//if pt is first point(i == 0): move to there
-					//else draw line to pt
 				}
-				if(outputCanvas != false)
-				{
-					if(i == 0) { //first pt
-						outContext.moveTo(points.x[i], points.y[i]);
-					} else if(i == points.x.length-1) { //last pt
-						outContext.lineTo(points.x[i], points.y[i]);
-						outContext.lineTo(points.x[0], points.y[0]);
+			}
 
-						outContext.lineWidth = 1;
-						outContext.strokeStyle = "#555";
-						outContext.stroke();
-					} else {
+			if(outputCanvas != false)
+			{
+				if(numPoints == points.x.length) { //if all pts selected
+					outContext.clearRect(0, 0, outCanvas.width, outCanvas.height); //clear anything already on the canvas
+
+					outContext.beginPath();
+					outContext.moveTo(points.x[0], points.y[0]);
+
+					for(i = 0; i < points.x.length; i++) {
 						outContext.lineTo(points.x[i], points.y[i]);
 					}
+					outContext.lineTo(points.x[0], points.y[0]);
+
+					outContext.lineWidth = 1;
+					outContext.strokeStyle = "#555";
+					outContext.stroke();
+					outContext.closePath();
 				}
 			}
 
@@ -1396,7 +1399,7 @@
 			imageUrl:	{value: undefined},
 		},
 
-		input: 1,
+		inputs: 1,
 		outputs: 0,
 		icon: "image-matrix.png",
 		label: function ()
@@ -1412,18 +1415,9 @@
 		oneditsave: function ()
 		{
 			const canvas = document.getElementById("outputCanvas");
+			const context = canvas.getContext('2d');
 
-			var scaledCanvas = document.createElement('canvas');
-			var scaledContext = scaledCanvas.getContext('2d');
-
-			scaledCanvas.width=canvas.width   * 0.25;
-			scaledCanvas.height=canvas.height * 0.25;
-
-			scaledContext.scale(0.25,0.25);
-			scaledContext.drawImage(canvas,0,0);
-
-
-			const img    = scaledCanvas.toDataURL("image/png");
+			const img    = canvas.toDataURL("image/png");
 			console.log(img);
 
 			this.imageUrl =	img;
