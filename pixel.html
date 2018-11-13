@@ -81,9 +81,11 @@
 	/*
 	 * function to draw a grid on the canvas for the pixel selector and give the coordinates of the selected pixel
 	 * numPoints: number of points in the polygon, pixelSelector: canvas to use, drawLines: draw the resulting shape or not,
-	 * updateFields: whether or not to change input text fields, outputCanvas: canvas to send the scaled down version of the pixelSelector canvas to (used for exporting as image, input as string id of canvas)
+	 * updateFields: whether or not to change input text fields, outputCanvas: canvas to send the scaled down version of the pixelSelector
+	 * canvas to (used for exporting as image, input as string id of canvas),
+	 * colorSelector: id of the color selector to use for output to the outputCanvas
 	 */
-	function pixelSelector (numPoints, pixelSelector, drawLines = true, updateFields = true, outputCanvas = false)
+	function pixelSelector (numPoints, pixelSelector, drawLines = true, updateFields = true, outputCanvas = false, colorSelector = false)
 	{
 
 		var canvas = document.getElementById(pixelSelector);
@@ -96,6 +98,10 @@
 			var outCanvas = document.getElementById(outputCanvas);
 			var outContext = outCanvas.getContext("2d");
 			outContext.translate(0.5, 0.5);
+		}
+
+		if(colorSelector == false) { //if no color selector specified
+			var color = "#fff";
 		}
 
 		if(updateFields) { //get the numbers in the input fields
@@ -151,6 +157,11 @@
 			if(outputCanvas != false)
 			{
 				if(numPoints == points.x.length) { //if all pts selected
+
+					if(colorSelector != false) { //get color to draw shape with
+						var color = document.getElementById(colorSelector).value;
+					}
+
 					outContext.clearRect(0, 0, outCanvas.width, outCanvas.height); //clear anything already on the canvas
 
 					outContext.beginPath();
@@ -162,7 +173,7 @@
 					outContext.lineTo(points.x[0], points.y[0]);
 
 					outContext.lineWidth = 1;
-					outContext.strokeStyle = "#555";
+					outContext.strokeStyle = color;
 					outContext.stroke();
 					outContext.closePath();
 				}
@@ -1385,6 +1396,18 @@
 </script>
 
 <script type="text/javascript">
+
+	function componentToHex(c)
+	{
+		var hex = c.toString(16);
+		return hex.length == 1 ? "0" + hex : hex;
+	}
+
+	function rgbToHex(r, g, b)
+	{
+		return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+	}
+
 	RED.nodes.registerType('canvas-to-matrix',
 	{
 		category: 'LED Matrix',
@@ -1393,7 +1416,7 @@
 		defaults:
 		{
 			name:		{value:""},
-
+			rgb:		{value: "255,255,255"},
 			matrix:		{type: 'led-matrix', required: true},
 			zLevel:		{value: undefined},
 			imageUrl:	{value: undefined},
@@ -1409,7 +1432,26 @@
 
 		oneditprepare: function ()
 		{
-			pixelSelector(3, "canvasPixelSelect", true, false, "outputCanvas");
+			$("#node-input-rgb2").change(function()
+			{
+				var hex = $("#node-input-rgb2").val();
+				var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+				hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+					return r + r + g + g + b + b;
+				});
+
+				var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+				var output =  "" + parseInt(result[1], 16) + ',' + parseInt(result[2], 16) + ',' + parseInt(result[3], 16);
+
+				$("#node-input-rgb").val(output);
+			});
+
+			var tr = $("#node-input-rgb").val();
+			var split = tr.split(',');
+
+			$("#node-input-rgb2").val( rgbToHex( parseInt(split[0]), parseInt(split[1]), parseInt(split[2])));
+
+			pixelSelector(3, "canvasPixelSelect", true, false, "outputCanvas", "node-input-rgb2");
 		},
 
 		oneditsave: function ()
@@ -1418,7 +1460,6 @@
 			const context = canvas.getContext('2d');
 
 			const img    = canvas.toDataURL("image/png");
-			console.log(img);
 
 			this.imageUrl =	img;
 		},
@@ -1435,6 +1476,16 @@
 	<div class="form-row">
 		<label for="node-config-input-name"><i class="icon-tag"></i> Name </label>
 		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+
+	<div class = "form-row">
+		<label for="node-config-input-rgb"><i class="icon-tag"></i>RGB color </label>
+		<input type="text" id="node-input-rgb" placeholder="255,255,255">
+	</div>
+
+	<div class = "form-row">
+		<label for="node-config-input-rgb2"><i class="icon-tag"></i>Color picker</label>
+		<input type="color" id="node-input-rgb2">
 	</div>
 
 	<canvas id="canvasPixelSelect" style="outline: 1px solid black;" width="512" height="256"></canvas>
