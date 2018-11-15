@@ -1,6 +1,6 @@
 <script type="text/javascript">
 
-	function pixelReDraw (points, numPoints, pixelSelector, drawLines = true, updateFields = true)
+	function pixelReDraw (points, numPoints, pixelSelector, drawLines = true)
 	{
 		var canvas  = document.getElementById(pixelSelector);
 		var context = canvas.getContext("2d");
@@ -111,7 +111,7 @@
 			var color = "#fff";
 		}
 
-		if(updateFields) { //get the numbers in the input fields
+		if(updateFields == true) { //get the numbers in the input fields
 			for(i = 0; i < numPoints; i++) {
 				points.x.push(parseInt(document.getElementById("node-input-x"+i).value));
 				points.y.push(parseInt(document.getElementById("node-input-y"+i).value));
@@ -119,19 +119,20 @@
 		}
 
 		drawGrid(canvas, context);
-		pixelReDraw(points, numPoints, pixelSelector, drawLines, updateFields);
+		pixelReDraw(points, numPoints, pixelSelector, drawLines);
 
 		canvas.addEventListener('mousedown', function(evt)
 		{
 			currentPoint.down = getMousePos(canvas, evt);
-			if(typeof numPointsElement === "string") { //update the numPoints variable if it was changed from what it was as the edit dialog was opened
-				numPoints = parseInt(document.getElementById(numPointsElement).value);
-			}
 		});
 
 		canvas.addEventListener('mouseup', function(evt)
 		{
 			currentPoint.up = getMousePos(canvas, evt);
+
+			if(typeof numPointsElement === "string") { //update the numPoints variable if it was changed from what it was as the edit dialog was opened
+				numPoints = parseInt(document.getElementById(numPointsElement).value);
+			}
 
 			if(currentPoint.down.x == currentPoint.up.x && currentPoint.down.y == currentPoint.up.y) { //if mouse not dragged
 				points.x.push(currentPoint.up.x);
@@ -157,7 +158,7 @@
 
 			for(i = 0; i < points.x.length; i++)
 			{
-				if(updateFields)
+				if(updateFields == true)
 				{
 					document.getElementById("node-input-x"+i).value = points.x[i]; //set input fields to the coordinates of each pixel
 					document.getElementById("node-input-y"+i).value = points.y[i];
@@ -189,7 +190,7 @@
 				}
 			}
 
-			pixelReDraw(points, numPoints, pixelSelector, drawLines, updateFields);
+			pixelReDraw(points, numPoints, pixelSelector, drawLines);
 		});
 	}
 
@@ -1428,9 +1429,10 @@
 			name:		{value:""},
 			rgb:		{value: "255,255,255"},
 			matrix:		{type: 'led-matrix', required: true},
-			numpts:		{value: "2"},
+			numPts:		{value: "2"},
 			zLevel:		{value: undefined},
 			imageUrl:	{value: undefined},
+			savedPts:	{value: {}},
 		},
 
 		inputs: 1,
@@ -1462,7 +1464,7 @@
 
 			$("#node-input-rgb2").val( rgbToHex( parseInt(split[0]), parseInt(split[1]), parseInt(split[2])));
 
-			pixelSelector("node-input-numpts", "canvasPixelSelect", true, false, "outputCanvas", "node-input-rgb2");
+			pixelSelector("node-input-numPts", "canvasPixelSelect", true, false, "outputCanvas", "node-input-rgb2");
 		},
 
 		oneditsave: function ()
@@ -1500,8 +1502,8 @@
 	</div>
 
 	<div class='form-row'>
-		<label for="node-config-input-numpts"><i class='fa fa-tag'></i>Number of points</label>
-		<input type='number' min='2' step='1' id='node-input-numpts'/>
+		<label for="node-config-input-numPts"><i class='fa fa-tag'></i>Number of points</label>
+		<input type='number' min='2' step='1' id='node-input-numPts'/>
 	</div>
 
 	<canvas id="canvasPixelSelect" style="outline: 1px solid black;" width="512" height="256"></canvas>
