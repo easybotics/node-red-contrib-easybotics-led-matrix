@@ -82,7 +82,7 @@
 
 	/*
 	 * function to draw a grid on the canvas for the pixel selector and give the coordinates of the selected pixel
-	 * numPoints: number of points in the polygon, pixelSelector: canvas to use, drawLines: draw the resulting shape or not,
+	 * numPoints: number of points in the polygon (if string input, id of input field with number of pts), pixelSelector: canvas to use, drawLines: draw the resulting shape or not,
 	 * updateFields: whether or not to change input text fields, outputCanvas: canvas to send the scaled down version of the pixelSelector
 	 * canvas to (used for exporting as image, input as string id of canvas),
 	 * colorSelector: id of the color selector to use for output to the outputCanvas
@@ -95,6 +95,11 @@
 
 		var currentPoint = {};
 		var points = { x: [], y: [] };
+		var numPointsElement = numPoints;
+
+		if(typeof numPointsElement === "string") {
+			numPoints = parseInt(document.getElementById(numPointsElement).value);
+		}
 
 		if(outputCanvas != false) {
 			var outCanvas = document.getElementById(outputCanvas);
@@ -119,6 +124,9 @@
 		canvas.addEventListener('mousedown', function(evt)
 		{
 			currentPoint.down = getMousePos(canvas, evt);
+			if(typeof numPointsElement === "string") { //update the numPoints variable if it was changed from what it was as the edit dialog was opened
+				numPoints = parseInt(document.getElementById(numPointsElement).value);
+			}
 		});
 
 		canvas.addEventListener('mouseup', function(evt)
@@ -141,10 +149,10 @@
 			context.clearRect(0, 0, canvas.width, canvas.height);
 			drawGrid(canvas, context);
 
-			if(points.x.length == numPoints+1)
-			{ //if the number of points is one too many
-				points.x.splice(0, 1); //removes the first value from x & y arrays
-				points.y.splice(0, 1);
+			if(points.x.length > numPoints)
+			{ //if the number of points is too many
+				points.x.splice(0, points.x.length - numPoints); //removes the extra value(s) from x & y arrays
+				points.y.splice(0, points.y.length - numPoints);
 			}
 
 			for(i = 0; i < points.x.length; i++)
@@ -1420,6 +1428,7 @@
 			name:		{value:""},
 			rgb:		{value: "255,255,255"},
 			matrix:		{type: 'led-matrix', required: true},
+			numpts:		{value: "2"},
 			zLevel:		{value: undefined},
 			imageUrl:	{value: undefined},
 		},
@@ -1453,7 +1462,7 @@
 
 			$("#node-input-rgb2").val( rgbToHex( parseInt(split[0]), parseInt(split[1]), parseInt(split[2])));
 
-			pixelSelector(3, "canvasPixelSelect", true, false, "outputCanvas", "node-input-rgb2");
+			pixelSelector("node-input-numpts", "canvasPixelSelect", true, false, "outputCanvas", "node-input-rgb2");
 		},
 
 		oneditsave: function ()
@@ -1488,6 +1497,11 @@
 	<div class = "form-row">
 		<label for="node-config-input-rgb2"><i class="icon-tag"></i>Color picker</label>
 		<input type="color" id="node-input-rgb2">
+	</div>
+
+	<div class='form-row'>
+		<label for="node-config-input-numpts"><i class='fa fa-tag'></i>Number of points</label>
+		<input type='number' min='2' step='1' id='node-input-numpts'/>
 	</div>
 
 	<canvas id="canvasPixelSelect" style="outline: 1px solid black;" width="512" height="256"></canvas>
