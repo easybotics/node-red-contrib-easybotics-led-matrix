@@ -577,7 +577,7 @@
 			xOffset:      {value:0, required: true},
 			yOffset:	  {value:0, required: true},
 			rgb:		  {value:"0,255,41"},
-			font: {value:"fonts/9x18B.bdf", required:true},
+			font: {value:"9x18B.bdf", required:true},
 			prefix:		  {value:""},
 			source:		  {value:"msg.payload"},
 			matrix: { type:'led-matrix', required:true},
@@ -623,7 +623,8 @@
 					this.font = fontDropdown.val();
 				});
 
-			fontDropdown.val(this.font);
+			if(this.font) fontDropdown.val(this.font);
+			else fontDropdown.val("5x8.bdf");
 
 			$("#node-input-source").change(function()
 				{
