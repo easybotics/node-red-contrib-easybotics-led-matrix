@@ -82,19 +82,19 @@
 
 	/*
 	 * function to draw a grid on the canvas for the pixel selector and give the coordinates of the selected pixel
-	 * numPoints: number of points in the polygon (if string input, id of input field with number of pts), pixelSelector: canvas to use, drawLines: draw the resulting shape or not,
-	 * updateFields: whether or not to change input text fields, outputCanvas: canvas to send the scaled down version of the pixelSelector
-	 * canvas to (used for exporting as image, input as string id of canvas),
-	 * colorSelector: id of the color selector to use for output to the outputCanvas
+	 * numPoints: number of points in the polygon (if string input, id of input field with number of pts),
+	 * pixelSelector: canvas to use, drawLines: draw the resulting shape or not, updateFields: whether or not to change input text fields,
+	 * outputCanvas: canvas to send the scaled down version of the pixelSelector canvas to (used for exporting as image, input as string id of canvas),
+	 * colorSelector: id of the color selector to use for output to the outputCanvas, loadPts: object with points to draw on canvas
 	 */
-	function pixelSelector (numPoints, pixelSelector, drawLines = true, updateFields = true, outputCanvas = false, colorSelector = false)
+	function pixelSelector (numPoints, pixelSelector, drawLines = true, updateFields = true, outputCanvas = false, colorSelector = false, loadPts = false)
 	{
 
 		var canvas = document.getElementById(pixelSelector);
 		var context = canvas.getContext("2d");
 
 		var currentPoint = {};
-		var points = { x: [], y: [] };
+		var points = loadPts == false ? { x: [], y: [] } : loadPts;
 		var numPointsElement = numPoints;
 
 		if(typeof numPointsElement === "string") {
@@ -102,6 +102,7 @@
 		}
 
 		if(outputCanvas != false) {
+			$("#"+outputCanvas).data(points); //save selected point(s) to be loaded next time the edit dialog is opened
 			var outCanvas = document.getElementById(outputCanvas);
 			var outContext = outCanvas.getContext("2d");
 			outContext.translate(0.5, 0.5);
@@ -168,6 +169,8 @@
 			if(outputCanvas != false)
 			{
 				if(numPoints == points.x.length) { //if all pts selected
+
+					$("#"+outputCanvas).data(points); //save selected point(s) to be loaded next time the edit dialog is opened
 
 					if(colorSelector != false) { //get color to draw shape with
 						var color = document.getElementById(colorSelector).value;
@@ -1433,7 +1436,7 @@
 			numPts:		{value: "2"},
 			zLevel:		{value: undefined},
 			imageUrl:	{value: undefined},
-			savedPts:	{value: {}},
+			savedPts:	{value: { x: [], y: [] }},
 		},
 
 		inputs: 1,
@@ -1465,17 +1468,24 @@
 
 			$("#node-input-rgb2").val( rgbToHex( parseInt(split[0]), parseInt(split[1]), parseInt(split[2])));
 
-			pixelSelector("node-input-numPts", "canvasPixelSelect", true, false, "outputCanvas", "node-input-rgb2");
+			pixelSelector("node-input-numPts", "canvasPixelSelect", true, false, "outputCanvas", "node-input-rgb2", this.savedPts.x == undefined ? false : this.savedPts);
 		},
 
 		oneditsave: function ()
 		{
 			const canvas = document.getElementById("outputCanvas");
-			const context = canvas.getContext('2d');
+			const blankCanvas = document.getElementById("blankCanvas"); //needs to have same width and height as outputCanvas
 
-			const img    = canvas.toDataURL("image/png");
+			const img = canvas.toDataURL("image/png");
+			const blank = blankCanvas.toDataURL("image/png");
 
-			this.imageUrl =	img;
+			if(img != blank) { //the canvas is only drawn on when the user changes it, so if the edit dialog is opened without making changes, it won't send a blank image to the display
+				this.imageUrl =	img;
+			}
+
+			if(this.savedPts != $("#outputCanvas").data()) {
+				this.savedPts = $("#outputCanvas").data(); //save points of current shape to be used next time edit dialog opened
+			}
 		},
 	});
 </script>
@@ -1508,7 +1518,8 @@
 	</div>
 
 	<canvas id="canvasPixelSelect" style="outline: 1px solid black;" width="512" height="256"></canvas>
-	<canvas id="outputCanvas" style="outline: 1px solid black; display: none;" width="128" height="64"></canvas>
+	<canvas id="outputCanvas" style="display: none;" width="128" height="64"></canvas>
+	<canvas id="blankCanvas" style="display: none;" width="128" height="64"></canvas>
 
     <div class="form-row">
         <label for="node-config-input-zLevel"><i class="icon-tag"></i> z level</label>
