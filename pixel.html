@@ -102,7 +102,6 @@
 		}
 
 		if(outputCanvas != false) {
-			$("#"+outputCanvas).data(points); //save selected point(s) to be loaded next time the edit dialog is opened
 			var outCanvas = document.getElementById(outputCanvas);
 			var outContext = outCanvas.getContext("2d");
 			outContext.translate(0.5, 0.5);
@@ -169,9 +168,6 @@
 			if(outputCanvas != false)
 			{
 				if(numPoints == points.x.length) { //if all pts selected
-
-					$("#"+outputCanvas).data(points); //save selected point(s) to be loaded next time the edit dialog is opened
-
 					if(colorSelector != false) { //get color to draw shape with
 						var color = document.getElementById(colorSelector).value;
 					}
@@ -1437,6 +1433,7 @@
 			zLevel:		{value: undefined},
 			imageUrl:	{value: undefined},
 			savedPts:	{value: { x: [], y: [] }},
+			tempPts:	{value: { x: [], y: [] }},
 		},
 
 		inputs: 1,
@@ -1468,7 +1465,13 @@
 
 			$("#node-input-rgb2").val( rgbToHex( parseInt(split[0]), parseInt(split[1]), parseInt(split[2])));
 
+			this.tempPts = $.extend(true, {}, this.savedPts); //create a copy of savedPts in case edits are made in edit dialog but not saved
 			pixelSelector("node-input-numPts", "canvasPixelSelect", true, false, "outputCanvas", "node-input-rgb2", this.savedPts.x == undefined ? false : this.savedPts);
+		},
+
+		oneditcancel: function ()
+		{ //this.savedPts is directly edited in the pixelSelector function, so if the edit dialog is cancelled, it needs to be reset
+			this.savedPts = $.extend(true, {}, this.tempPts);
 		},
 
 		oneditsave: function ()
@@ -1481,10 +1484,6 @@
 
 			if(img != blank) { //the canvas is only drawn on when the user changes it, so if the edit dialog is opened without making changes, it won't send a blank image to the display
 				this.imageUrl =	img;
-			}
-
-			if(this.savedPts != $("#outputCanvas").data()) {
-				this.savedPts = $("#outputCanvas").data(); //save points of current shape to be used next time edit dialog opened
 			}
 		},
 	});
