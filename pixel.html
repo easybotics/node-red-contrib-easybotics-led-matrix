@@ -344,9 +344,9 @@
         },
         inputs:1,
         outputs:0,
-        icon: "pixel-matrix.png",
+        icon: "pixel.png",
         label: function() {
-            return this.name||"pixel to matrix";
+            return this.name||"pixel";
         }
     });
 </script>
@@ -409,7 +409,7 @@
 		},
 		inputs:1,
 		outputs:0,
-		icon: "refresh-matrix.png",
+		icon: "refresh.png",
 		label: function ()
 		{
 			return this.name || "refresh-matrix";
@@ -438,7 +438,7 @@
 </script>
 
 <script type="text/javascript">
-	RED.nodes.registerType('image-to-matrix',
+	RED.nodes.registerType('image',
 	{
 		category: 'LED Matrix',
 		color: '#a6bbcf',
@@ -455,16 +455,16 @@
 
 		inputs:1,
 		outputs:0,
-		icon: "image-matrix.png",
+		icon: "image.png",
 		label: function()
 		{
-			return this.name || "image to matrix";
+			return this.name || "image";
 		}
 	});
 </script>
 
 
-<script type="text/x-red" data-template-name="image-to-matrix">
+<script type="text/x-red" data-template-name="image">
 	<div class='form-row'>
 		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
 		<input type='text' id='node-input-matrix'/>
@@ -490,7 +490,7 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="image-to-matrix">
+<script type="text/x-red" data-help-name="image">
 	<p> Takes a url, or a file path  as a payload, and uses the x,y in the settings <br>
 		If a gif is injected, the frame displayed will advance on each inject <br><br>
 
@@ -527,7 +527,7 @@
 		},
 		inputs:1,
 		outputs:0,
-		icon: "clear-matrix.png",
+		icon: "clear.png",
 		label: function()
 		{
 			return this.name || "led-matrix";
@@ -567,7 +567,7 @@
 		}
 
 
-    RED.nodes.registerType('text-to-matrix',{
+    RED.nodes.registerType('text',{
         category: 'LED Matrix',
         color: '#a6bbcf',
 
@@ -585,9 +585,9 @@
 
         inputs:1,
         outputs:0,
-        icon: "text-matrix.png",
+        icon: "text.png",
         label: function() {
-            return this.name ||"text to matrix";
+            return this.name ||"text";
         },
 
 		oneditprepare: function ()
@@ -666,7 +666,7 @@
 
 
 
-<script type="text/x-red" data-template-name="text-to-matrix">
+<script type="text/x-red" data-template-name="text">
 
 	<div class='form-row'>
 		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
@@ -714,7 +714,7 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="text-to-matrix">
+<script type="text/x-red" data-help-name="text">
     <p>prints text to the matrix buffer <br>
 	If <i> source </i> is a string it uses the x and y coordinates from the settings. <br>
 	<i> source </i> can also be an object with the following properties: <br>
@@ -855,7 +855,7 @@
 	}
 
 
-	RED.nodes.registerType('circle-to-matrix',
+	RED.nodes.registerType('circle',
 		{
 			category: 'LED Matrix',
 			color: '#a6bbcf',
@@ -874,10 +874,10 @@
 
 			inputs: 1,
 			outputs:0,
-			icon: "circle-matrix.png",
+			icon: "circle.png",
 			label: function ()
 			{
-				return this.name || "circle to matrix";
+				return this.name || "circle";
 			},
 
 			oneditprepare: function ()
@@ -904,7 +904,7 @@
 		});
 </script>
 
-<script type="text/x-red" data-template-name="circle-to-matrix">
+<script type="text/x-red" data-template-name="circle">
 
 	<div class='form-row'>
 		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
@@ -948,7 +948,7 @@
 
 </script>
 
-<script type="text/x-red" data-help-name="circle-to-matrix">
+<script type="text/x-red" data-help-name="circle">
 	<p> Prints a circle to the matrix buffer <br>
 		<i> msg.payload </i> can be an object with the following properties: <br>
 		<b> x: </b> X location <br>
@@ -972,7 +972,7 @@
 	}
 
 
-	RED.nodes.registerType('line-to-matrix',
+	RED.nodes.registerType('line',
 	{
 		category: 'LED Matrix',
 		color: '#a6bbcf',
@@ -992,10 +992,10 @@
 
 		inputs: 1,
 		outputs: 0,
-		icon: "line-matrix.png",
+		icon: "line.png",
 		label: function ()
 		{
-			return this.name || "line to matrix";
+			return this.name || "line";
 		},
 
 		oneditprepare: function ()
@@ -1026,7 +1026,7 @@
 </script>
 
 
-<script type="text/x-red" data-template-name="line-to-matrix">
+<script type="text/x-red" data-template-name="line">
 
 	<div class='form-row'>
 		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
@@ -1082,7 +1082,7 @@
 
 </script>
 
-<script type="text/x-red" data-help-name="line-to-matrix">
+<script type="text/x-red" data-help-name="line">
 	<p> Prints a line to the matrix buffer, refresh the matrix to see the result  <br>
 		When injected it will add itself to the buffer, and will continue to be printed until a msg.clear property is injected into it <br>
 		Will use the location and color from the settings, or can be injected with an object with the following preoperties: <br><br>
@@ -1123,7 +1123,7 @@
 	}
 
 
-	RED.nodes.registerType('triangle-to-matrix',
+	RED.nodes.registerType('triangle',
 	{
 		category: 'LED Matrix',
 		color: '#a6bbcf',
@@ -1145,10 +1145,10 @@
 
 		inputs: 1,
 		outputs: 0,
-		icon: "triangle-matrix.png",
+		icon: "triangle.png",
 		label: function ()
 		{
-			return this.name || "triangle to matrix";
+			return this.name || "triangle";
 		},
 
 		oneditprepare: function ()
@@ -1185,7 +1185,7 @@
 </script>
 
 
-<script type="text/x-red" data-template-name="triangle-to-matrix">
+<script type="text/x-red" data-template-name="triangle">
 
 	<div class='form-row'>
 		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
@@ -1245,7 +1245,7 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="triangle-to-matrix">
+<script type="text/x-red" data-help-name="triangle">
 	<p> Prints a triangle to the matrix buffer, refresh the matrix to see the result  <br>
 		When injected it will add itself to the buffer, and will continue to be printed until a msg.clear property is injected into it <br>
 		Will use the location and color from the settings, or can be injected with an object with the following preoperties: <br><br>
@@ -1279,7 +1279,7 @@
 		color: '#a6bbcf',
 		inputs:  1,
 		outputs: 1,
-		icon: "refresh-matrix.png",
+		icon: "refresh.png",
 		label: function ()
 		{
 			return "clear node";
@@ -1307,7 +1307,7 @@
 	}
 
 
-	RED.nodes.registerType('realtime-circle-to-matrix',
+	RED.nodes.registerType('realtime-circle',
 		{
 			category: 'LED Matrix',
 			color: '#F4ED57',
@@ -1325,7 +1325,7 @@
 
 			inputs: 1,
 			outputs:0,
-			icon: "circle-matrix.png",
+			icon: "circle.png",
 			label: function ()
 			{
 				return this.name || "realtime circle";
@@ -1355,7 +1355,7 @@
 		});
 </script>
 
-<script type="text/x-red" data-template-name="realtime-circle-to-matrix">
+<script type="text/x-red" data-template-name="realtime-circle">
 
 	<div class='form-row'>
 		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
@@ -1396,7 +1396,7 @@
 
 </script>
 
-<script type="text/x-red" data-help-name="circle-to-matrix">
+<script type="text/x-red" data-help-name="circle">
 	<p> Prints a circle to the matrix buffer <br>
 		<i> msg.payload </i> can be an object with the following properties: <br>
 		<b> x: </b> X location <br>
@@ -1419,7 +1419,7 @@
 		return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
 	}
 
-	RED.nodes.registerType('canvas-to-matrix',
+	RED.nodes.registerType('polygon',
 	{
 		category: 'LED Matrix',
 		color: '#a6bbcf',
@@ -1438,10 +1438,10 @@
 
 		inputs: 1,
 		outputs: 0,
-		icon: "image-matrix.png",
+		icon: "polygon.png",
 		label: function ()
 		{
-			return this.name || "canvas to matrix";
+			return this.name || "polygon";
 		},
 
 		oneditprepare: function ()
@@ -1489,7 +1489,7 @@
 	});
 </script>
 
-<script type="text/x-red" data-template-name="canvas-to-matrix">
+<script type="text/x-red" data-template-name="polygon">
 
 	<div class='form-row'>
 		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>

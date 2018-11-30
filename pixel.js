@@ -815,7 +815,7 @@ module.exports = function(RED) {
 	};
 
 
-	function CanvasToMatrix (config)
+	function Polygon (config)
 	{
 		RED.nodes.createNode(this, config);
 		const node = this;
@@ -893,12 +893,12 @@ module.exports = function(RED) {
 //	RED.nodes.registerType("clear-matrix", ClearMatrix);
 	RED.nodes.registerType("refresh-matrix", RefreshMatrix);
 	RED.nodes.registerType("pixel", PixelNode);
-	RED.nodes.registerType("image-to-matrix", ImageToPixels);
-	RED.nodes.registerType("text-to-matrix", Text);
+	RED.nodes.registerType("image", ImageToPixels);
+	RED.nodes.registerType("text", Text);
 	RED.nodes.registerType("pixel-transform", PixelDataTransform);
-	RED.nodes.registerType("circle-to-matrix", CircleToMatrix);
-	RED.nodes.registerType("line-to-matrix", LineToMatrix);
-	RED.nodes.registerType("triangle-to-matrix", TriangleToMatrix);
+	RED.nodes.registerType("circle", Circle);
+	RED.nodes.registerType("line", Line);
+	RED.nodes.registerType("triangle", Triangle);
 	RED.nodes.registerType("clear-node", ClearNode);
-	RED.nodes.registerType("canvas-to-matrix", CanvasToMatrix);
+	RED.nodes.registerType("polygon", Polygon);
 }
