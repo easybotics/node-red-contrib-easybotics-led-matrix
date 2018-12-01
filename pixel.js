@@ -575,7 +575,7 @@ module.exports = function(RED) {
 	/*
 	 * node to print a circle to the matrix buffer
 	 */
-	function CircleToMatrix (config)
+	function Circle (config)
 	{
 		RED.nodes.createNode(this, config);
 		const node = this;
@@ -630,7 +630,7 @@ module.exports = function(RED) {
 	/*
 	 * draws a line to the matrix buffer
 	 */
-	function LineToMatrix (config)
+	function Line (config)
 	{
 		RED.nodes.createNode(this, config);
 		const node = this;
@@ -688,7 +688,7 @@ module.exports = function(RED) {
 	 * node that draws a triangle to the screen
 	 */
 
-	function TriangleToMatrix (config)
+	function Triangle (config)
 	{
 		RED.nodes.createNode(this, config);
 		const node = this;
