@@ -1525,3 +1525,20 @@
         <input type="number" id="node-input-zLevel" placeholder="-">
     </div>
 </script>
+
+<script type="text/x-red" data-help-name="polygon">
+	<p> Prints a polygon to the matrix buffer, refresh the matrix to see the result  <br>
+		When injected it will add itself to the buffer, and will continue to be printed until a msg.clear property is injected into it <br>
+		Will use the location and color from the settings, or can be injected with an object with the following preoperties: <br><br>
+	<b> rgb:</b> rgb color, as a CSV string. Example: "255,0,0" (RED) <br>
+	<b> numPts:</b> number of points of the polygon to draw <br>
+	<b> savedPts:</b> what points to draw the polygon with. Use the following format, replacing x1, x2, y1, y2, etc. with the numerical coordinates of the points: <br>
+
+	<i>
+		{<br>
+		x: [x1, x2, x3, ...],<br>
+		y: [y1, y2, y3, ...]<br>
+		};<br>
+
+	</p>
+</script>
