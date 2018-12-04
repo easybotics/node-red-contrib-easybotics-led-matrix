@@ -822,18 +822,32 @@ module.exports = function(RED) {
 
 		node.matrix = RED.nodes.getNode(config.matrix);
 		node.zLevel = config.zLevel != undefined ? config.zLevel : 1;
-		node.url	= config.imageUrl;
-		var output = undefined;
+		node.savedPts = config.savedPts;
+		node.numPts = config.numPts || 0;
+		node.rgb = config.rgb || "255,255,255";
+		var output;
 
 		node.draw = function ()
 		{
-			if(output == undefined) return;
-
-			for(let b of output)
+			if(output != undefined)
 			{
-				const payload = b.payload;
-
-				led.setPixel( parseInt(payload.x), parseInt(payload.y), parseInt(payload.r), parseInt(payload.g), parseInt(payload.b));
+				let o = output;
+				if(o.numPts > 2)
+				{
+					for(i = 0; i < o.numPts-1; i++)
+					{
+						led.drawLine(o.points.x[i], o.points.y[i], o.points.x[i+1], o.points.y[i+1], o.color.r, o.color.g, o.color.b);
+					}
+					led.drawLine(o.points.x[0], o.points.y[0], o.points.x[o.points.x.length-1], o.points.y[o.points.y.length-1], o.color.r, o.color.g, o.color.b);
+				}
+				else if (o.numPts == 2)
+				{
+					led.drawLine(o.points.x[0], o.points.y[0], o.points.x[1], o.points.y[1], o.color.r, o.color.g, o.color.b);
+				}
+				else
+				{
+					led.setPixel(o.points.x[0], o.points.y[0], o.color.r, o.color.g, o.color.b);
+				}
 			}
 		}
 
@@ -843,48 +857,25 @@ module.exports = function(RED) {
 			node.matrix.refresh();
 		}
 
-
-		function createPixelStream ()
+		node.on('input', function(msg)
 		{
-			const cc = context;
-			if(!node.url) return;
-
-			getPixels( node.url, function( err, pixels, c = cc)
+			if(msg.clear)
 			{
-				outArray = [];
+				node.clear();
+				return;
+			}
 
-				if(!pixels) return;
-				const width = pixels.shape.length == 4 ?  Math.min( 128, pixels.shape[1]) :  Math.min( 128, pixels.shape[0]);
-				const height = pixels.shape.length == 4 ?  Math.min( 128, pixels.shape[2]) :  Math.min( 128, pixels.shape[1]);
+			const data   = msg.payload.data != undefined ? msg.payload.data : msg;
+			output =
+			{
+				color	: data.rgb		!= undefined	? eatRGBString(data.rgb)	: eatRGBString(node.rgb),
+				numPts	: data.numPts	!= undefined	? parseInt(data.numPts)		: parseInt(node.numPts),
+				points	: data.savedPts != undefined	? data.savedPts				: node.savedPts
+			};
 
-				//loop over the 2d array of pixels returned by getPixels
-				for(let x = 0; x < width; x++)
-				{
-					for(let y = 0; y < height; y++)
-					{
-						//make sure the array actually contains data for this location
-						if(pixels.get(x,y,0))
-						{
-							outArray.push({payload: { x: x, y: y,  r:pixels.get(x,y,0), g:pixels.get(x,y,1), b:pixels.get(x,y,2)} });
-						}
-					}
-				}
-
-				if(c == context)
-				{
-					output = outArray
-					readySend();
-				}
-			});
-		}
-
-		function readySend ()
-		{
 			nodeRegister.add(node);
 			node.matrix.refresh();
-		}
-
-		createPixelStream();
+		});
 	}
 
 

@@ -84,10 +84,9 @@
 	 * function to draw a grid on the canvas for the pixel selector and give the coordinates of the selected pixel
 	 * numPoints: number of points in the polygon (if string input, id of input field with number of pts),
 	 * pixelSelector: canvas to use, drawLines: draw the resulting shape or not, updateFields: whether or not to change input text fields,
-	 * outputCanvas: canvas to send the scaled down version of the pixelSelector canvas to (used for exporting as image, input as string id of canvas),
-	 * colorSelector: id of the color selector to use for output to the outputCanvas, loadPts: object with points to draw on canvas
+	 * colorSelector: id of the color selector to use for the shape, loadPts: object with points to draw on canvas
 	 */
-	function pixelSelector (numPoints, pixelSelector, drawLines = true, updateFields = true, outputCanvas = false, colorSelector = false, loadPts = false)
+	function pixelSelector (numPoints, pixelSelector, drawLines = true, updateFields = true, colorSelector = false, loadPts = false)
 	{
 
 		var canvas = document.getElementById(pixelSelector);
@@ -99,12 +98,6 @@
 
 		if(typeof numPointsElement === "string") {
 			numPoints = parseInt(document.getElementById(numPointsElement).value);
-		}
-
-		if(outputCanvas != false) {
-			var outCanvas = document.getElementById(outputCanvas);
-			var outContext = outCanvas.getContext("2d");
-			outContext.translate(0.5, 0.5);
 		}
 
 		if(colorSelector == false) { //if no color selector specified
@@ -162,30 +155,6 @@
 				{
 					document.getElementById("node-input-x"+i).value = points.x[i]; //set input fields to the coordinates of each pixel
 					document.getElementById("node-input-y"+i).value = points.y[i];
-				}
-			}
-
-			if(outputCanvas != false)
-			{
-				if(numPoints == points.x.length) { //if all pts selected
-					if(colorSelector != false) { //get color to draw shape with
-						var color = document.getElementById(colorSelector).value;
-					}
-
-					outContext.clearRect(0, 0, outCanvas.width, outCanvas.height); //clear anything already on the canvas
-
-					outContext.beginPath();
-					outContext.moveTo(points.x[0], points.y[0]);
-
-					for(i = 1; i < points.x.length; i++) {
-						outContext.lineTo(points.x[i], points.y[i]);
-					}
-					outContext.lineTo(points.x[0], points.y[0]);
-
-					outContext.lineWidth = 1;
-					outContext.strokeStyle = color;
-					outContext.stroke();
-					outContext.closePath();
 				}
 			}
 
@@ -1431,9 +1400,10 @@
 			matrix:		{type: 'led-matrix', required: true},
 			numPts:		{value: "2"},
 			zLevel:		{value: undefined},
-			imageUrl:	{value: undefined},
 			savedPts:	{value: { x: [], y: [] }},
 			tempPts:	{value: { x: [], y: [] }},
+			test:		{value: 0}, //needed, see comment in oneditsave
+			filled:		{value: false}, //-------------------------------add feature to fill later-------------------------
 		},
 
 		inputs: 1,
@@ -1466,24 +1436,21 @@
 			$("#node-input-rgb2").val( rgbToHex( parseInt(split[0]), parseInt(split[1]), parseInt(split[2])));
 
 			this.tempPts = $.extend(true, {}, this.savedPts); //create a copy of savedPts in case edits are made in edit dialog but not saved
-			pixelSelector("node-input-numPts", "canvasPixelSelect", true, false, "outputCanvas", "node-input-rgb2", this.savedPts.x == undefined ? false : this.savedPts);
+			pixelSelector("node-input-numPts", "canvasPixelSelect", true, false, "node-input-rgb2", this.savedPts.x == undefined ? false : this.savedPts);
 		},
 
 		oneditcancel: function ()
-		{ //this.savedPts is directly edited in the pixelSelector function, so if the edit dialog is cancelled, it needs to be reset
+		{
+			//this.savedPts is directly edited in the pixelSelector function, so if the edit dialog is cancelled, it needs to be reset
 			this.savedPts = $.extend(true, {}, this.tempPts);
 		},
 
 		oneditsave: function ()
 		{
-			const canvas = document.getElementById("outputCanvas");
-			const blankCanvas = document.getElementById("blankCanvas"); //needs to have same width and height as outputCanvas
-
-			const img = canvas.toDataURL("image/png");
-			const blank = blankCanvas.toDataURL("image/png");
-
-			if(img != blank) { //the canvas is only drawn on when the user changes it, so if the edit dialog is opened without making changes, it won't send a blank image to the display
-				this.imageUrl =	img;
+			//node red only allows the user to press the deploy button if something in an html input changes
+			//the object with points isn't tied to any html input, so this is needed to let the user click deploy
+			if(JSON.stringify(this.savedPts) !== JSON.stringify(this.tempPts)) { //if changes are made to the points
+				this.test++; //update the hidden input "test"
 			}
 		},
 	});
@@ -1517,8 +1484,7 @@
 	</div>
 
 	<canvas id="canvasPixelSelect" style="outline: 1px solid black;" width="512" height="256"></canvas>
-	<canvas id="outputCanvas" style="display: none;" width="128" height="64"></canvas>
-	<canvas id="blankCanvas" style="display: none;" width="128" height="64"></canvas>
+	<input type="number" id="node-input-test" style="display: none">
 
     <div class="form-row">
         <label for="node-config-input-zLevel"><i class="icon-tag"></i> z level</label>
