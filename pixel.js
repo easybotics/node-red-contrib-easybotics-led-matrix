@@ -879,6 +879,187 @@ module.exports = function(RED) {
 	}
 
 
+	function FillTest (config)
+	{
+		RED.nodes.createNode(this, config);
+		const node = this;
+
+		node.matrix = RED.nodes.getNode(config.matrix);
+		node.zLevel = 1;
+
+		function Point (x, y)
+		{
+			this.x = x;
+			this.y = y;
+		}
+
+		function Line (start, end)
+		{
+			this.start = start;
+			this.end   = end;
+
+			this.intersects = function (line)
+			{
+				function onSegment (p, q, r)
+				{
+					if (q.x <= Math.max(p.x, r.x) &&
+						q.x >= Math.min(p.x, r.x) &&
+						q.y <= Math.max(p.y, r.y) &&
+						q.y >= Math.min(p.y, r.y))
+					{
+						return true;
+					}
+
+					return false;
+				}
+
+				function orientation (p, q, r)
+				{
+					val = (q.y - p.y) * (r.x - q.x) -(q.x - p.x) * (r.y - q.y);
+
+					if (val == 0) return 0;  // colinear
+
+					return (val > 0)? 1: 2; // clock or counterclock wise
+				}
+
+				p1 = this.start;
+				q1 = this.end;
+				p2 = line.start;
+				q2 = line.end;
+
+				o1 = orientation(p1, q1, p2);
+				o2 = orientation(p1, q1, q2);
+				o3 = orientation(p2, q2, p1);
+				o4 = orientation(p2, q2, q1);
+
+				if (o1 != o2 && o3 != o4)
+					return true;
+
+				// Special Cases
+				// p1, q1 and p2 are colinear and p2 lies on segment p1q1
+				if (o1 == 0 && onSegment(p1, p2, q1)) return true;
+
+				// p1, q1 and q2 are colinear and q2 lies on segment p1q1
+				if (o2 == 0 && onSegment(p1, q2, q1)) return true;
+
+				// p2, q2 and p1 are colinear and p1 lies on segment p2q2
+				if (o3 == 0 && onSegment(p2, p1, q2)) return true;
+
+				 // p2, q2 and q1 are colinear and q1 lies on segment p2q2
+				if (o4 == 0 && onSegment(p2, q1, q2)) return true;
+
+				return false; // Doesn't fall in any of the above cases
+			}
+		}
+
+
+		const points = [ new Point(10,10), new Point(20,30), new Point(25, 5)]
+
+
+		function getLines ()
+		{
+			lines = []
+			first = points[0];
+			last = undefined;
+
+			for(const p of points)
+			{
+				if (last)
+					lines.push(new Line(last, p));
+
+				last = p;
+			}
+
+			lines.push(new Line(last, first));
+			return lines;
+		}
+
+		function ins (l)
+		{
+			num = 0;
+			for( const c of getLines())
+			{
+				if(l.intersects(c)) num++;
+			}
+
+			return num
+
+		}
+
+		function topLeft ()
+		{
+			x = points[0].x;
+			y = points[0].y;
+
+			for( const p of points)
+			{
+				x = p.x < x ? p.x : x;
+				y = p.y < y ? p.y : y;
+			}
+
+			return new Point(x, y);
+		}
+
+		function bottomRight ()
+		{
+			x = points[0].x;
+			y = points[0].y;
+
+			for( const p of points)
+			{
+				x = p.x > x ? p.x : x;
+				y = p.y > y ? p.y : y;
+			}
+
+			return new Point(x, y);
+		}
+
+		node.draw = function ()
+		{
+			for( const c of getLines())
+			{
+				led.drawLine( c.start.x, c.start.y, c.end.x, c.end.y, 255, 255, 0);
+			}
+
+
+			node.log(topLeft().x + ' ' + topLeft().y);
+			node.log(bottomRight().x + ' ' + bottomRight().y);
+
+			const tl = topLeft();
+			const br = bottomRight();
+
+			for(x = tl.x; x < br.x;  x++)
+			{
+				for(y = tl.y; y < br.y; y++)
+				{
+					leftTest = new Line( new Point(0, y), new Point(x, y));
+					rightTest = new Line( new Point(x,y), new Point(100, y));
+
+					const left  = ins(leftTest);
+					const right = ins(rightTest);
+
+					if( (left % 2) && (right % 2) ) led.setPixel(x, y, 255, 0, 0);
+					else led.setPixel(x,y, 0,255,0);
+
+				}
+			}
+
+
+
+
+		}
+
+		nodeRegister.add(node);
+
+	}
+
+
+
+
+
+
+
+
 	//register our functions with node-red
 	RED.nodes.registerType("led-matrix", LedMatrix);
 //	RED.nodes.registerType("clear-matrix", ClearMatrix);
@@ -892,4 +1073,5 @@ module.exports = function(RED) {
 	RED.nodes.registerType("triangle", Triangle);
 	RED.nodes.registerType("clear-node", ClearNode);
 	RED.nodes.registerType("polygon", Polygon);
+	RED.nodes.registerType("fill-test", FillTest);
 }
