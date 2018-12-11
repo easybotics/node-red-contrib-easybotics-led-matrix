@@ -159,15 +159,15 @@ module.exports = function(RED) {
 		node.matrix = RED.nodes.getNode(config.matrix);
 		node.zLevel = config.zLevel != undefined ? config.zLevel : 0;
 
-		var outputInfo;
+		var point;
+		var color;
 
 		node.draw = function ()
 		{
-			if( outputInfo != undefined)
-			{
-				const o = outputInfo;
-				led.setPixel( o.x, o.y, o.r, o.g, o.b);
-			}
+			if(point && color) point.draw(led, color);
+			node.log(point.x);
+			node.log(point.y);
+			node.log(color.r);
 		}
 
 		node.clear = function ()
@@ -193,14 +193,8 @@ module.exports = function(RED) {
 					node.error("your pixel csv doesn't seem correct:", vals);
 				}
 
-				outputInfo =
-					{
-						x: parseInt(vals[0]),
-						y: parseInt(vals[1]),
-						r: parseInt(vals[2]),
-						g: parseInt(vals[3]),
-						b: parseInt(vals[4]),
-					};
+				point = new dp.Point(parseInt(vals[0]), parseInt(vals[1]));
+				color = new dp.Color().fromRgb( parseInt(vals[2]), parseInt(vals[3]), parseInt(vals[4]));
 
 				nodeRegister.add(node);
 				node.matrix.refresh();
@@ -211,19 +205,15 @@ module.exports = function(RED) {
 			//here we do some crude javascript type checking
 			if(msg.payload.x && msg.payload.y && msg.payload.r && msg.payload.g && msg.payload.b)
 			{
-				outputInfo =
-					{
-						x: parseInt(msg.payload.x),
-						y: parseInt(msg.payload.y),
-						r: parseInt(msg.payload.r),
-						g: parseInt(msg.payload.g),
-						b: parseInt(msg.payload.b),
-					};
+				point = new dp.Point(msg.payload.x, msg.payload.y);
+				color = new dp.Color().fromRgb( msg.payload.r, msg.payload.g, msg.payload.b);
 
 				nodeRegister.add(node);
 				node.matrix.refresh();
 				return;
 			}
+
+			node.log("fell through message type");
 
 		});
 	}
