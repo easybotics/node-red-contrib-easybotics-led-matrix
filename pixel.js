@@ -917,14 +917,30 @@ module.exports = function(RED) {
 		function ins (l)
 		{
 			num = 0;
-			for( const c of getLines())
+			heightTripped = false;
+			height = l.start.y;
+
+			for (const c of getLines())
 			{
+				if(heightTripped && (c.start.y == height || c.end.y == height)) continue;
 				if(l.intersects(c)) num++;
+				if(c.start.y == height || c.end.y == height) heightTripped = true;
 			}
 
 			return num
-
 		}
+
+		function corners (l)
+		{
+			num = 0;
+			for( const p of points)
+			{
+				if(p.y == l.start.y) num++;
+			}
+
+			return num;
+		}
+
 
 		function topLeft ()
 		{
@@ -961,9 +977,6 @@ module.exports = function(RED) {
 				led.drawLine( c.start.x, c.start.y, c.end.x, c.end.y, 255, 255, 0);
 			}
 
-
-			node.log(topLeft().x + ' ' + topLeft().y);
-			node.log(bottomRight().x + ' ' + bottomRight().y);
 
 			const tl = topLeft();
 			const br = bottomRight();
