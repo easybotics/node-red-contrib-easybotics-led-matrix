@@ -922,7 +922,7 @@ module.exports = function(RED) {
 
 			for (const c of getLines())
 			{
-				if(heightTripped && (c.start.y == height || c.end.y == height)) continue;
+				if(height == c.yMax()) continue;
 				if(l.intersects(c)) num++;
 				if(c.start.y == height || c.end.y == height) heightTripped = true;
 			}

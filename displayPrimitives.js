@@ -102,6 +102,19 @@ exports.Line = function (start, end)
 	this.start = start;
 	this.end   = end;
 
+	this.yMax = function ()
+	{
+		return start.y > end.y ? start.y : end.y;
+	}
+
+	this.yMin = function ()
+	{
+		return start.y < end.y ? start.y : end.y;
+	}
+
+
+
+
 	this.intersects = function (line)
 	{
 		function onSegment (p, q, r)
@@ -125,6 +138,7 @@ exports.Line = function (start, end)
 
 			return (val > 0)? 1: 2; // clock or counterclock wise
 		}
+
 
 		p1 = this.start;
 		q1 = this.end;
