@@ -256,24 +256,26 @@ module.exports = function(RED) {
 		node.matrix = RED.nodes.getNode(config.matrix);
 		node.xOffset = config.xOffset;
 		node.yOffset = config.yOffset;
+
 		node.zLevel = config.zLevel != undefined ? config.zLevel : 0;
 
 		//filename or URL to look for an image
 		//and an array we will will with pixels
+		var offset = new dp.Point(parseInt(node.xOffset), parseInt(node.yOffset));
+		node.log("offsets: " + offset.x + ' ' + offset.y);
 		var output;
 		var lastSent;
-		var lastX;
-		var lastY;
+		var lastPoint;
+
 		var currentFrame = 0;
 
 		node.draw = function ()
 		{
 			if(output != undefined)
 			{
-				for(let i = 0; i < output.length; i++)
+				for(const p of output)
 				{
-					let payload = output[i].payload;
-					led.setPixel( parseInt(payload.x), parseInt(payload.y), parseInt(payload.r), parseInt(payload.g), parseInt(payload.b));
+					p.point.draw(led, p.color);
 				}
 			}
 		}
@@ -309,7 +311,7 @@ module.exports = function(RED) {
 		}
 
 		//function that takes a file, and an offset and tries to convert the file into a stream of pixels
-		function createPixelStream (file, xOffset, yOffset)
+		function createPixelStream (file, offset)
 		{
 			const cc = context;
 
@@ -338,7 +340,8 @@ module.exports = function(RED) {
 							//push pixels to the output buffer
 							if(pixels.shape.length == 4)  //gif
 							{
-								output.push({payload: { x: x + xOffset, y: y + yOffset, r: pixels.get(currentFrame,x,y,0), g: pixels.get(currentFrame,x,y,1), b: pixels.get(currentFrame,x,y,2)} });
+								output.push( { point: new dp.Point(offset.x + x, offset.y + y), color: new dp.Color().fromRgb( pixels.get(currentFrame, x, y, 0), pixels.get(currentFrame, x, y, 1) ,pixels.get(currentFrame, x, y, 2))});
+ 
 
 								if(currentFrame == pixels.shape[0] -1)
 								{
@@ -347,7 +350,7 @@ module.exports = function(RED) {
 							}
 							else
 							{ //still image
-								output.push({payload: { x: x + xOffset, y: y + yOffset, r:pixels.get(x,y,0), g:pixels.get(x,y,1), b:pixels.get(x,y,2)} });
+								output.push( { point: new dp.Point(x + offset.x, y + offset.y), color: new dp.Color().fromRgb( pixels.get(x, y, 0), pixels.get(x, y, 1) ,pixels.get(x, y, 2))});
 							}
 						}
 					}
@@ -382,33 +385,32 @@ module.exports = function(RED) {
 			//set the url var
 			if( typeof msg.payload === "string")
 			{
-				if(msg.payload === lastSent && (output && output.length > 0) && lastY == node.yOffset && lastX == node.xOffset && (!currentFrame))
+				if(msg.payload === lastSent && (output && output.length > 0) && lastPoint == offset && (!currentFrame))
 				{
 
 
 					return readySend();
 				}
 
-				lastX = node.xOffset;
-				lastY = node.yOffset;
+				lastPoint = offset;
 				lastSent = msg.payload;
 
-				return createPixelStream( msg.payload, parseInt(node.xOffset), parseInt(node.yOffset));
+				return createPixelStream( msg.payload, offset);
 			}
 
 			if( msg.payload.data)
 			{
-				if(msg.payload.data === lastSent && (output && output.length > 0) && lastX == msg.payload.x && lastY == msg.payload.y && (!currentFrame))
+				if(msg.payload.data === lastSent && (output && output.length > 0) && lastPoint.x  == msg.payload.x && lastPoint.y == msg.payload.y && (!currentFrame))
 				{
 
 					return readySend();
 				}
 
 				lastSent = msg.payload.data;
-				lastX = msg.payload.x;
-				lastY = msg.payload.y;
+				offset = new dp.Point(msg.payload.x, msg.payload.y);
+				lastPoint = offset;
 
-				return createPixelStream(msg.payload.data, msg.payload.x, msg.payload.y);
+				return createPixelStream(msg.payload.data, offset);
 			}
 		});
 	}
