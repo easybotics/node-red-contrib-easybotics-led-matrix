@@ -1,10 +1,12 @@
 var Matrix		= require('easybotics-rpi-rgb-led-matrix')
 var getPixels	= require('get-pixels');
+var dp			= require('./displayPrimitives.js')
 
 
 //var led = new LedMatrix(64, 64, 1, 2, "adafruit-hat-pwm");
 
 module.exports = function(RED) {
+
 
 	var led;
 	var nodeRegister;
@@ -157,15 +159,15 @@ module.exports = function(RED) {
 		node.matrix = RED.nodes.getNode(config.matrix);
 		node.zLevel = config.zLevel != undefined ? config.zLevel : 0;
 
-		var outputInfo;
+		var point;
+		var color;
 
 		node.draw = function ()
 		{
-			if( outputInfo != undefined)
-			{
-				const o = outputInfo;
-				led.setPixel( o.x, o.y, o.r, o.g, o.b);
-			}
+			if(point && color) point.draw(led, color);
+			node.log(point.x);
+			node.log(point.y);
+			node.log(color.r);
 		}
 
 		node.clear = function ()
@@ -191,14 +193,8 @@ module.exports = function(RED) {
 					node.error("your pixel csv doesn't seem correct:", vals);
 				}
 
-				outputInfo =
-					{
-						x: parseInt(vals[0]),
-						y: parseInt(vals[1]),
-						r: parseInt(vals[2]),
-						g: parseInt(vals[3]),
-						b: parseInt(vals[4]),
-					};
+				point = new dp.Point(parseInt(vals[0]), parseInt(vals[1]));
+				color = new dp.Color().fromRgb( parseInt(vals[2]), parseInt(vals[3]), parseInt(vals[4]));
 
 				nodeRegister.add(node);
 				node.matrix.refresh();
@@ -209,19 +205,15 @@ module.exports = function(RED) {
 			//here we do some crude javascript type checking
 			if(msg.payload.x && msg.payload.y && msg.payload.r && msg.payload.g && msg.payload.b)
 			{
-				outputInfo =
-					{
-						x: parseInt(msg.payload.x),
-						y: parseInt(msg.payload.y),
-						r: parseInt(msg.payload.r),
-						g: parseInt(msg.payload.g),
-						b: parseInt(msg.payload.b),
-					};
+				point = new dp.Point(msg.payload.x, msg.payload.y);
+				color = new dp.Color().fromRgb( msg.payload.r, msg.payload.g, msg.payload.b);
 
 				nodeRegister.add(node);
 				node.matrix.refresh();
 				return;
 			}
+
+			node.log("fell through message type");
 
 		});
 	}
@@ -264,24 +256,26 @@ module.exports = function(RED) {
 		node.matrix = RED.nodes.getNode(config.matrix);
 		node.xOffset = config.xOffset;
 		node.yOffset = config.yOffset;
+
 		node.zLevel = config.zLevel != undefined ? config.zLevel : 0;
 
 		//filename or URL to look for an image
 		//and an array we will will with pixels
+		var offset = new dp.Point(parseInt(node.xOffset), parseInt(node.yOffset));
+		node.log("offsets: " + offset.x + ' ' + offset.y);
 		var output;
 		var lastSent;
-		var lastX;
-		var lastY;
+		var lastPoint;
+
 		var currentFrame = 0;
 
 		node.draw = function ()
 		{
 			if(output != undefined)
 			{
-				for(let i = 0; i < output.length; i++)
+				for(const p of output)
 				{
-					let payload = output[i].payload;
-					led.setPixel( parseInt(payload.x), parseInt(payload.y), parseInt(payload.r), parseInt(payload.g), parseInt(payload.b));
+					p.point.draw(led, p.color);
 				}
 			}
 		}
@@ -317,7 +311,7 @@ module.exports = function(RED) {
 		}
 
 		//function that takes a file, and an offset and tries to convert the file into a stream of pixels
-		function createPixelStream (file, xOffset, yOffset)
+		function createPixelStream (file, offset)
 		{
 			const cc = context;
 
@@ -346,7 +340,8 @@ module.exports = function(RED) {
 							//push pixels to the output buffer
 							if(pixels.shape.length == 4)  //gif
 							{
-								output.push({payload: { x: x + xOffset, y: y + yOffset, r: pixels.get(currentFrame,x,y,0), g: pixels.get(currentFrame,x,y,1), b: pixels.get(currentFrame,x,y,2)} });
+								output.push( { point: new dp.Point(offset.x + x, offset.y + y), color: new dp.Color().fromRgb( pixels.get(currentFrame, x, y, 0), pixels.get(currentFrame, x, y, 1) ,pixels.get(currentFrame, x, y, 2))});
+
 
 								if(currentFrame == pixels.shape[0] -1)
 								{
@@ -355,7 +350,7 @@ module.exports = function(RED) {
 							}
 							else
 							{ //still image
-								output.push({payload: { x: x + xOffset, y: y + yOffset, r:pixels.get(x,y,0), g:pixels.get(x,y,1), b:pixels.get(x,y,2)} });
+								output.push( { point: new dp.Point(x + offset.x, y + offset.y), color: new dp.Color().fromRgb( pixels.get(x, y, 0), pixels.get(x, y, 1) ,pixels.get(x, y, 2))});
 							}
 						}
 					}
@@ -390,33 +385,32 @@ module.exports = function(RED) {
 			//set the url var
 			if( typeof msg.payload === "string")
 			{
-				if(msg.payload === lastSent && (output && output.length > 0) && lastY == node.yOffset && lastX == node.xOffset && (!currentFrame))
+				if(msg.payload === lastSent && (output && output.length > 0) && lastPoint == offset && (!currentFrame))
 				{
 
 
 					return readySend();
 				}
 
-				lastX = node.xOffset;
-				lastY = node.yOffset;
+				lastPoint = offset;
 				lastSent = msg.payload;
 
-				return createPixelStream( msg.payload, parseInt(node.xOffset), parseInt(node.yOffset));
+				return createPixelStream( msg.payload, offset);
 			}
 
 			if( msg.payload.data)
 			{
-				if(msg.payload.data === lastSent && (output && output.length > 0) && lastX == msg.payload.x && lastY == msg.payload.y && (!currentFrame))
+				if(msg.payload.data === lastSent && (output && output.length > 0) && lastPoint.x  == msg.payload.x && lastPoint.y == msg.payload.y && (!currentFrame))
 				{
 
 					return readySend();
 				}
 
 				lastSent = msg.payload.data;
-				lastX = msg.payload.x;
-				lastY = msg.payload.y;
+				offset = new dp.Point(msg.payload.x, msg.payload.y);
+				lastPoint = offset;
 
-				return createPixelStream(msg.payload.data, msg.payload.x, msg.payload.y);
+				return createPixelStream(msg.payload.data, offset);
 			}
 		});
 	}
@@ -887,73 +881,10 @@ module.exports = function(RED) {
 		node.matrix = RED.nodes.getNode(config.matrix);
 		node.zLevel = 1;
 
-		function Point (x, y)
-		{
-			this.x = x;
-			this.y = y;
-		}
-
-		function Line (start, end)
-		{
-			this.start = start;
-			this.end   = end;
-
-			this.intersects = function (line)
-			{
-				function onSegment (p, q, r)
-				{
-					if (q.x <= Math.max(p.x, r.x) &&
-						q.x >= Math.min(p.x, r.x) &&
-						q.y <= Math.max(p.y, r.y) &&
-						q.y >= Math.min(p.y, r.y))
-					{
-						return true;
-					}
-
-					return false;
-				}
-
-				function orientation (p, q, r)
-				{
-					val = (q.y - p.y) * (r.x - q.x) -(q.x - p.x) * (r.y - q.y);
-
-					if (val == 0) return 0;  // colinear
-
-					return (val > 0)? 1: 2; // clock or counterclock wise
-				}
-
-				p1 = this.start;
-				q1 = this.end;
-				p2 = line.start;
-				q2 = line.end;
-
-				o1 = orientation(p1, q1, p2);
-				o2 = orientation(p1, q1, q2);
-				o3 = orientation(p2, q2, p1);
-				o4 = orientation(p2, q2, q1);
-
-				if (o1 != o2 && o3 != o4)
-					return true;
-
-				// Special Cases
-				// p1, q1 and p2 are colinear and p2 lies on segment p1q1
-				if (o1 == 0 && onSegment(p1, p2, q1)) return true;
-
-				// p1, q1 and q2 are colinear and q2 lies on segment p1q1
-				if (o2 == 0 && onSegment(p1, q2, q1)) return true;
-
-				// p2, q2 and p1 are colinear and p1 lies on segment p2q2
-				if (o3 == 0 && onSegment(p2, p1, q2)) return true;
-
-				 // p2, q2 and q1 are colinear and q1 lies on segment p2q2
-				if (o4 == 0 && onSegment(p2, q1, q2)) return true;
-
-				return false; // Doesn't fall in any of the above cases
-			}
-		}
 
 
-		const points = [ new Point(10,10), new Point(20,30), new Point(25, 5)]
+
+		const points = [ new dp.Point(10,10), new dp.Point(20,30),  new dp.Point(25, 5)]
 
 
 		function getLines ()
@@ -965,26 +896,42 @@ module.exports = function(RED) {
 			for(const p of points)
 			{
 				if (last)
-					lines.push(new Line(last, p));
+					lines.push(new dp.Line(last, p));
 
 				last = p;
 			}
 
-			lines.push(new Line(last, first));
+			lines.push(new dp.Line(last, first));
 			return lines;
 		}
 
 		function ins (l)
 		{
 			num = 0;
-			for( const c of getLines())
+			heightTripped = false;
+			height = l.start.y;
+
+			for (const c of getLines())
 			{
+				if(heightTripped && (c.start.y == height || c.end.y == height)) continue;
 				if(l.intersects(c)) num++;
+				if(c.start.y == height || c.end.y == height) heightTripped = true;
 			}
 
 			return num
-
 		}
+
+		function corners (l)
+		{
+			num = 0;
+			for( const p of points)
+			{
+				if(p.y == l.start.y) num++;
+			}
+
+			return num;
+		}
+
 
 		function topLeft ()
 		{
@@ -997,7 +944,7 @@ module.exports = function(RED) {
 				y = p.y < y ? p.y : y;
 			}
 
-			return new Point(x, y);
+			return new dp.Point(x, y);
 		}
 
 		function bottomRight ()
@@ -1011,7 +958,7 @@ module.exports = function(RED) {
 				y = p.y > y ? p.y : y;
 			}
 
-			return new Point(x, y);
+			return new dp.Point(x, y);
 		}
 
 		node.draw = function ()
@@ -1022,9 +969,6 @@ module.exports = function(RED) {
 			}
 
 
-			node.log(topLeft().x + ' ' + topLeft().y);
-			node.log(bottomRight().x + ' ' + bottomRight().y);
-
 			const tl = topLeft();
 			const br = bottomRight();
 
@@ -1032,8 +976,8 @@ module.exports = function(RED) {
 			{
 				for(y = tl.y; y < br.y; y++)
 				{
-					leftTest = new Line( new Point(0, y), new Point(x, y));
-					rightTest = new Line( new Point(x,y), new Point(100, y));
+					leftTest = new dp.Line( new dp.Point(0, y), new dp.Point(x, y));
+					rightTest = new dp.Line( new dp.Point(x,y), new dp.Point(100, y));
 
 					const left  = ins(leftTest);
 					const right = ins(rightTest);
