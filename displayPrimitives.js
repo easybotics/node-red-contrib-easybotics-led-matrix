@@ -47,7 +47,7 @@ exports.Color = function ()
 		return rgbToHex(this.r, this.g, this.b);
 	}
 
-	this.fromRgbString (s)
+	this.fromRgbString = function (str)
 	{
 		const s = str.split(',');
 		const  output = {r: parseInt(s[0]), g: parseInt(s[1]), b: parseInt(s[2])};
@@ -57,16 +57,18 @@ exports.Color = function ()
 		this.b = output.b;
 	}
 
-	this.toRgbString ()
+	this.toRgbString  = function ()
 	{
 		return r + ',' + g + ',' + b;
 	}
 
-	this.fromRgb (r, g, b)
+	this.fromRgb = function (r, g, b)
 	{
 		this.r = r;
 		this.g = g;
 		this.b = b;
+
+		return this;
 	}
 }
 
@@ -90,7 +92,7 @@ exports.Point = function (x, y)
 	//draws on an led matrix we give it 
 	this.draw = function (l, color)
 	{
-		l.setPixel(this.x, this.y, parseInt(color.r), parseInt(color.g), parseInt(color.b));
+		l.setPixel(parseInt(this.x), parseInt(this.y), parseInt(color.r), parseInt(color.g), parseInt(color.b));
 	}
 }
 
