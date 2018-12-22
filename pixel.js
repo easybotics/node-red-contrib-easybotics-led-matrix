@@ -894,111 +894,23 @@ module.exports = function(RED) {
 
 
 		const points = [ new dp.Point(10,10), new dp.Point(20,30),  new dp.Point(25, 5)]
+		poly = new dp.Polygon(points);
+		t = poly.clipBounds();
 
+		node.log(t.topLeft.x + ',' + t.bottomRight.x);
+		node.log(t.topLeft.y + ',' + t.bottomRight.y);
 
-		function getLines ()
+		for(var x = t.topLeft.x; x < t.bottomRight.x; x++)
 		{
-			lines = []
-			first = points[0];
-			last = undefined;
-
-			for(const p of points)
-			{
-				if (last)
-					lines.push(new dp.Line(last, p));
-
-				last = p;
-			}
-
-			lines.push(new dp.Line(last, first));
-			return lines;
+			node.log(x)
 		}
 
-		function ins (l)
-		{
-			num = 0;
-			heightTripped = false;
-			height = l.start.y;
-
-			for (const c of getLines())
-			{
-				if(height == c.yMax()) continue;
-				if(l.intersects(c)) num++;
-				if(c.start.y == height || c.end.y == height) heightTripped = true;
-			}
-
-			return num
-		}
-
-		function corners (l)
-		{
-			num = 0;
-			for( const p of points)
-			{
-				if(p.y == l.start.y) num++;
-			}
-
-			return num;
-		}
-
-
-		function topLeft ()
-		{
-			x = points[0].x;
-			y = points[0].y;
-
-			for( const p of points)
-			{
-				x = p.x < x ? p.x : x;
-				y = p.y < y ? p.y : y;
-			}
-
-			return new dp.Point(x, y);
-		}
-
-		function bottomRight ()
-		{
-			x = points[0].x;
-			y = points[0].y;
-
-			for( const p of points)
-			{
-				x = p.x > x ? p.x : x;
-				y = p.y > y ? p.y : y;
-			}
-
-			return new dp.Point(x, y);
-		}
+		poly.fill();
 
 		node.draw = function ()
 		{
-			for( const c of getLines())
-			{
-				led.drawLine( c.start.x, c.start.y, c.end.x, c.end.y, 255, 255, 0);
-			}
-
-
-			const tl = topLeft();
-			const br = bottomRight();
-
-			for(x = tl.x; x < br.x;  x++)
-			{
-				for(y = tl.y; y < br.y; y++)
-				{
-					leftTest = new dp.Line( new dp.Point(0, y), new dp.Point(x, y));
-					rightTest = new dp.Line( new dp.Point(x,y), new dp.Point(100, y));
-
-					const left  = ins(leftTest);
-					const right = ins(rightTest);
-
-					if( (left % 2) && (right % 2) ) led.setPixel(x, y, 255, 0, 0);
-					else led.setPixel(x,y, 0,255,0);
-
-				}
-			}
-
-
- 
+			poly.draw(led, new dp.Color().fromRgb(255,255,255));
+			
 
 		}
 
