@@ -823,26 +823,88 @@ module.exports = function(RED) {
 		var output;
 		var points = [];
 
+		function getLines ()
+		{
+			lines = []
+			first = points[0];
+			last = undefined;
+
+			for(const p of points)
+			{
+				if (last)
+					lines.push(new dp.Line(last, p));
+
+				last = p;
+			}
+
+			lines.push(new dp.Line(last, first));
+			return lines;
+		}
+
+		function ins (l)
+		{
+			num = 0;
+			heightTripped = false;
+			height = l.start.y;
+
+			for (const c of getLines())
+			{
+				if(height == c.yMax()) continue;
+				if(l.intersects(c)) num++;
+				if(c.start.y == height || c.end.y == height) heightTripped = true;
+			}
+
+			return num
+		}
+
+		function corners (l)
+		{
+			num = 0;
+			for( const p of points)
+			{
+				if(p.y == l.start.y) num++;
+			}
+
+			return num;
+		}
+
+
+		function topLeft ()
+		{
+			x = points[0].x;
+			y = points[0].y;
+
+			for( const p of points)
+			{
+				x = p.x < x ? p.x : x;
+				y = p.y < y ? p.y : y;
+			}
+
+			return new dp.Point(x, y);
+		}
+
+		function bottomRight ()
+		{
+			x = points[0].x;
+			y = points[0].y;
+
+			for( const p of points)
+			{
+				x = p.x > x ? p.x : x;
+				y = p.y > y ? p.y : y;
+			}
+
+			return new dp.Point(x, y);
+		}
+
 		node.draw = function ()
 		{
 			if(output != undefined)
 			{
 				let o = output;
-				if(o.numPts > 2)
+				for( const c of getLines())
 				{
-					for(i = 0; i < o.numPts-1; i++)
-					{
-						led.drawLine(points[i].x, points[i].y, points[i+1].x, points[i+1].y, o.color.r, o.color.g, o.color.b);
-					}
-					led.drawLine(points[0].x, points[0].y, points[points.length-1].x, points[points.length-1].y, o.color.r, o.color.g, o.color.b);
-				}
-				else if (o.numPts == 2)
-				{
-					led.drawLine(points[0].x, points[0].y, points[1].x, points[1].y, o.color.r, o.color.g, o.color.b);
-				}
-				else
-				{
-					led.setPixel(points[0].x, points[0].y, o.color.r, o.color.g, o.color.b);
+					led.drawLine(c.start.x, c.start.y, c.end.x, c.end.y, o.color.r, o.color.g, o.color.b);
 				}
 			}
 		}
