@@ -906,6 +906,25 @@ module.exports = function(RED) {
 				{
 					led.drawLine(c.start.x, c.start.y, c.end.x, c.end.y, o.color.r, o.color.g, o.color.b);
 				}
+
+				if(o.filled) {
+					const tl = topLeft();
+					const br = bottomRight();
+
+					for(x = tl.x; x < br.x;  x++)
+					{
+						for(y = tl.y; y < br.y; y++)
+						{
+							leftTest = new dp.Line( new dp.Point(0, y), new dp.Point(x, y));
+							rightTest = new dp.Line( new dp.Point(x,y), new dp.Point(100, y));
+
+							const left  = ins(leftTest);
+							const right = ins(rightTest);
+
+							if( (left % 2) && (right % 2) ) led.setPixel(x, y, o.color.r, o.color.g, o.color.b);
+						}
+					}
+				}
 			}
 		}
 
