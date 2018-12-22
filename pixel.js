@@ -819,7 +819,9 @@ module.exports = function(RED) {
 		node.savedPts = config.savedPts;
 		node.numPts = config.numPts || 0;
 		node.rgb = config.rgb || "255,255,255";
+		node.filled = config.filled || false;
 		var output;
+		var points = [];
 
 		node.draw = function ()
 		{
@@ -830,17 +832,17 @@ module.exports = function(RED) {
 				{
 					for(i = 0; i < o.numPts-1; i++)
 					{
-						led.drawLine(o.points.x[i], o.points.y[i], o.points.x[i+1], o.points.y[i+1], o.color.r, o.color.g, o.color.b);
+						led.drawLine(points[i].x, points[i].y, points[i+1].x, points[i+1].y, o.color.r, o.color.g, o.color.b);
 					}
-					led.drawLine(o.points.x[0], o.points.y[0], o.points.x[o.points.x.length-1], o.points.y[o.points.y.length-1], o.color.r, o.color.g, o.color.b);
+					led.drawLine(points[0].x, points[0].y, points[points.length-1].x, points[points.length-1].y, o.color.r, o.color.g, o.color.b);
 				}
 				else if (o.numPts == 2)
 				{
-					led.drawLine(o.points.x[0], o.points.y[0], o.points.x[1], o.points.y[1], o.color.r, o.color.g, o.color.b);
+					led.drawLine(points[0].x, points[0].y, points[1].x, points[1].y, o.color.r, o.color.g, o.color.b);
 				}
 				else
 				{
-					led.setPixel(o.points.x[0], o.points.y[0], o.color.r, o.color.g, o.color.b);
+					led.setPixel(points[0].x, points[0].y, o.color.r, o.color.g, o.color.b);
 				}
 			}
 		}
@@ -864,8 +866,14 @@ module.exports = function(RED) {
 			{
 				color	: data.rgb		!= undefined	? eatRGBString(data.rgb)	: eatRGBString(node.rgb),
 				numPts	: data.numPts	!= undefined	? parseInt(data.numPts)		: parseInt(node.numPts),
-				points	: data.savedPts != undefined	? data.savedPts				: node.savedPts
+				points	: data.savedPts != undefined	? data.savedPts				: node.savedPts,
+				filled	: data.filled	!= undefined	? data.filled				: node.filled,
 			};
+
+			points = [];
+			for(i = 0; i < output.points.x.length; i++) { // convert points to the dp.Point object
+				points.push(new dp.Point(output.points.x[i], output.points.y[i]));
+			}
 
 			nodeRegister.add(node);
 			node.matrix.refresh();
@@ -880,11 +888,17 @@ module.exports = function(RED) {
 
 		node.matrix = RED.nodes.getNode(config.matrix);
 		node.zLevel = 1;
+		node.savedPts = config.savedPts;
+		var output;
 
+		const points = [];
 
+		for(i = 0; i < output.savedPts.x.length; i++) {
+			console.log(output.savedPts.x[i], output.savedPts.y[i]);
+			newPoints.push(new dp.Point(output.savedPts.x[i], output.savedPts.y[i]));
+		}
 
-
-		const points = [ new dp.Point(10,10), new dp.Point(20,30),  new dp.Point(25, 5)]
+		//const points = [new dp.Point(10,10), new dp.Point(20,30),  new dp.Point(25, 5), new dp.Point(48, 16), new dp.Point(64, 64)]
 
 
 		function getLines ()
@@ -983,17 +997,33 @@ module.exports = function(RED) {
 					const right = ins(rightTest);
 
 					if( (left % 2) && (right % 2) ) led.setPixel(x, y, 255, 0, 0);
-					else led.setPixel(x,y, 0,255,0);
+					//else led.setPixel(x,y, 0,255,0);
 
 				}
 			}
-
-
-
-
 		}
 
-		nodeRegister.add(node);
+		node.on('input', function(msg)
+		{
+			if(msg.clear)
+			{
+				node.clear();
+				return;
+			}
+
+			const data   = msg.payload.data != undefined ? msg.payload.data : msg;
+			output =
+			{
+				points	: data.savedPts != undefined	? data.savedPts				: node.savedPts,
+			};
+
+			nodeRegister.add(node);
+			node.matrix.refresh();
+		});
+
+
+
+		//nodeRegister.add(node);
 
 	}
 
