@@ -74,8 +74,8 @@ exports.Color = function ()
 
 exports.Point = function (x, y)
 {
-	this.x = x;
-	this.y = y;
+	this.x = parseInt(x);
+	this.y = parseInt(y);
 
 	//returns the distance to another point
 	this.distance = function (p)
@@ -175,3 +175,106 @@ exports.Line = function (start, end)
 		l.drawLine( this.start.x, this.start.y, this.end.x, this.end.y, parseInt(color.r), parseInt(color.g), parseInt(color.b));
 	}
 }
+
+exports.Polygon = function (p)
+{
+	this.points = p;
+	this.drawLineCache;
+	this.drawFillCache;
+
+	this.boundryIntersections = function (l)
+	{
+		num = 0;
+		height = l.start.y;
+
+		for (const c of this.getLines())
+		{
+			if(height == c.yMax()) continue;
+			if(l.intersects(c)) num++;
+		}
+
+		return num;
+	}
+
+	this.clipBounds = function ()
+	{
+		tx = this.points[0].x;
+		ty = this.points[0].y;
+		bx = this.points[0].x;
+		by = this.points[0].y;
+
+		for( const p of this.points)
+		{
+			tx = p.x < tx ? p.x : tx;
+			ty = p.y < ty ? p.y : ty;
+			bx = p.x > bx ? p.x : bx;
+			by = p.y > by ? p.y : by;
+		}
+
+		return {topLeft: new exports.Point(tx, ty), bottomRight: new exports.Point(bx, by)}
+	}
+
+	this.getLines = function ()
+	{
+		lines = [];
+
+		first = this.points[0];
+		last  = undefined;
+
+		for(const p of this.points)
+		{
+			if (last)
+				lines.push(new exports.Line(last, p));
+
+			last = p;
+		}
+
+		lines.push(new exports.Line(last, first));
+		return lines;
+	}
+
+	this.fill = function ()
+	{
+		this.drawFillCache = [];
+		const bounds = this.clipBounds();
+
+
+		for(var x = t.topLeft.x; x < t.bottomRight.x; x++)
+		{
+			for(var y = t.topLeft.y; y < t.bottomRight.y; y++)
+			{
+				const leftTest  = new exports.Line( new exports.Point(bounds.topLeft.x, y), new exports.Point(x, y));
+				const rightTest = new exports.Line( new exports.Point(x, y), new exports.Point(bounds.bottomRight.x, y));
+
+				const left  = this.boundryIntersections(leftTest);
+				const right = this.boundryIntersections(rightTest);
+
+				if ((left % 2) && (right % 2)) 
+				{
+					this.drawFillCache.push( new exports.Point(x, y));
+				}
+			}
+		}
+	}
+
+
+	this.draw = function (l, color)
+	{
+		this.drawLinesCache = this.getLines();
+
+		for( const c of this.drawLinesCache)
+		{
+			c.draw(l, color);
+		}
+
+		if(this.drawFillCache)
+		{
+		for( const p of this.drawFillCache)
+		{
+			p.draw(l, new exports.Color().fromRgb(255,0,0));
+		}
+		}
+	}
+}
+
+
