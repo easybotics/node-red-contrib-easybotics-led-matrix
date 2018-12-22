@@ -901,8 +901,10 @@ module.exports = function(RED) {
 		{
 			if(output != undefined)
 			{
+				node.log("recieved input");
+				var startTime = Date.now();
 				let o = output;
-				for( const c of getLines())
+				for(const c of getLines())
 				{
 					led.drawLine(c.start.x, c.start.y, c.end.x, c.end.y, o.color.r, o.color.g, o.color.b);
 				}
@@ -915,8 +917,8 @@ module.exports = function(RED) {
 					{
 						for(y = tl.y; y < br.y; y++)
 						{
-							leftTest = new dp.Line( new dp.Point(0, y), new dp.Point(x, y));
-							rightTest = new dp.Line( new dp.Point(x,y), new dp.Point(100, y));
+							leftTest = new dp.Line( new dp.Point(tl.x, y), new dp.Point(x, y));
+							rightTest = new dp.Line( new dp.Point(x,y), new dp.Point(br.x, y));
 
 							const left  = ins(leftTest);
 							const right = ins(rightTest);
@@ -925,6 +927,8 @@ module.exports = function(RED) {
 						}
 					}
 				}
+				var execTime = (Date.now() - startTime);
+				node.log("done drawing in "+execTime+" ms. "+o.filled);
 			}
 		}
 
@@ -961,160 +965,6 @@ module.exports = function(RED) {
 		});
 	}
 
-
-	function FillTest (config)
-	{
-		RED.nodes.createNode(this, config);
-		const node = this;
-
-		node.matrix = RED.nodes.getNode(config.matrix);
-		node.zLevel = 1;
-		node.savedPts = config.savedPts;
-		var output;
-
-		const points = [];
-
-		for(i = 0; i < output.savedPts.x.length; i++) {
-			console.log(output.savedPts.x[i], output.savedPts.y[i]);
-			newPoints.push(new dp.Point(output.savedPts.x[i], output.savedPts.y[i]));
-		}
-
-		//const points = [new dp.Point(10,10), new dp.Point(20,30),  new dp.Point(25, 5), new dp.Point(48, 16), new dp.Point(64, 64)]
-
-
-		function getLines ()
-		{
-			lines = []
-			first = points[0];
-			last = undefined;
-
-			for(const p of points)
-			{
-				if (last)
-					lines.push(new dp.Line(last, p));
-
-				last = p;
-			}
-
-			lines.push(new dp.Line(last, first));
-			return lines;
-		}
-
-		function ins (l)
-		{
-			num = 0;
-			heightTripped = false;
-			height = l.start.y;
-
-			for (const c of getLines())
-			{
-				if(height == c.yMax()) continue;
-				if(l.intersects(c)) num++;
-				if(c.start.y == height || c.end.y == height) heightTripped = true;
-			}
-
-			return num
-		}
-
-		function corners (l)
-		{
-			num = 0;
-			for( const p of points)
-			{
-				if(p.y == l.start.y) num++;
-			}
-
-			return num;
-		}
-
-
-		function topLeft ()
-		{
-			x = points[0].x;
-			y = points[0].y;
-
-			for( const p of points)
-			{
-				x = p.x < x ? p.x : x;
-				y = p.y < y ? p.y : y;
-			}
-
-			return new dp.Point(x, y);
-		}
-
-		function bottomRight ()
-		{
-			x = points[0].x;
-			y = points[0].y;
-
-			for( const p of points)
-			{
-				x = p.x > x ? p.x : x;
-				y = p.y > y ? p.y : y;
-			}
-
-			return new dp.Point(x, y);
-		}
-
-		node.draw = function ()
-		{
-			for( const c of getLines())
-			{
-				led.drawLine( c.start.x, c.start.y, c.end.x, c.end.y, 255, 255, 0);
-			}
-
-
-			const tl = topLeft();
-			const br = bottomRight();
-
-			for(x = tl.x; x < br.x;  x++)
-			{
-				for(y = tl.y; y < br.y; y++)
-				{
-					leftTest = new dp.Line( new dp.Point(0, y), new dp.Point(x, y));
-					rightTest = new dp.Line( new dp.Point(x,y), new dp.Point(100, y));
-
-					const left  = ins(leftTest);
-					const right = ins(rightTest);
-
-					if( (left % 2) && (right % 2) ) led.setPixel(x, y, 255, 0, 0);
-					//else led.setPixel(x,y, 0,255,0);
-
-				}
-			}
-		}
-
-		node.on('input', function(msg)
-		{
-			if(msg.clear)
-			{
-				node.clear();
-				return;
-			}
-
-			const data   = msg.payload.data != undefined ? msg.payload.data : msg;
-			output =
-			{
-				points	: data.savedPts != undefined	? data.savedPts				: node.savedPts,
-			};
-
-			nodeRegister.add(node);
-			node.matrix.refresh();
-		});
-
-
-
-		//nodeRegister.add(node);
-
-	}
-
-
-
-
-
-
-
-
 	//register our functions with node-red
 	RED.nodes.registerType("led-matrix", LedMatrix);
 //	RED.nodes.registerType("clear-matrix", ClearMatrix);
@@ -1128,5 +978,4 @@ module.exports = function(RED) {
 	RED.nodes.registerType("triangle", Triangle);
 	RED.nodes.registerType("clear-node", ClearNode);
 	RED.nodes.registerType("polygon", Polygon);
-	RED.nodes.registerType("fill-test", FillTest);
 }

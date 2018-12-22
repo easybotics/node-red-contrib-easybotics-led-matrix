@@ -1402,8 +1402,8 @@
 			zLevel:		{value: undefined},
 			savedPts:	{value: { x: [], y: [] }},
 			tempPts:	{value: { x: [], y: [] }},
-			test:		{value: 0}, //needed, see comment in oneditsave
-			filled:		{value: false}, //-------------------------------add feature to fill later-------------------------
+			allowDeploy:{value: 0}, //see comment in oneditsave
+			filled:		{value: false},
 		},
 
 		inputs: 1,
@@ -1450,7 +1450,7 @@
 			//node red only allows the user to press the deploy button if something in an html input changes
 			//the object with points isn't tied to any html input, so this is needed to let the user click deploy
 			if(JSON.stringify(this.savedPts) !== JSON.stringify(this.tempPts)) { //if changes are made to the points
-				this.test++; //update the hidden input "test"
+				this.allowDeploy++; //update the hidden input "allowDeploy"
 			}
 		},
 	});
@@ -1484,7 +1484,7 @@
 	</div>
 
 	<canvas id="canvasPixelSelect" style="outline: 1px solid black;" width="512" height="256"></canvas>
-	<input type="number" id="node-input-test" style="display: none">
+	<input type="number" id="node-input-allowDeploy" style="display: none">
 
     <div class="form-row">
         <label for="node-config-input-zLevel"><i class="icon-tag"></i> z level</label>
@@ -1507,20 +1507,4 @@
 		};<br>
 
 	</p>
-</script>
-
-<script type="text/javascript">
-	RED.nodes.registerType("fill-test",
-	{
-		category: 'LED Matrix',
-		color: '#a6bbcf',
-		inputs:  1,
-		outputs: 1,
-		icon: "refresh-matrix.png",
-		label: function ()
-		{
-			return "fill-test";
-		}
-
-	});
 </script>
