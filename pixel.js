@@ -822,80 +822,95 @@ module.exports = function(RED) {
 		node.filled = config.filled || false;
 		var output;
 		var points = [];
+		node.url	= config.imageUrl;
 
-		function getLines ()
+		node.draw = function ()
 		{
-			lines = []
-			first = points[0];
-			last = undefined;
+			if(output == undefined) return;
 
-			for(const p of points)
+			for(let b of output)
 			{
-				if (last)
-					lines.push(new dp.Line(last, p));
+				const payload = b.payload;
 
-				last = p;
+				led.setPixel( parseInt(payload.x), parseInt(payload.y), parseInt(payload.r), parseInt(payload.g), parseInt(payload.b));
 			}
-
-			lines.push(new dp.Line(last, first));
-			return lines;
 		}
 
-		function ins (l)
+		node.clear = function ()
 		{
-			num = 0;
-			heightTripped = false;
-			height = l.start.y;
-
-			for (const c of getLines())
-			{
-				if(height == c.yMax()) continue;
-				if(l.intersects(c)) num++;
-				if(c.start.y == height || c.end.y == height) heightTripped = true;
-			}
-
-			return num
-		}
-
-		function corners (l)
-		{
-			num = 0;
-			for( const p of points)
-			{
-				if(p.y == l.start.y) num++;
-			}
-
-			return num;
+			nodeRegister.delete(node);
+			node.matrix.refresh();
 		}
 
 
-		function topLeft ()
+		function createPixelStream ()
 		{
-			x = points[0].x;
-			y = points[0].y;
+			const cc = context;
+			if(!node.url) return;
 
-			for( const p of points)
+			getPixels( node.url, function( err, pixels, c = cc)
 			{
-				x = p.x < x ? p.x : x;
-				y = p.y < y ? p.y : y;
-			}
+				outArray = [];
 
-			return new dp.Point(x, y);
+				if(!pixels) return;
+				const width = pixels.shape.length == 4 ?  Math.min( 128, pixels.shape[1]) :  Math.min( 128, pixels.shape[0]);
+				const height = pixels.shape.length == 4 ?  Math.min( 128, pixels.shape[2]) :  Math.min( 128, pixels.shape[1]);
+
+				//loop over the 2d array of pixels returned by getPixels
+				for(let x = 0; x < width; x++)
+				{
+					for(let y = 0; y < height; y++)
+					{
+						//make sure the array actually contains data for this location
+						if(pixels.get(x,y,0))
+						{
+							outArray.push({payload: { x: x, y: y,  r:pixels.get(x,y,0), g:pixels.get(x,y,1), b:pixels.get(x,y,2)} });
+						}
+					}
+				}
+
+				if(c == context)
+				{
+					output = outArray
+					readySend();
+				}
+			});
 		}
 
-		function bottomRight ()
+		function readySend ()
 		{
-			x = points[0].x;
-			y = points[0].y;
-
-			for( const p of points)
-			{
-				x = p.x > x ? p.x : x;
-				y = p.y > y ? p.y : y;
-			}
-
-			return new dp.Point(x, y);
+			nodeRegister.add(node);
+			node.matrix.refresh();
 		}
+
+		createPixelStream();
+	}
+
+
+	function FillTest (config)
+	{
+		RED.nodes.createNode(this, config);
+		const node = this;
+		
+		node.matrix = RED.nodes.getNode(config.matrix);
+		node.zLevel = 1;
+
+
+
+
+		const points = [ new dp.Point(10,10), new dp.Point(20,30),  new dp.Point(25, 5)]
+		poly = new dp.Polygon(points);
+		t = poly.clipBounds();
+
+		node.log(t.topLeft.x + ',' + t.bottomRight.x);
+		node.log(t.topLeft.y + ',' + t.bottomRight.y);
+
+		for(var x = t.topLeft.x; x < t.bottomRight.x; x++)
+		{
+			node.log(x)
+		}
+
+		poly.fill();
 
 		node.draw = function ()
 		{
@@ -930,6 +945,7 @@ module.exports = function(RED) {
 				var execTime = (Date.now() - startTime);
 				node.log("done drawing in "+execTime+" ms. "+o.filled);
 			}
+
 		}
 
 		node.clear = function ()
