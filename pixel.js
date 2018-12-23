@@ -341,7 +341,7 @@ module.exports = function(RED) {
 							if(pixels.shape.length == 4)  //gif
 							{
 								output.push( { point: new dp.Point(offset.x + x, offset.y + y), color: new dp.Color().fromRgb( pixels.get(currentFrame, x, y, 0), pixels.get(currentFrame, x, y, 1) ,pixels.get(currentFrame, x, y, 2))});
- 
+
 
 								if(currentFrame == pixels.shape[0] -1)
 								{
@@ -569,7 +569,7 @@ module.exports = function(RED) {
 	/*
 	 * node to print a circle to the matrix buffer
 	 */
-	function CircleToMatrix (config)
+	function Circle (config)
 	{
 		RED.nodes.createNode(this, config);
 		const node = this;
@@ -624,7 +624,7 @@ module.exports = function(RED) {
 	/*
 	 * draws a line to the matrix buffer
 	 */
-	function LineToMatrix (config)
+	function Line (config)
 	{
 		RED.nodes.createNode(this, config);
 		const node = this;
@@ -682,7 +682,7 @@ module.exports = function(RED) {
 	 * node that draws a triangle to the screen
 	 */
 
-	function TriangleToMatrix (config)
+	function Triangle (config)
 	{
 		RED.nodes.createNode(this, config);
 		const node = this;
@@ -809,15 +809,20 @@ module.exports = function(RED) {
 	};
 
 
-	function CanvasToMatrix (config)
+	function Polygon (config)
 	{
 		RED.nodes.createNode(this, config);
 		const node = this;
 
 		node.matrix = RED.nodes.getNode(config.matrix);
 		node.zLevel = config.zLevel != undefined ? config.zLevel : 1;
+		node.savedPts = config.savedPts;
+		node.numPts = config.numPts || 0;
+		node.rgb = config.rgb || "255,255,255";
+		node.filled = config.filled || false;
+		var output;
+		var points = [];
 		node.url	= config.imageUrl;
-		var output = undefined;
 
 		node.draw = function ()
 		{
@@ -909,34 +914,84 @@ module.exports = function(RED) {
 
 		node.draw = function ()
 		{
-			poly.draw(led, new dp.Color().fromRgb(255,255,255));
-			
+			if(output != undefined)
+			{
+				node.log("recieved input");
+				var startTime = Date.now();
+				let o = output;
+				for(const c of getLines())
+				{
+					led.drawLine(c.start.x, c.start.y, c.end.x, c.end.y, o.color.r, o.color.g, o.color.b);
+				}
+
+				if(o.filled) {
+					const tl = topLeft();
+					const br = bottomRight();
+
+					for(x = tl.x; x < br.x;  x++)
+					{
+						for(y = tl.y; y < br.y; y++)
+						{
+							leftTest = new dp.Line( new dp.Point(tl.x, y), new dp.Point(x, y));
+							rightTest = new dp.Line( new dp.Point(x,y), new dp.Point(br.x, y));
+
+							const left  = ins(leftTest);
+							const right = ins(rightTest);
+
+							if( (left % 2) && (right % 2) ) led.setPixel(x, y, o.color.r, o.color.g, o.color.b);
+						}
+					}
+				}
+				var execTime = (Date.now() - startTime);
+				node.log("done drawing in "+execTime+" ms. "+o.filled);
+			}
 
 		}
 
-		nodeRegister.add(node);
+		node.clear = function ()
+		{
+			nodeRegister.delete(node);
+			node.matrix.refresh();
+		}
 
+		node.on('input', function(msg)
+		{
+			if(msg.clear)
+			{
+				node.clear();
+				return;
+			}
+
+			const data   = msg.payload.data != undefined ? msg.payload.data : msg;
+			output =
+			{
+				color	: data.rgb		!= undefined	? eatRGBString(data.rgb)	: eatRGBString(node.rgb),
+				numPts	: data.numPts	!= undefined	? parseInt(data.numPts)		: parseInt(node.numPts),
+				points	: data.savedPts != undefined	? data.savedPts				: node.savedPts,
+				filled	: data.filled	!= undefined	? data.filled				: node.filled,
+			};
+
+			points = [];
+			for(i = 0; i < output.points.x.length; i++) { // convert points to the dp.Point object
+				points.push(new dp.Point(output.points.x[i], output.points.y[i]));
+			}
+
+			nodeRegister.add(node);
+			node.matrix.refresh();
+		});
 	}
-
-
-
-			
-
-
-
 
 	//register our functions with node-red
 	RED.nodes.registerType("led-matrix", LedMatrix);
 //	RED.nodes.registerType("clear-matrix", ClearMatrix);
 	RED.nodes.registerType("refresh-matrix", RefreshMatrix);
 	RED.nodes.registerType("pixel", PixelNode);
-	RED.nodes.registerType("image-to-matrix", ImageToPixels);
-	RED.nodes.registerType("text-to-matrix", Text);
+	RED.nodes.registerType("image", ImageToPixels);
+	RED.nodes.registerType("text", Text);
 	RED.nodes.registerType("pixel-transform", PixelDataTransform);
-	RED.nodes.registerType("circle-to-matrix", CircleToMatrix);
-	RED.nodes.registerType("line-to-matrix", LineToMatrix);
-	RED.nodes.registerType("triangle-to-matrix", TriangleToMatrix);
+	RED.nodes.registerType("circle", Circle);
+	RED.nodes.registerType("line", Line);
+	RED.nodes.registerType("triangle", Triangle);
 	RED.nodes.registerType("clear-node", ClearNode);
-	RED.nodes.registerType("canvas-to-matrix", CanvasToMatrix);
-	RED.nodes.registerType("fill-test", FillTest);
+	RED.nodes.registerType("polygon", Polygon);
 }
