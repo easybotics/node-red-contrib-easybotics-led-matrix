@@ -987,7 +987,7 @@ module.exports = function(RED) {
 	RED.nodes.registerType("refresh-matrix", RefreshMatrix);
 	RED.nodes.registerType("pixel", PixelNode);
 	RED.nodes.registerType("image", ImageToPixels);
-	RED.nodes.registerType("text", Text);
+	RED.nodes.registerType("text-to-matrix", Text);
 	RED.nodes.registerType("pixel-transform", PixelDataTransform);
 	RED.nodes.registerType("circle", Circle);
 	RED.nodes.registerType("line", Line);

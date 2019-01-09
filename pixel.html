@@ -536,7 +536,7 @@
 		}
 
 
-    RED.nodes.registerType('text',{
+    RED.nodes.registerType('text-to-matrix',{
         category: 'LED Matrix',
         color: '#a6bbcf',
 
@@ -635,7 +635,7 @@
 
 
 
-<script type="text/x-red" data-template-name="text">
+<script type="text/x-red" data-template-name="text-to-matrix">
 
 	<div class='form-row'>
 		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
@@ -683,7 +683,7 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="text">
+<script type="text/x-red" data-help-name="text-to-matrix">
     <p>prints text to the matrix buffer <br>
 	If <i> source </i> is a string it uses the x and y coordinates from the settings. <br>
 	<i> source </i> can also be an object with the following properties: <br>
