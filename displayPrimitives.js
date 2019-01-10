@@ -55,6 +55,8 @@ exports.Color = function ()
 		this.r = output.r;
 		this.g = output.g;
 		this.b = output.b;
+
+		return this;
 	}
 
 	this.toRgbString  = function ()
