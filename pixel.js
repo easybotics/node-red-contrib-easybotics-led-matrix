@@ -891,7 +891,7 @@ module.exports = function(RED) {
 	{
 		RED.nodes.createNode(this, config);
 		const node = this;
-		
+
 		node.matrix = RED.nodes.getNode(config.matrix);
 		node.zLevel = 1;
 
@@ -986,7 +986,7 @@ module.exports = function(RED) {
 //	RED.nodes.registerType("clear-matrix", ClearMatrix);
 	RED.nodes.registerType("refresh-matrix", RefreshMatrix);
 	RED.nodes.registerType("pixel", PixelNode);
-	RED.nodes.registerType("image", ImageToPixels);
+	RED.nodes.registerType("image-to-matrix", ImageToPixels);
 	RED.nodes.registerType("text-to-matrix", Text);
 	RED.nodes.registerType("pixel-transform", PixelDataTransform);
 	RED.nodes.registerType("circle", Circle);

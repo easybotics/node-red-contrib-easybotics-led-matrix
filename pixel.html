@@ -407,7 +407,7 @@
 </script>
 
 <script type="text/javascript">
-	RED.nodes.registerType('image',
+	RED.nodes.registerType('image-to-matrix',
 	{
 		category: 'LED Matrix',
 		color: '#a6bbcf',
@@ -433,7 +433,7 @@
 </script>
 
 
-<script type="text/x-red" data-template-name="image">
+<script type="text/x-red" data-template-name="image-to-matrix">
 	<div class='form-row'>
 		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
 		<input type='text' id='node-input-matrix'/>
@@ -459,7 +459,7 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="image">
+<script type="text/x-red" data-help-name="image-to-matrix">
 	<p> Takes a url, or a file path  as a payload, and uses the x,y in the settings <br>
 		If a gif is injected, the frame displayed will advance on each inject <br><br>
 
