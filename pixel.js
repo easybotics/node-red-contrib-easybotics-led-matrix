@@ -813,26 +813,49 @@ module.exports = function(RED) {
 	{
 		RED.nodes.createNode(this, config);
 		const node = this;
-
 		node.matrix = RED.nodes.getNode(config.matrix);
+
+		//get the config data we'll use later
 		node.zLevel = config.zLevel != undefined ? config.zLevel : 1;
 		node.savedPts = config.savedPts;
-		node.numPts = config.numPts || 0;
 		node.rgb = config.rgb || "255,255,255";
 		node.filled = config.filled || false;
-		var output;
-		var points = [];
-		node.url	= config.imageUrl;
+
+		//the data we'll use to actually draw starts off empty
+		node.polygon = undefined;
+		node.color = undefined;
+
+
+		//this functin returns a dp Polygon based on the config data
+		//we only call this if the user doesn't want to draw their own custom polygon
+		node.buildFromConfig = function()
+		{
+			realPoints = new Array();
+
+			//fill realPoints with dp points to make a polygon later
+			for( i = 0; i < node.savedPts.x.length; i++)
+			{
+				const x = node.savedPts.x[i] 
+				const y = node.savedPts.y[i]
+
+				realPoints.push( new dp.Point(x, y));
+				node.log(x);
+			}
+
+			//create our DP polygon 
+			polygon = new dp.Polygon(realPoints);
+
+			if(node.filled) polygon.fill();
+
+			return polygon;
+		}
+
 
 		node.draw = function ()
 		{
-			if(output == undefined) return;
-
-			for(let b of output)
+			if(node.polygon && node.color) 
 			{
-				const payload = b.payload;
-
-				led.setPixel( parseInt(payload.x), parseInt(payload.y), parseInt(payload.r), parseInt(payload.g), parseInt(payload.b));
+				node.polygon.draw( led, node.color);
 			}
 		}
 
@@ -842,40 +865,40 @@ module.exports = function(RED) {
 			node.matrix.refresh();
 		}
 
-
-		function createPixelStream ()
+		node.on('input', function (msg)
 		{
-			const cc = context;
-			if(!node.url) return;
-
-			getPixels( node.url, function( err, pixels, c = cc)
+			if(msg.clear)
 			{
-				outArray = [];
+				node.clear();
+				return;				
+			}
 
-				if(!pixels) return;
-				const width = pixels.shape.length == 4 ?  Math.min( 128, pixels.shape[1]) :  Math.min( 128, pixels.shape[0]);
-				const height = pixels.shape.length == 4 ?  Math.min( 128, pixels.shape[2]) :  Math.min( 128, pixels.shape[1]);
+			//here is where to check if the user is sending a polygon as data and then to use
+			//that data instead of using the config.data 
+			/*
+			if(msg.....)
+			{
 
-				//loop over the 2d array of pixels returned by getPixels
-				for(let x = 0; x < width; x++)
-				{
-					for(let y = 0; y < height; y++)
-					{
-						//make sure the array actually contains data for this location
-						if(pixels.get(x,y,0))
-						{
-							outArray.push({payload: { x: x, y: y,  r:pixels.get(x,y,0), g:pixels.get(x,y,1), b:pixels.get(x,y,2)} });
-						}
-					}
-				}
+				nodeRegister.add(node);
+				node.matrix.refresh();
+				return;
+			*/
 
-				if(c == context)
-				{
-					output = outArray
-					readySend();
-				}
-			});
-		}
+			//don't redo this if we haven't had user data and the config hasn't changed
+			//this if statement will need changing
+			if(!node.polygon)
+			{
+				node.polygon = node.buildFromConfig();
+				node.color = new dp.Color().fromRgbString(node.rgb);
+			}
+
+
+			//dont forget to register the node
+			nodeRegister.add(node);
+			node.matrix.refresh();
+
+		});
+
 
 		function readySend ()
 		{
@@ -883,7 +906,6 @@ module.exports = function(RED) {
 			node.matrix.refresh();
 		}
 
-		createPixelStream();
 	}
 
 
