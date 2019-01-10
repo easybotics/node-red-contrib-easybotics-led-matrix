@@ -624,16 +624,10 @@ module.exports = function(RED) {
 				return;
 			}
 
-			//here is where to check if the user is sending a polygon as data and then to use
-			//that data instead of using the config.data
-			/*
-			if(msg.....)
-			{
-
-				nodeRegister.add(node);
-				node.matrix.refresh();
-				return;
-			*/
+			const data = msg.payload;
+			node.rgb = data.rgb != undefined ? data.rgb : node.rgb;
+			node.savedPts = data.savedPts != undefined ? data.savedPts : node.savedPts;
+			node.filled = data.filled != undefined ? data.filled : node.filled;
 
 			//don't redo this if we haven't had user data and the config hasn't changed
 			//this if statement will need changing
