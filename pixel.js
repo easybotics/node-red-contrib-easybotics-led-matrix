@@ -839,7 +839,6 @@ module.exports = function(RED) {
 				const y = node.savedPts.y[i]
 
 				realPoints.push( new dp.Point(x, y));
-				node.log(x);
 			}
 
 			//create our DP polygon 
