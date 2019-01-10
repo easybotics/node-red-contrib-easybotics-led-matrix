@@ -179,30 +179,27 @@ module.exports = function(RED) {
 	{
 		RED.nodes.createNode(this, config);
 		const node = this;
-
 		node.matrix = RED.nodes.getNode(config.matrix);
+
+		//get config data 
 		node.xOffset = config.xOffset;
 		node.yOffset = config.yOffset;
-
 		node.zLevel = config.zLevel != undefined ? config.zLevel : 0;
+		node.file = config.file;
 
-		//filename or URL to look for an image
-		//and an array we will will with pixels
-		var offset = new dp.Point(parseInt(node.xOffset), parseInt(node.yOffset));
-		node.log("offsets: " + offset.x + ' ' + offset.y);
-		var output;
-		var lastSent;
-		var lastPoint;
-
-		var currentFrame = 0;
+		//info about the frame we've built last; expensive so we want to avoid repeating this if we can!
+		node.output		  = undefined;
+		node.lastFile	  = undefined;
+		node.lastPoint	  = undefined;
+		node.currentFrame = 0;
 
 		node.draw = function ()
 		{
 			if(output != undefined)
 			{
-				for(const p of output)
+				for(const tuple of output)
 				{
-					p.point.draw(led, p.color);
+					tuple.point.draw(led, tuple.color);
 				}
 			}
 		}
@@ -216,23 +213,6 @@ module.exports = function(RED) {
 		//function to actually send the output to the next node
 		function readySend ()
 		{
-			//console.log("sending pixels");
-
-			//see node-red docmentation for how node.send treats arrays
-			//node.send(output) would send one pixel to n outputs
-			//node.send([output], true) sends the pixiels to output 1, and true to output 2
-			//
-			//node.send([output]);
-			//instead of sending it out we're not just processing it in place here to match the text node
-			/*
-			for(var i = 0; i < output.length; i++)
-			{
-				let payload = output[i].payload;
-				led.setPixel( parseInt(payload.x), parseInt(payload.y), parseInt(payload.r), parseInt(payload.g), parseInt(payload.b));
-			}
-			*/
-
-
 			nodeRegister.add(node);
 			node.matrix.refresh();
 		}
@@ -252,27 +232,30 @@ module.exports = function(RED) {
 					node.error("image did not convert correctly\n please check the url or file location");
 					return;
 				}
+
 				const width = pixels.shape.length == 4 ?  Math.min( 128, pixels.shape[1]) :  Math.min( 128, pixels.shape[0]);
 				const height = pixels.shape.length == 4 ?  Math.min( 128, pixels.shape[2]) :  Math.min( 128, pixels.shape[1]);
-
 
 				//loop over the 2d array of pixels returned by getPixels
 				for(let x = 0; x < width; x++)
 				{
+					//give up if the next frame is already being pushed
+					if(c != context) return; 
+
 					for(let y = 0; y < height; y++)
 					{
 						//make sure the array actually contains data for this location
-						if(pixels.get(x,y,0) || pixels.get(currentFrame,x,y,0))
+						if(pixels.get(x,y,0) || pixels.get(node.currentFrame,x,y,0))
 						{
 							//push pixels to the output buffer
 							if(pixels.shape.length == 4)  //gif
 							{
-								output.push( { point: new dp.Point(offset.x + x, offset.y + y), color: new dp.Color().fromRgb( pixels.get(currentFrame, x, y, 0), pixels.get(currentFrame, x, y, 1) ,pixels.get(currentFrame, x, y, 2))});
+								output.push( { point: new dp.Point(offset.x + x, offset.y + y), color: new dp.Color().fromRgb( pixels.get(node.currentFrame, x, y, 0), pixels.get(node.currentFrame, x, y, 1) ,pixels.get(node.currentFrame, x, y, 2))});
 
 
-								if(currentFrame == pixels.shape[0] -1)
+								if(node.currentFrame == pixels.shape[0] -1)
 								{
-									currentFrame = 0; //restart the gif
+									node.currentFrame = 0; //restart the gif
 								}
 							}
 							else
@@ -287,7 +270,7 @@ module.exports = function(RED) {
 				if(c == context)
 				{
 					readySend();
-					if(pixels.shape[0] > 1) currentFrame++;
+					if(pixels.shape[0] > 1) node.currentFrame++;
 				}
 
 			});
@@ -297,48 +280,56 @@ module.exports = function(RED) {
 		node.on('input', function(msg)
 		{
 
+			//start out with a blank file and offset
+			runFile = undefined;
+			runPoint = undefined;
+
 			if(msg.clear)
 			{
 				node.clear();
 				return;
 			}
 
-			if(!msg.payload)
-			{
-				node.error("empty payload");
-				return;
-			}
-
+			//catch various attemps to modify the file and offset, either via direct injection 
+			//or via a msg.payload.data property 
 			//set the url var
 			if( typeof msg.payload === "string")
 			{
-				if(msg.payload === lastSent && (output && output.length > 0) && lastPoint == offset && (!currentFrame))
-				{
-
-
-					return readySend();
-				}
-
-				lastPoint = offset;
-				lastSent = msg.payload;
-
-				return createPixelStream( msg.payload, offset);
+				runFile = msg.payload;
 			}
 
 			if( msg.payload.data)
 			{
-				if(msg.payload.data === lastSent && (output && output.length > 0) && lastPoint.x  == msg.payload.x && lastPoint.y == msg.payload.y && (!currentFrame))
-				{
-
-					return readySend();
-				}
-
-				lastSent = msg.payload.data;
-				offset = new dp.Point(msg.payload.x, msg.payload.y);
-				lastPoint = offset;
-
-				return createPixelStream(msg.payload.data, offset);
+				runFile = msg.payload.data;
+				runPoint = new dp.Point(msg.payload.x, msg.payload.y);
 			}
+
+			//if the user didn't provide a file or offset, use the one from the config
+			if( !runFile) runFile = node.file;;
+			if( !runPoint) runPoint = new dp.Point(node.xOffset, node.yOffset);
+
+
+			//if we didn't dislpay an image yet, always display one 
+			if(node.oldFile == undefined  || node.oldPoint == undefined || node.currentFrame)
+			{
+				node.oldFile = runFile;
+				node.oldPoint = runPoint;
+
+				createPixelStream(runFile, runPoint);
+				return;
+			}
+
+			//otherwise, carefully check if we are trying to draw the same image twice for no reason
+			if(runFile != node.oldFile && (runPoint.x != oldPoint.x && runPoint.y != oldPoint.y))
+			{
+				node.oldFile = runFile;
+				node.oldPoint = runPoint;
+
+				createPixelStream(runFile, runPoint);
+				return;
+			}
+
+			node.log("falling through, not running pixel stream");
 		});
 	}
 
