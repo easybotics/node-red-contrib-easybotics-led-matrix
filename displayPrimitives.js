@@ -55,6 +55,8 @@ exports.Color = function ()
 		this.r = output.r;
 		this.g = output.g;
 		this.b = output.b;
+
+		return this;
 	}
 
 	this.toRgbString  = function ()
@@ -239,9 +241,9 @@ exports.Polygon = function (p)
 		const bounds = this.clipBounds();
 
 
-		for(var x = t.topLeft.x; x < t.bottomRight.x; x++)
+		for(var x = bounds.topLeft.x; x < bounds.bottomRight.x; x++)
 		{
-			for(var y = t.topLeft.y; y < t.bottomRight.y; y++)
+			for(var y = bounds.topLeft.y; y < bounds.bottomRight.y; y++)
 			{
 				const leftTest  = new exports.Line( new exports.Point(bounds.topLeft.x, y), new exports.Point(x, y));
 				const rightTest = new exports.Line( new exports.Point(x, y), new exports.Point(bounds.bottomRight.x, y));
