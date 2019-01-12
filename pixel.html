@@ -1,30 +1,35 @@
 <script type="text/javascript">
 
+	function Point(x, y) {
+		this.x = parseInt(x);
+		this.y = parseInt(y);
+	}
+
 	function pixelReDraw (points, numPoints, pixelSelector, drawLines = true)
 	{
 		var canvas  = document.getElementById(pixelSelector);
 		var context = canvas.getContext("2d");
 
 		context.beginPath();
-		for(i = 0; i < points.x.length; i++)
+		for(i = 0; i < points.length; i++)
 		{
-			context.rect(points.x[i] * 4+1, points.y[i] * 4+1, 3, 3);
+			context.rect(points[i].x * 4+1, points[i].y * 4+1, 3, 3);
 			context.fillStyle = "#555";
 			context.fill();
 		}
 		context.closePath();
 
-		if(drawLines)
+		if(drawLines === true && points.length !== 0)
 		{
 			context.beginPath();
-			context.moveTo(points.x[0] * 4 + 2.5, points.y[0] * 4 + 2.5);
-			for(i = 1; i < points.x.length; i++)
+			context.moveTo(points[0].x * 4 + 2.5, points[0].y * 4 + 2.5);
+			for(i = 1; i < points.length; i++)
 			{
-				context.lineTo(points.x[i] * 4 + 2.5, points.y[i] * 4 + 2.5);
+				context.lineTo(points[i].x * 4 + 2.5, points[i].y * 4 + 2.5);
 			}
 
-			if(points.x.length == numPoints) { //only close the shape if all points are there
-				context.lineTo(points.x[0] * 4 + 2.5, points.y[0] * 4 + 2.5);
+			if(points.length == numPoints) { //only close the shape if all points are there
+				context.lineTo(points[0].x * 4 + 2.5, points[0].y * 4 + 2.5);
 			}
 
 			context.lineWidth = 1;
@@ -72,8 +77,10 @@
 	{
 		for(i = coord.x-range; i <= coord.x+range; i++) {
 			for(j = coord.y-range; j <= coord.y+range; j++) {
-				if(points.x.includes(i) && points.y[points.x.indexOf(i)] == j) {
-					return points.x.indexOf(i); //returns index of x and y coordinates
+				for(k = 0; k < points.length; k++) {
+					if(points[k].x === i && points[k].y === j) {
+						return k;
+					}
 				}
 			}
 		}
@@ -84,16 +91,16 @@
 	 * function to draw a grid on the canvas for the pixel selector and give the coordinates of the selected pixel
 	 * numPoints: number of points in the polygon (if string input, id of input field with number of pts),
 	 * pixelSelector: canvas to use, drawLines: draw the resulting shape or not, updateFields: whether or not to change input text fields,
-	 * colorSelector: id of the color selector to use for the shape, loadPts: object with points to draw on canvas
+	 * colorSelector: id of the color selector to use for the shape, loadPts: array with points to draw on canvas
 	 */
-	function pixelSelector (numPoints, pixelSelector, drawLines = true, updateFields = true, colorSelector = false, loadPts = false)
+	function pixelSelector (numPoints, pixelSelector, drawLines = true, updateFields = true, colorSelector = false, loadPts = [])
 	{
 
 		var canvas = document.getElementById(pixelSelector);
 		var context = canvas.getContext("2d");
 
 		var currentPoint = {};
-		var points = loadPts == false ? { x: [], y: [] } : loadPts;
+		var points = loadPts;
 		var numPointsElement = numPoints;
 
 		if(typeof numPointsElement === "string") {
@@ -106,8 +113,7 @@
 
 		if(updateFields == true) { //get the numbers in the input fields
 			for(i = 0; i < numPoints; i++) {
-				points.x.push(parseInt(document.getElementById("node-input-x"+i).value));
-				points.y.push(parseInt(document.getElementById("node-input-y"+i).value));
+				points.push(new Point(document.getElementById("node-input-x"+i).value, document.getElementById("node-input-y"+i).value));
 			}
 		}
 
@@ -127,34 +133,28 @@
 				numPoints = parseInt(document.getElementById(numPointsElement).value);
 			}
 
-			if(currentPoint.down.x == currentPoint.up.x && currentPoint.down.y == currentPoint.up.y) { //if mouse not dragged
-				points.x.push(currentPoint.up.x);
-				points.y.push(currentPoint.up.y);
-			} else if (ptNear(points, currentPoint.down) !== false) { //mouse dragged and starting on/near a point
+			if (ptNear(points, currentPoint.down) !== false) { //mouse dragged and starting on/near a point
 				//update the selected point
 				ptIndex = ptNear(points, currentPoint.down)
-				points.x[ptIndex] = currentPoint.up.x;
-				points.y[ptIndex] = currentPoint.up.y;
-			} else { //if mouse dragged, not starting on a point
-				points.x.push(currentPoint.up.x);
-				points.y.push(currentPoint.up.y);
+				points[ptIndex] = currentPoint.up;
+			} else { //if mouse not starting on a point
+				points.push(new Point(currentPoint.up.x, currentPoint.up.y));
 			}
 
 			context.clearRect(0, 0, canvas.width, canvas.height);
 			drawGrid(canvas, context);
 
-			if(points.x.length > numPoints)
-			{ //if the number of points is too many
-				points.x.splice(0, points.x.length - numPoints); //removes the extra value(s) from x & y arrays
-				points.y.splice(0, points.y.length - numPoints);
+			if(points.length > numPoints)
+			{ // if the number of points is too many, remove extra points
+				points.splice(0, points.length - numPoints);
 			}
 
-			for(i = 0; i < points.x.length; i++)
+			for(i = 0; i < points.length; i++)
 			{
 				if(updateFields == true)
 				{
-					document.getElementById("node-input-x"+i).value = points.x[i]; //set input fields to the coordinates of each pixel
-					document.getElementById("node-input-y"+i).value = points.y[i];
+					document.getElementById("node-input-x"+i).value = points[i].x; //set input fields to the coordinates of each pixel
+					document.getElementById("node-input-y"+i).value = points[i].y;
 				}
 			}
 
@@ -982,8 +982,8 @@
 			matrix:		{type: 'led-matrix', required: true},
 			numPts:		{value: "2"},
 			zLevel:		{value: undefined},
-			savedPts:	{value: { x: [], y: [] }},
-			tempPts:	{value: { x: [], y: [] }},
+			savedPts:	{value: []},
+			tempPts:	{value: []},
 			allowDeploy:{value: 0}, //see comment in oneditsave
 			filled:		{value: false},
 		},
@@ -1017,14 +1017,14 @@
 
 			$("#node-input-rgb2").val( rgbToHex( parseInt(split[0]), parseInt(split[1]), parseInt(split[2])));
 
-			this.tempPts = $.extend(true, {}, this.savedPts); //create a copy of savedPts in case edits are made in edit dialog but not saved
-			pixelSelector("node-input-numPts", "canvasPixelSelect", true, false, "node-input-rgb2", this.savedPts.x == undefined ? false : this.savedPts);
+			this.tempPts = this.savedPts.slice(0); //create a copy of savedPts in case edits are made in edit dialog but not saved
+			pixelSelector("node-input-numPts", "canvasPixelSelect", true, false, "node-input-rgb2", this.savedPts);
 		},
 
 		oneditcancel: function ()
 		{
 			//this.savedPts is directly edited in the pixelSelector function, so if the edit dialog is cancelled, it needs to be reset
-			this.savedPts = $.extend(true, {}, this.tempPts);
+			this.savedPts = this.tempPts.slice(0);
 		},
 
 		oneditsave: function ()
@@ -1082,16 +1082,13 @@
 <script type="text/x-red" data-help-name="polygon">
 	<p> Prints a polygon to the matrix buffer, refresh the matrix to see the result  <br>
 		When injected it will add itself to the buffer, and will continue to be printed until a msg.clear property is injected into it <br>
-		Will use the location and color from the settings, or can be injected with an object with the following preoperties: <br><br>
+		Will use the location and color from the settings, or can be injected with an object with the following properties: <br><br>
 	<b> rgb:</b> rgb color, as a CSV string. Example: "255,0,0" (RED) <br>
 	<b> filled:</b> boolean determining if the shape will be filled <br>
 	<b> savedPts:</b> what points to draw the polygon with. Use the following format, replacing x1, x2, y1, y2, etc. with the numerical coordinates of the points: <br>
-
-	<i>
-		{<br>
-		x: [x1, x2, x3, ...],<br>
-		y: [y1, y2, y3, ...]<br>
-		};<br>
+	<code>
+		[{x: x1, y: y1}, {x: x2, y: y2}]
+	</code>
 
 	</p>
 </script>

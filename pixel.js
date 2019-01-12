@@ -181,7 +181,7 @@ module.exports = function(RED) {
 		const node = this;
 		node.matrix = RED.nodes.getNode(config.matrix);
 
-		//get config data 
+		//get config data
 		node.xOffset = config.xOffset;
 		node.yOffset = config.yOffset;
 		node.zLevel = config.zLevel != undefined ? config.zLevel : 0;
@@ -240,7 +240,7 @@ module.exports = function(RED) {
 				for(let x = 0; x < width; x++)
 				{
 					//give up if the next frame is already being pushed
-					if(c != context) return; 
+					if(c != context) return;
 
 					for(let y = 0; y < height; y++)
 					{
@@ -290,8 +290,8 @@ module.exports = function(RED) {
 				return;
 			}
 
-			//catch various attemps to modify the file and offset, either via direct injection 
-			//or via a msg.payload.data property 
+			//catch various attemps to modify the file and offset, either via direct injection
+			//or via a msg.payload.data property
 			//set the url var
 			if( typeof msg.payload === "string")
 			{
@@ -309,7 +309,7 @@ module.exports = function(RED) {
 			if( !runPoint) runPoint = new dp.Point(node.xOffset, node.yOffset);
 
 
-			//if we didn't dislpay an image yet, always display one 
+			//if we didn't dislpay an image yet, always display one
 			if(node.oldFile == undefined  || node.oldPoint == undefined || node.currentFrame)
 			{
 				node.oldFile = runFile;
@@ -576,14 +576,14 @@ module.exports = function(RED) {
 			realPoints = new Array();
 
 			//fill realPoints with dp points to make a polygon later
-			for( i = 0; i < node.savedPts.x.length; i++)
+			for(i = 0; i < node.savedPts.length; i++)
 			{
-				const x = node.savedPts.x[i]
-				const y = node.savedPts.y[i]
+				const x = node.savedPts[i].x;
+				const y = node.savedPts[i].y;
 
-				realPoints.push( new dp.Point(x, y));
+				realPoints.push(new dp.Point(x, y));
 			}
-
+			console.log(realPoints);
 			//create our DP polygon
 			polygon = new dp.Polygon(realPoints);
 
