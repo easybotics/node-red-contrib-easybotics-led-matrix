@@ -3,7 +3,7 @@ var getPixels	= require('get-pixels')
 var dp			= require('./displayPrimitives.js')
 
 
-//var led = new LedMatrix(64, 64, 1, 2, "adafruit-hat-pwm")
+//var led = new LedMatrix(64, 64, 1, 2, 'adafruit-hat-pwm')
 
 module.exports = function(RED) {
 
@@ -102,7 +102,7 @@ module.exports = function(RED) {
 
 				if(actualDelay > node.refreshDelay)
 				{
-					node.log("using delay " + actualDelay)
+					node.log('using delay ' + actualDelay)
 				}
 			}
 		}
@@ -111,7 +111,7 @@ module.exports = function(RED) {
 		//if led is undefined we create a new one
 		if(!led)
 		{
-			node.warn("initing led")
+			node.warn('initing led')
 			led = new Matrix( parseInt(node.height), parseInt(node.width), parseInt(node.parallel), parseInt(node.chained), parseInt(node.brightness), node.mapping)
 			led.clear()
 			led.update()
@@ -120,9 +120,9 @@ module.exports = function(RED) {
 		}
 		else
 		{
-			node.warn("reusing led")
-				led.brightness( node.brightness)
-				node.log("set brightness")
+			node.warn('reusing led')
+			led.brightness( node.brightness)
+			node.log('set brightness')
 		}
 
 		//otherwise we clear the one we have, without these checks it can spawn new evertime we deploy
@@ -215,7 +215,7 @@ module.exports = function(RED) {
 
 				if(!pixels)
 				{
-					node.error("image did not convert correctly\n please check the url or file location")
+					node.error('image did not convert correctly\n please check the url or file location')
 					return
 				}
 
@@ -280,7 +280,7 @@ module.exports = function(RED) {
 			//catch various attemps to modify the file and offset, either via direct injection
 			//or via a msg.payload.data property
 			//set the url var
-			if( typeof msg.payload === "string")
+			if( typeof msg.payload === 'string')
 			{
 				runFile = msg.payload
 			}
@@ -316,7 +316,7 @@ module.exports = function(RED) {
 				return
 			}
 
-			node.log("falling through, not running pixel stream")
+			node.log('falling through, not running pixel stream')
 		})
 	}
 
@@ -346,8 +346,8 @@ module.exports = function(RED) {
 		var node = this
 
 		node.matrix		= RED.nodes.getNode(config.matrix)
-		node.prefix		= config.prefix || ""
- 		node.source		= config.source || "msg.payload"
+		node.prefix		= config.prefix || ''
+ 		node.source		= config.source || 'msg.payload'
 		node.font		= config.font
 		node.xOffset	= config.xOffset
 		node.yOffset	= config.yOffset
@@ -422,7 +422,7 @@ module.exports = function(RED) {
 		node.xOffset = (config.xOffset || 0)
 		node.yOffset = (config.yOffset || 0)
 		node.refresh = (config.refresh || 0)
-		node.rgb	 = (config.rgb     || "255,255,255")
+		node.rgb	 = (config.rgb     || '255,255,255')
 
 		function outputFromString (msg)
 		{
@@ -459,7 +459,7 @@ module.exports = function(RED) {
 
 		node.on('input', function(msg)
 		{
-			if (typeof msg.payload == "string")
+			if (typeof msg.payload == 'string')
 			{
 				return outputFromString(msg)
 			}
@@ -482,7 +482,7 @@ module.exports = function(RED) {
 		node.xPos	 = (config.xPos   || 0)
 		node.yPos	 = (config.yPos	  || 0)
 		node.radius	 = (config.radius || 0)
-		node.rgb	 = (config.rgb    || "255,255,255")
+		node.rgb	 = (config.rgb    || '255,255,255')
 		node.zLevel = config.zLevel != undefined ? config.zLevel : 1
 
 		node.draw = function()
@@ -546,7 +546,7 @@ module.exports = function(RED) {
 		//get the config data we'll use later
 		node.zLevel = config.zLevel != undefined ? config.zLevel : 1
 		node.savedPts = config.savedPts
-		node.rgb = config.rgb || "255,255,255"
+		node.rgb = config.rgb || '255,255,255'
 		node.filled = config.filled || false
 
 		//the data we'll use to actually draw starts off empty
@@ -629,13 +629,13 @@ module.exports = function(RED) {
 	}
 
 	//register our functions with node-red
-	RED.nodes.registerType("led-matrix", LedMatrix)
-//	RED.nodes.registerType("clear-matrix", ClearMatrix)
-	RED.nodes.registerType("refresh-matrix", RefreshMatrix)
-	RED.nodes.registerType("image-to-matrix", ImageToPixels)
-	RED.nodes.registerType("text-to-matrix", Text)
-	RED.nodes.registerType("pixel-transform", PixelDataTransform)
-	RED.nodes.registerType("circle", Circle)
-	RED.nodes.registerType("clear-node", ClearNode)
-	RED.nodes.registerType("polygon", Polygon)
+	RED.nodes.registerType('led-matrix', LedMatrix)
+//	RED.nodes.registerType('clear-matrix', ClearMatrix)
+	RED.nodes.registerType('refresh-matrix', RefreshMatrix)
+	RED.nodes.registerType('image-to-matrix', ImageToPixels)
+	RED.nodes.registerType('text-to-matrix', Text)
+	RED.nodes.registerType('pixel-transform', PixelDataTransform)
+	RED.nodes.registerType('circle', Circle)
+	RED.nodes.registerType('clear-node', ClearNode)
+	RED.nodes.registerType('polygon', Polygon)
 }
