@@ -270,6 +270,8 @@ exports.Polygon = function (p)
 	this.promiseWrapperFill = function()
 	{
 		//tricky error here, which is that 'this' is not captured in these lambdas 
+		const n = this;
+
 		//so we just make a n. thing to use as this
 		//probably should have assigned a const to this at the global scope, which ill probably do
 		return new Promise(function(resolve, reject)
