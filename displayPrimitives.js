@@ -182,7 +182,7 @@ exports.Polygon = function (p)
 {
 	this.points = p;
 	this.drawLineCache;
-	this.drawFillCache;
+	this.drawFillCache = [];
 
 	this.boundryIntersections = function (l)
 	{
@@ -235,9 +235,12 @@ exports.Polygon = function (p)
 		return lines;
 	}
 
-	this.fill = function ()
+	//moved this to a pure function so its fine to call async
+	//pure function just means it doesn't modify any variables outside its scope
+	//returns a buffer instead of editing the classes one
+	this.pureFill = function()
 	{
-		this.drawFillCache = [];
+		var dfCache = [];
 		const bounds = this.clipBounds();
 
 
@@ -253,10 +256,41 @@ exports.Polygon = function (p)
 
 				if ((left % 2) && (right % 2)) 
 				{
-					this.drawFillCache.push( new exports.Point(x, y));
+					dfCache.push( new exports.Point(x, y));
 				}
 			}
 		}
+
+		return dfCache;
+	}
+
+	//wrap our pure function in a promise
+	//promises run asynchronously, and have a .then() method which defines 
+	//-- what happens when the result is returned
+	this.promiseWrapperFill = function()
+	{
+		//tricky error here, which is that 'this' is not captured in these lambdas 
+		//so we just make a n. thing to use as this
+		//probably should have assigned a const to this at the global scope, which ill probably do
+		return new Promise(function(resolve, reject)
+			{
+				const buffer = n.pureFill();
+				resolve(buffer);
+			});
+	}
+
+
+	this.fill = function ()
+	{
+
+		//remmeber that 'this' isn't captured
+		const n = this;
+
+		//.then() notation
+		this.promiseWrapperFill().then(function(result)
+			{
+				n.drawFillCache = result;
+			});
 	}
 
 
@@ -269,12 +303,9 @@ exports.Polygon = function (p)
 			c.draw(l, color);
 		}
 
-		if(this.drawFillCache)
-		{
 		for( const p of this.drawFillCache)
 		{
-			p.draw(l, new exports.Color().fromRgb(255,0,0));
-		}
+			p.draw(l, color);
 		}
 	}
 }
