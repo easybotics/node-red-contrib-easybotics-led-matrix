@@ -181,7 +181,7 @@ module.exports = function(RED) {
 		const node = this;
 		node.matrix = RED.nodes.getNode(config.matrix);
 
-		//get config data 
+		//get config data
 		node.xOffset = config.xOffset;
 		node.yOffset = config.yOffset;
 		node.zLevel = config.zLevel != undefined ? config.zLevel : 0;
@@ -240,7 +240,7 @@ module.exports = function(RED) {
 				for(let x = 0; x < width; x++)
 				{
 					//give up if the next frame is already being pushed
-					if(c != context) return; 
+					if(c != context) return;
 
 					for(let y = 0; y < height; y++)
 					{
@@ -290,8 +290,8 @@ module.exports = function(RED) {
 				return;
 			}
 
-			//catch various attemps to modify the file and offset, either via direct injection 
-			//or via a msg.payload.data property 
+			//catch various attemps to modify the file and offset, either via direct injection
+			//or via a msg.payload.data property
 			//set the url var
 			if( typeof msg.payload === "string")
 			{
@@ -309,7 +309,7 @@ module.exports = function(RED) {
 			if( !runPoint) runPoint = new dp.Point(node.xOffset, node.yOffset);
 
 
-			//if we didn't dislpay an image yet, always display one 
+			//if we didn't dislpay an image yet, always display one
 			if(node.oldFile == undefined  || node.oldPoint == undefined || node.currentFrame)
 			{
 				node.oldFile = runFile;
@@ -576,15 +576,15 @@ module.exports = function(RED) {
 			realPoints = new Array();
 
 			//fill realPoints with dp points to make a polygon later
-			for( i = 0; i < node.savedPts.x.length; i++)
+			for(i = 0; i < node.savedPts.length; i++)
 			{
-				const x = node.savedPts.x[i] 
-				const y = node.savedPts.y[i]
+				const x = node.savedPts[i].x;
+				const y = node.savedPts[i].y;
 
-				realPoints.push( new dp.Point(x, y));
+				realPoints.push(new dp.Point(x, y));
 			}
-
-			//create our DP polygon 
+			console.log(realPoints);
+			//create our DP polygon
 			polygon = new dp.Polygon(realPoints);
 
 			if(node.filled) polygon.fill();
@@ -595,7 +595,7 @@ module.exports = function(RED) {
 
 		node.draw = function ()
 		{
-			if(node.polygon && node.color) 
+			if(node.polygon && node.color)
 			{
 				node.polygon.draw( led, node.color);
 			}
@@ -612,19 +612,13 @@ module.exports = function(RED) {
 			if(msg.clear)
 			{
 				node.clear();
-				return;				
+				return;
 			}
 
-			//here is where to check if the user is sending a polygon as data and then to use
-			//that data instead of using the config.data 
-			/*
-			if(msg.....)
-			{
-
-				nodeRegister.add(node);
-				node.matrix.refresh();
-				return;
-			*/
+			const data = msg.payload;
+			node.rgb = data.rgb != undefined ? data.rgb : node.rgb;
+			node.savedPts = data.savedPts != undefined ? data.savedPts : node.savedPts;
+			node.filled = data.filled != undefined ? data.filled : node.filled;
 
 			//don't redo this if we haven't had user data and the config hasn't changed
 			//this if statement will need changing
@@ -654,7 +648,7 @@ module.exports = function(RED) {
 	RED.nodes.registerType("led-matrix", LedMatrix);
 //	RED.nodes.registerType("clear-matrix", ClearMatrix);
 	RED.nodes.registerType("refresh-matrix", RefreshMatrix);
-	RED.nodes.registerType("image", ImageToPixels);
+	RED.nodes.registerType("image-to-matrix", ImageToPixels);
 	RED.nodes.registerType("text-to-matrix", Text);
 	RED.nodes.registerType("pixel-transform", PixelDataTransform);
 	RED.nodes.registerType("circle", Circle);

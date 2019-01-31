@@ -1,6 +1,6 @@
 
 var exports = module.exports = {};
-//some geo primitives we'll use everywhere 
+//some geo primitives we'll use everywhere
 
 exports.Color = function ()
 {
@@ -85,13 +85,13 @@ exports.Point = function (x, y)
 		return Math.sqrt( Math.pow( p.x - this.x) + Math.pow( p.y - this.y));
 	}
 
-	//returns the midpoint between this point and another point 
+	//returns the midpoint between this point and another point
 	this.midpoint = function (p)
 	{
 		return Point( (this.x + p.x) / 2, (this.y + p.y) / 2);
 	}
 
-	//draws on an led matrix we give it 
+	//draws on an led matrix we give it
 	this.draw = function (l, color)
 	{
 		l.setPixel(parseInt(this.x), parseInt(this.y), parseInt(color.r), parseInt(color.g), parseInt(color.b));
@@ -121,15 +121,15 @@ exports.Line = function (start, end)
 	{
 		function onSegment (p, q, r)
 		{
-			if (q.x <= Math.max(p.x, r.x) && 
-				q.x >= Math.min(p.x, r.x) && 
-				q.y <= Math.max(p.y, r.y) && 
-				q.y >= Math.min(p.y, r.y)) 
+			if (q.x <= Math.max(p.x, r.x) &&
+				q.x >= Math.min(p.x, r.x) &&
+				q.y <= Math.max(p.y, r.y) &&
+				q.y >= Math.min(p.y, r.y))
 			{
-				return true; 
+				return true;
 			}
 
-			return false; 
+			return false;
 		}
 
 		function orientation (p, q, r)
@@ -155,20 +155,20 @@ exports.Line = function (start, end)
 		if (o1 != o2 && o3 != o4)
 			return true;
 
-		// Special Cases 
-		// p1, q1 and p2 are colinear and p2 lies on segment p1q1 
-		if (o1 == 0 && onSegment(p1, p2, q1)) return true; 
-	  
-		// p1, q1 and q2 are colinear and q2 lies on segment p1q1 
-		if (o2 == 0 && onSegment(p1, q2, q1)) return true; 
-	  
-		// p2, q2 and p1 are colinear and p1 lies on segment p2q2 
-		if (o3 == 0 && onSegment(p2, p1, q2)) return true; 
-	  
-		 // p2, q2 and q1 are colinear and q1 lies on segment p2q2 
-		if (o4 == 0 && onSegment(p2, q1, q2)) return true; 
-	  
-		return false; // Doesn't fall in any of the above cases 
+		// Special Cases
+		// p1, q1 and p2 are colinear and p2 lies on segment p1q1
+		if (o1 == 0 && onSegment(p1, p2, q1)) return true;
+
+		// p1, q1 and q2 are colinear and q2 lies on segment p1q1
+		if (o2 == 0 && onSegment(p1, q2, q1)) return true;
+
+		// p2, q2 and p1 are colinear and p1 lies on segment p2q2
+		if (o3 == 0 && onSegment(p2, p1, q2)) return true;
+
+		 // p2, q2 and q1 are colinear and q1 lies on segment p2q2
+		if (o4 == 0 && onSegment(p2, q1, q2)) return true;
+
+		return false; // Doesn't fall in any of the above cases
 	}
 
 	//draw on an led matrix we give it
@@ -254,7 +254,7 @@ exports.Polygon = function (p)
 				const left  = this.boundryIntersections(leftTest);
 				const right = this.boundryIntersections(rightTest);
 
-				if ((left % 2) && (right % 2)) 
+				if ((left % 2) && (right % 2))
 				{
 					dfCache.push( new exports.Point(x, y));
 				}
@@ -309,5 +309,3 @@ exports.Polygon = function (p)
 		}
 	}
 }
-
-
