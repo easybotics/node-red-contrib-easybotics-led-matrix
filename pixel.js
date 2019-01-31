@@ -192,8 +192,8 @@ module.exports = function(RED) {
 
 		node.clear = function ()
 		{
-				nodeRegister.delete(node)
-				node.matrix.refresh()
+			nodeRegister.delete(node)
+			node.matrix.refresh()
 		}
 
 		//function to actually send the output to the next node
@@ -255,7 +255,7 @@ module.exports = function(RED) {
 				//call our send function from earlier
 				if(c == context)
 				{
-					node.output = output;
+					node.output = output
 					readySend()
 					if(pixels.shape[0] > 1) node.currentFrame++
 				}
@@ -368,8 +368,8 @@ module.exports = function(RED) {
 
 		node.clear = function ()
 		{
-				nodeRegister.delete(node)
-				node.matrix.refresh()
+			nodeRegister.delete(node)
+			node.matrix.refresh()
 		}
 
 		node.on('input', function(msg)
@@ -496,8 +496,8 @@ module.exports = function(RED) {
 
 		node.clear = function ()
 		{
-				nodeRegister.delete(node)
-				node.matrix.refresh()
+			nodeRegister.delete(node)
+			node.matrix.refresh()
 		}
 
 		node.on('input', function (msg)
@@ -630,7 +630,7 @@ module.exports = function(RED) {
 
 	//register our functions with node-red
 	RED.nodes.registerType('led-matrix', LedMatrix)
-//	RED.nodes.registerType('clear-matrix', ClearMatrix)
+	//RED.nodes.registerType('clear-matrix', ClearMatrix)
 	RED.nodes.registerType('refresh-matrix', RefreshMatrix)
 	RED.nodes.registerType('image-to-matrix', ImageToPixels)
 	RED.nodes.registerType('text-to-matrix', Text)
