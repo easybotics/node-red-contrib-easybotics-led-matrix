@@ -52,7 +52,6 @@ module.exports = function(RED) {
 
 		node.draw = function()
 		{
-			const time = Date.now()
 
 			led.clear()
 
@@ -64,12 +63,12 @@ module.exports = function(RED) {
 			}
 
 			nArray.sort(function(a, b)
-				{
-					const aa = a.zLevel != undefined ? a.zLevel : -99
-					const bb = b.zLevel != undefined ? b.zLevel : -99
+			{
+				const aa = a.zLevel != undefined ? a.zLevel : -99
+				const bb = b.zLevel != undefined ? b.zLevel : -99
 
-					return aa > bb
-				})
+				return aa > bb
+			})
 
 
 			for(let n of nArray)
@@ -182,9 +181,9 @@ module.exports = function(RED) {
 
 		node.draw = function ()
 		{
-			if(output != undefined)
+			if(node.output != undefined)
 			{
-				for(const tuple of output)
+				for(const tuple of node.output)
 				{
 					tuple.point.draw(led, tuple.color)
 				}
@@ -212,7 +211,7 @@ module.exports = function(RED) {
 			getPixels(file, function(err, pixels, c = cc)
 			{
 
-				output = []
+				var output = []
 
 				if(!pixels)
 				{
@@ -256,6 +255,7 @@ module.exports = function(RED) {
 				//call our send function from earlier
 				if(c == context)
 				{
+					node.output = output;
 					readySend()
 					if(pixels.shape[0] > 1) node.currentFrame++
 				}
@@ -268,8 +268,8 @@ module.exports = function(RED) {
 		{
 
 			//start out with a blank file and offset
-			runFile = undefined
-			runPoint = undefined
+			var runFile = undefined
+			var runPoint = undefined
 
 			if(msg.clear)
 			{
@@ -307,7 +307,7 @@ module.exports = function(RED) {
 			}
 
 			//otherwise, carefully check if we are trying to draw the same image twice for no reason
-			if(runFile != node.oldFile && (runPoint.x != oldPoint.x && runPoint.y != oldPoint.y))
+			if(runFile != node.oldFile && (runPoint.x != node.oldPoint.x && runPoint.y != node.oldPoint.y))
 			{
 				node.oldFile = runFile
 				node.oldPoint = runPoint
@@ -354,7 +354,6 @@ module.exports = function(RED) {
 		node.rgb		= config.rgb
 		node.zLevel = config.zLevel != undefined ? config.zLevel : 2
 
-		var lastMsg
 		var outputInfo
 
 		node.draw = function ()
@@ -404,7 +403,6 @@ module.exports = function(RED) {
 					rgb: outputData.rgb	  || node.rgb,
 				}
 
-				lastMsg = msg
 				nodeRegister.add(node)
 				node.matrix.refresh()
 			}
@@ -560,19 +558,18 @@ module.exports = function(RED) {
 		//we only call this if the user doesn't want to draw their own custom polygon
 		node.buildFromConfig = function()
 		{
-			realPoints = new Array()
+			const realPoints = new Array()
 
 			//fill realPoints with dp points to make a polygon later
-			for(i = 0; i < node.savedPts.length; i++)
+			for(var i = 0; i < node.savedPts.length; i++)
 			{
 				const x = node.savedPts[i].x
 				const y = node.savedPts[i].y
 
 				realPoints.push(new dp.Point(x, y))
 			}
-			console.log(realPoints)
 			//create our DP polygon
-			polygon = new dp.Polygon(realPoints)
+			const polygon = new dp.Polygon(realPoints)
 
 			if(node.filled) polygon.fill()
 
