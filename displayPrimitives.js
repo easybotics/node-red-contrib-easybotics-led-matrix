@@ -41,7 +41,7 @@ exports.Color = function ()
 
 		function rgbToHex(r, g, b)
 		{
-			return "#" + componentToHex(this,r) + componentToHex(this.g) + componentToHex(this.b)
+			return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b)
 		}
 
 		return rgbToHex(this.r, this.g, this.b)
@@ -61,7 +61,7 @@ exports.Color = function ()
 
 	this.toRgbString  = function ()
 	{
-		return r + ',' + g + ',' + b
+		return this.r + ',' + this.g + ',' + this.b
 	}
 
 	this.fromRgb = function (r, g, b)
@@ -88,7 +88,7 @@ exports.Point = function (x, y)
 	//returns the midpoint between this point and another point
 	this.midpoint = function (p)
 	{
-		return Point( (this.x + p.x) / 2, (this.y + p.y) / 2)
+		return exports.Points((this.x + p.x) / 2, (this.y + p.y) / 2)
 	}
 
 	//draws on an led matrix we give it
@@ -134,7 +134,7 @@ exports.Line = function (start, end)
 
 		function orientation (p, q, r)
 		{
-			val = (q.y - p.y) * (r.x - q.x) -(q.x - p.x) * (r.y - q.y)
+			const val = (q.y - p.y) * (r.x - q.x) -(q.x - p.x) * (r.y - q.y)
 
 			if (val == 0) return 0  // colinear
 
@@ -142,15 +142,15 @@ exports.Line = function (start, end)
 		}
 
 
-		p1 = this.start
-		q1 = this.end
-		p2 = line.start
-		q2 = line.end
+		const p1 = this.start
+		const q1 = this.end
+		const p2 = line.start
+		const q2 = line.end
 
-		o1 = orientation(p1, q1, p2)
-		o2 = orientation(p1, q1, q2)
-		o3 = orientation(p2, q2, p1)
-		o4 = orientation(p2, q2, q1)
+		const o1 = orientation(p1, q1, p2)
+		const o2 = orientation(p1, q1, q2)
+		const o3 = orientation(p2, q2, p1)
+		const o4 = orientation(p2, q2, q1)
 
 		if (o1 != o2 && o3 != o4)
 			return true
@@ -186,8 +186,8 @@ exports.Polygon = function (p)
 
 	this.boundryIntersections = function (l)
 	{
-		num = 0
-		height = l.start.y
+		var num = 0
+		const height = l.start.y
 
 		for (const c of this.getLines())
 		{
@@ -200,10 +200,10 @@ exports.Polygon = function (p)
 
 	this.clipBounds = function ()
 	{
-		tx = this.points[0].x
-		ty = this.points[0].y
-		bx = this.points[0].x
-		by = this.points[0].y
+		var tx = this.points[0].x
+		var ty = this.points[0].y
+		var bx = this.points[0].x
+		var by = this.points[0].y
 
 		for( const p of this.points)
 		{
@@ -218,10 +218,10 @@ exports.Polygon = function (p)
 
 	this.getLines = function ()
 	{
-		lines = []
+		const lines = []
 
-		first = this.points[0]
-		last  = undefined
+		const first = this.points[0]
+		var last  = undefined
 
 		for(const p of this.points)
 		{
