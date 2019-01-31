@@ -12,13 +12,13 @@ exports.Color = function ()
 	{
 		function eatHexString (hex)
 		{
-			// Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+			// Expand shorthand form (e.g. '03F') to full form (e.g. "0033FF")
 			const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i
 
 			hex = hex.replace(shorthandRegex, function(m, r, g, b)
-				  {
-						return r + r + g + g + b + b
-				  })
+			{
+				return r + r + g + g + b + b
+			})
 
 			const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
 			return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16)} : null
@@ -36,12 +36,12 @@ exports.Color = function ()
 		function componentToHex(c)
 		{
 			var hex = c.toString(16)
-			return hex.length == 1 ? "0" + hex : hex
+			return hex.length == 1 ? '0' + hex : hex
 		}
 
 		function rgbToHex(r, g, b)
 		{
-			return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b)
+			return '#' + componentToHex(r) + componentToHex(g) + componentToHex(b)
 		}
 
 		return rgbToHex(this.r, this.g, this.b)
@@ -274,11 +274,11 @@ exports.Polygon = function (p)
 
 		//so we just make a n. thing to use as this
 		//probably should have assigned a const to this at the global scope, which ill probably do
-		return new Promise(function(resolve, reject)
-			{
-				const buffer = n.pureFill()
-				resolve(buffer)
-			})
+		return new Promise(function(resolve)
+		{
+			const buffer = n.pureFill()
+			resolve(buffer)
+		})
 	}
 
 
@@ -290,9 +290,9 @@ exports.Polygon = function (p)
 
 		//.then() notation
 		this.promiseWrapperFill().then(function(result)
-			{
-				n.drawFillCache = result
-			})
+		{
+			n.drawFillCache = result
+		})
 	}
 
 
