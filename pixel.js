@@ -571,7 +571,7 @@ module.exports = function(RED) {
 			//create our DP polygon
 			const polygon = new dp.Polygon(realPoints)
 
-			if(node.filled) polygon.fill(() => {polygon.draw(led, node.color)})
+			if(node.filled) polygon.fill(node.matrix.draw)
 
 			return polygon
 		}
@@ -579,6 +579,8 @@ module.exports = function(RED) {
 
 		node.draw = function ()
 		{
+			console.log("nodedraw called polygon")
+		
 			if(node.polygon && node.color)
 			{
 				node.polygon.draw( led, node.color)
@@ -608,8 +610,8 @@ module.exports = function(RED) {
 			//this if statement will need changing
 			if(!node.polygon)
 			{
-				node.polygon = node.buildFromConfig()
 				node.color = new dp.Color().fromRgbString(node.rgb)
+				node.polygon = node.buildFromConfig()
 			}
 
 
