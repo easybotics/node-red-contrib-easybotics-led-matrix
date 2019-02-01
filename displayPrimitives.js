@@ -313,11 +313,14 @@ exports.Polygon = function (p)
 
 				if ((left.num % 2) && (right.num % 2) )
 				{
+					//if we're on the line itself, don't do anything 
 					if(right.lowest == x && left.highest == x) continue;
+
+					//draw a line from the current position to the next line intersection 
 					dfCache.push( new exports.Line( new exports.Point(x, y), new exports.Point( right.lowestX, y)))
-					//dfCache.push( new exports.Line( new exports.Point(x, y), new exports.Point( left.highestX, y)))
+
+					//skip to the next line intersection, because we just filled in up to there anyway
 					x = right.lowestX;
-					//dfCache.push( new exports.Point(x, y))
 				}
 			}
 		}
@@ -343,7 +346,7 @@ exports.Polygon = function (p)
 	}
 
 
-	this.fill = function ()
+	this.fill = function ( callback)
 	{
 		//remmeber that 'this' isn't captured
 		const n = this
@@ -352,6 +355,7 @@ exports.Polygon = function (p)
 		this.promiseWrapperFill().then(function(result)
 		{
 			n.drawFillCache = result
+			if(callback) callback();
 		})
 	}
 
