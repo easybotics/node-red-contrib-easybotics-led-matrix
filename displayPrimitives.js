@@ -230,15 +230,27 @@ exports.Polygon = function (p)
 	this.boundryIntersections = function (l)
 	{
 		var num = 0
+		var lowestX  = l.start.x 
+		var highestX = l.start.x 
 		const height = l.start.y
 
 		for (const c of this.getLines())
 		{
 			if(height == c.yMax()) continue
-			if(l.intersects(c)) num++
+			const interSect = l.intersection(c)
+			
+			//increment number of intersects 
+			if(interSect)
+			{
+				num++
+			
+				//update lowest and highest X found 
+				if(interSect.x > highestX) highestX = interSect.x 
+				if(interSect.y < lowestX) lowestX = interSect.x
+			}
 		}
 
-		return num
+		return {num: num, lowestX: lowestX, highestX: highestX};
 	}
 
 	this.clipBounds = function ()
@@ -287,9 +299,11 @@ exports.Polygon = function (p)
 		const bounds = this.clipBounds()
 
 
-		for(var x = bounds.topLeft.x; x < bounds.bottomRight.x; x++)
+
+		for(var y = bounds.topLeft.y; y < bounds.bottomRight.y; y++)
 		{
-			for(var y = bounds.topLeft.y; y < bounds.bottomRight.y; y++)
+
+			for(var x = bounds.topLeft.x; x < bounds.bottomRight.x; x++)
 			{
 				const leftTest  = new exports.Line( new exports.Point(bounds.topLeft.x, y), new exports.Point(x, y))
 				const rightTest = new exports.Line( new exports.Point(x, y), new exports.Point(bounds.bottomRight.x, y))
@@ -297,9 +311,13 @@ exports.Polygon = function (p)
 				const left  = this.boundryIntersections(leftTest)
 				const right = this.boundryIntersections(rightTest)
 
-				if ((left % 2) && (right % 2))
+				if ((left.num % 2) && (right.num % 2) )
 				{
-					dfCache.push( new exports.Point(x, y))
+					if(right.lowest == x && left.highest == x) continue;
+					dfCache.push( new exports.Line( new exports.Point(x, y), new exports.Point( right.lowestX, y)))
+					//dfCache.push( new exports.Line( new exports.Point(x, y), new exports.Point( left.highestX, y)))
+					x = right.lowestX;
+					//dfCache.push( new exports.Point(x, y))
 				}
 			}
 		}
@@ -327,7 +345,6 @@ exports.Polygon = function (p)
 
 	this.fill = function ()
 	{
-
 		//remmeber that 'this' isn't captured
 		const n = this
 
