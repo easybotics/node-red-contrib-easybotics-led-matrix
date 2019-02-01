@@ -571,7 +571,7 @@ module.exports = function(RED) {
 			//create our DP polygon
 			const polygon = new dp.Polygon(realPoints)
 
-			if(node.filled) polygon.fill()
+			if(node.filled) polygon.fill(() => {polygon.draw(led, node.color)})
 
 			return polygon
 		}
