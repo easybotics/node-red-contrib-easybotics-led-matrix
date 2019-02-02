@@ -579,7 +579,6 @@ module.exports = function(RED) {
 
 		node.draw = function ()
 		{
-			console.log("nodedraw called polygon")
 		
 			if(node.polygon && node.color)
 			{
