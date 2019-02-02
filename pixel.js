@@ -549,6 +549,10 @@ module.exports = function(RED) {
 		node.rgb = config.rgb || '255,255,255'
 		node.filled = config.filled || false
 
+		node.oldPoints = undefined; 
+		node.oldRgb = undefined; 
+		node.oldFilled = undefined; 
+
 		//the data we'll use to actually draw starts off empty
 		node.polygon = undefined
 		node.color = undefined
@@ -556,22 +560,22 @@ module.exports = function(RED) {
 
 		//this functin returns a dp Polygon based on the config data
 		//we only call this if the user doesn't want to draw their own custom polygon
-		node.buildFromConfig = function()
+		node.buildFromConfig = function(points, filled)
 		{
 			const realPoints = new Array()
 
 			//fill realPoints with dp points to make a polygon later
-			for(var i = 0; i < node.savedPts.length; i++)
+			for(var i = 0; i < points.length; i++)
 			{
-				const x = node.savedPts[i].x
-				const y = node.savedPts[i].y
+				const x = points[i].x
+				const y = points[i].y
 
 				realPoints.push(new dp.Point(x, y))
 			}
 			//create our DP polygon
 			const polygon = new dp.Polygon(realPoints)
 
-			if(node.filled) polygon.fill(node.matrix.draw)
+			if(filled) polygon.fill(node.matrix.draw)
 
 			return polygon
 		}
@@ -601,22 +605,35 @@ module.exports = function(RED) {
 			}
 
 			const data = msg.payload
-			node.rgb = data.rgb != undefined ? data.rgb : node.rgb
-			node.savedPts = data.savedPts != undefined ? data.savedPts : node.savedPts
-			node.filled = data.filled != undefined ? data.filled : node.filled
+			var runPts		= undefined
+			var runColor	= undefined
+			var runFilled	= undefined
+
+			if(data.savedPts) runPts = data.savedPts
+			if(data.filled) runFilled = data.filled 
+			if(data.rgb) runColor = data.rgb 
+
+			if(!runPts) runPts = node.savedPts 
+			if(!runFilled) runFilled = node.filled 
+			if(!runColor) runColor = node.rgb
+
+
+			//color is cheap so we'll just set this every time 
+			node.color = new dp.Color().fromRgbString(runColor)
+
+
+			if(node.polygon && (node.oldPoints != runPts && node.oldFilled != runFilled))
+				return
 
 			//don't redo this if we haven't had user data and the config hasn't changed
 			//this if statement will need changing
-			if(!node.polygon)
-			{
-				node.color = new dp.Color().fromRgbString(node.rgb)
-				node.polygon = node.buildFromConfig()
-			}
+			node.polygon = node.buildFromConfig(runPts, runFilled)
+			node.oldPoints = runPts 
+			node.oldFilled = runFilled
+			//dont forget to register our node to be drawn 
+			readySend()
+			return; 
 
-
-			//dont forget to register the node
-			nodeRegister.add(node)
-			node.matrix.refresh()
 
 		})
 
