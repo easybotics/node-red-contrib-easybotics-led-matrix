@@ -230,8 +230,8 @@ exports.Polygon = function (p)
 	this.boundryIntersections = function (l)
 	{
 		var num = 0
-		var lowestX  = l.start.x 
-		var highestX = l.start.x 
+		var lowestX  = undefined; 
+		var highestX = undefined; 
 		const height = l.start.y
 
 		for (const c of this.getLines())
@@ -245,8 +245,8 @@ exports.Polygon = function (p)
 				num++
 			
 				//update lowest and highest X found 
-				if(interSect.x > highestX) highestX = interSect.x 
-				if(interSect.y < lowestX) lowestX = interSect.x
+				if(interSect.x > highestX || highestX == undefined) highestX = interSect.x 
+				if(interSect.y < lowestX  || lowestX == undefined) lowestX = interSect.x
 			}
 		}
 
@@ -313,14 +313,8 @@ exports.Polygon = function (p)
 
 				if ((left.num % 2) && (right.num % 2) )
 				{
-					//if we're on the line itself, don't do anything 
-					if(right.lowest == x && left.highest == x) 
-					{
-						continue
-					}
-
 					//draw a line from the current position to the next line intersection 
-					dfCache.push( new exports.Line( new exports.Point(x, y), new exports.Point( right.lowestX, y)))
+					dfCache.push( new exports.Line( new exports.Point(left.highestX, y), new exports.Point( right.lowestX, y)))
 
 					//skip to the next line intersection, because we just filled in up to there anyway
 					x = right.lowestX
