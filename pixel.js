@@ -120,9 +120,7 @@ module.exports = function(RED) {
 		}
 		else
 		{
-			node.warn('reusing led')
 			led.brightness( node.brightness)
-			node.log('set brightness')
 		}
 
 		//otherwise we clear the one we have, without these checks it can spawn new evertime we deploy
@@ -316,7 +314,6 @@ module.exports = function(RED) {
 				return
 			}
 
-			node.log('falling through, not running pixel stream')
 		})
 	}
 
