@@ -410,9 +410,6 @@
 			&emsp;&emsp;data: "https://media.giphy.com/media/UaoxTrl8z1wre/giphy.gif" <br>
 		}; <br>
 		</i>
-
-
-
 		</p>
 </script>
 
@@ -855,119 +852,6 @@
 <script type="text/x-red" data-help-name="clear-node">
 	<p> Clears a shape, text, or image node from the display <br>
 		Note that these nodes usually re-impose themselves when injected, so if you are injecting on a loop it might just reappear on the display after you clear it </p>
-</script>
-
-<script type="text/javascript">
-
-	function componentToHex(c)
-	{
-		var hex = c.toString(16);
-		return hex.length == 1 ? "0" + hex : hex;
-	}
-
-	function rgbToHex(r, g, b)
-	{
-		return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
-	}
-
-
-	RED.nodes.registerType('realtime-circle',
-		{
-			category: 'LED Matrix',
-			color: '#F4ED57',
-
-			defaults:
-			{
-				name:	{value:""},
-				xPos:	{value:0, required: true},
-				yPos:	{value:0, required: true},
-				radius: {value:0, required: true},
-				rgb:	{value:"0,255,41"},
-
-				matrix: {type: 'led-matrix', required:true},
-			},
-
-			inputs: 1,
-			outputs:0,
-			icon: "circle.png",
-			label: function ()
-			{
-				return this.name || "realtime circle";
-			},
-
-			oneditprepare: function ()
-			{
-				$("#node-input-rgb2").change(function()
-				{
-					var hex = $("#node-input-rgb2").val();
-					var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-					hex = hex.replace(shorthandRegex, function(m, r, g, b) {
-						return r + r + g + g + b + b;
-					});
-
-					var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-					var output =  "" + parseInt(result[1], 16) + ',' + parseInt(result[2], 16) + ',' + parseInt(result[3], 16);
-
-					$("#node-input-rgb").val(output);
-				});
-
-				var tr = $("#node-input-rgb").val();
-				var split = tr.split(',');
-
-				$("#node-input-rgb2").val( rgbToHex( parseInt(split[0]), parseInt(split[1]), parseInt(split[2])));
-			},
-		});
-</script>
-
-<script type="text/x-red" data-template-name="realtime-circle">
-
-	<div class='form-row'>
-		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
-		<input type='text' id='node-input-matrix'/>
-	</div>
-
-
-	<div class="form-row">
-		<label for="node-config-input-name"><i class="icon-tag"></i> Name </label>
-		<input type="text" id="node-input-name" placeholder="Name">
-	</div>
-
-	<div class="form-row">
-		<label for="node-config-input-x"> <i class="fa fa-tag"></i> X Position </label>
-		<input type="number" id="node-input-xPos" min = "0" placeholder="0" />
-	<div>
-
-	<div class="form-row">
-		<label for="node-config-input-y"> <i class="fa fa-tag"></i> Y Position </label>
-		<input type="number" id="node-input-yPos" min = "0" placeholder="0" />
-	<div>
-
-	<div class="form-row">
-		<label for="node-config-input-radius"> <i class="fa fa-tag"></i> Radius </label>
-		<input type="number" id="node-input-radius" min = "0" placeholder="0" />
-	<div>
-
-
-	<div class = "form-row">
-		<label for="node-config-input-rgb"><i class="icon-tag"></i>RGB color </label>
-		<input type="text" id="node-input-rgb" placeholder="112,79,86">
-	</div>
-
-	<div class = "form-row">
-		<label for="node-config-input-rgb2"><i class="icon-tag"></i>Color picker</label>
-		<input type="color" id="node-input-rgb2" placeholder="#43DB2D">
-	</div>
-
-</script>
-
-<script type="text/x-red" data-help-name="realtime-circle">
-	<p> Prints a circle to the matrix buffer <br>
-		<i> msg.payload </i> can be an object with the following properties: <br>
-		<b> x: </b> X location <br>
-		<b> y: </b> Y location <br>
-		<b> radius: </b> radius <br>
-		<b> rgb: </b> an rgb CSV string, example : "255,0,0," (red) <br><br>
-		otherwise the settings from the node itself are used </p>
 </script>
 
 <script type="text/javascript">
