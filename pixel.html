@@ -820,6 +820,19 @@
 		<b> radius: </b> radius <br>
 		<b> rgb: </b> an rgb CSV string, example : "255,0,0," (red) <br><br>
 		otherwise the settings from the node itself are used </p>
+
+		<p>
+		<br> <b>object example: </b> <br>
+		<i>
+		msg.payload = { <br>
+			&emsp;&emsp;x: 10, <br>
+			&emsp;&emsp;y: 10, <br>
+			&emsp;&emsp;radius: 5, <br>
+			&emsp;&emsp;rgb: "255,255,0" <br>
+		}; <br>
+		</i>;
+
+		</p>
 </script>
 
 
@@ -947,7 +960,7 @@
 
 </script>
 
-<script type="text/x-red" data-help-name="circle">
+<script type="text/x-red" data-help-name="realtime-circle">
 	<p> Prints a circle to the matrix buffer <br>
 		<i> msg.payload </i> can be an object with the following properties: <br>
 		<b> x: </b> X location <br>
