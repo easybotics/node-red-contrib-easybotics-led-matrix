@@ -238,6 +238,8 @@ module.exports = function(RED) {
 							const g = frames ? pixels.get(frame, x, y, 1) : pixels.get(x, y, 1);
 							const b = frames ? pixels.get(frame, x, y, 2) : pixels.get(x, y, 2);
 
+							if( !(r || g || b)) continue;
+
 							//push to output array
 							output[frame].push( { point: new dp.Point(x, y), color: new dp.Color().fromRgb(r, g, b)})
 						}
