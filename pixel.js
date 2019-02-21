@@ -235,7 +235,6 @@ module.exports = function(RED) {
 							const r = frames ? pixels.get(frame, x, y, 0) : pixels.get(x, y, 0);
 							const g = frames ? pixels.get(frame, x, y, 1) : pixels.get(x, y, 1);
 							const b = frames ? pixels.get(frame, x, y, 2) : pixels.get(x, y, 2);
-							node.log("adding frame: " + frame);
 
 							output[frame].push( { point: new dp.Point(offset.x + x, offset.y + y), color: new dp.Color().fromRgb(r, g, b)})
 						}
@@ -258,9 +257,6 @@ module.exports = function(RED) {
 		{
 			node.currentFrame++;
 			if(node.currentFrame > node.maxFrames) node.currentFrame = 0;
-
-			node.log("maxframes: " + node.maxFrames);
-			node.log("current frame: " + node.currentFrame);
 			node.matrix.draw();
 
 			//start out with a blank file and offset
