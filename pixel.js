@@ -224,7 +224,7 @@ module.exports = function(RED) {
 				const frames = pixels.shape.length == 4 ? pixels.shape[0] : 0;
 
 				//loop agnostic between images and gifs
-				for(var frame = 0; frame <= frames; frame++)
+				for(var frame = 0; frame < frames; frame++)
 				{
 
 					output[frame] = []
@@ -260,7 +260,7 @@ module.exports = function(RED) {
 		node.on('input', function(msg)
 		{
 			node.currentFrame++;
-			if(node.currentFrame > node.maxFrames) node.currentFrame = 0;
+			if(node.currentFrame >= node.maxFrames) node.currentFrame = 0;
 			node.matrix.draw();
 
 			//start out with a blank file and offset
