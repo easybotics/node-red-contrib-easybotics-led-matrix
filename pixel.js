@@ -223,6 +223,7 @@ module.exports = function(RED) {
 				const height = pixels.shape.length == 4 ?  Math.min( 128, pixels.shape[2]) :  Math.min( 128, pixels.shape[1])
 				const frames = pixels.shape.length == 4 ? pixels.shape[0] : 0;
 
+				//loop agnostic between images and gifs
 				for(var frame = 0; frame <= frames; frame++)
 				{
 
@@ -232,16 +233,19 @@ module.exports = function(RED) {
 						if(c != context) return
 						for(let y = 0; y < height; y++)
 						{
+							//getting pixel is different for still images
 							const r = frames ? pixels.get(frame, x, y, 0) : pixels.get(x, y, 0);
 							const g = frames ? pixels.get(frame, x, y, 1) : pixels.get(x, y, 1);
 							const b = frames ? pixels.get(frame, x, y, 2) : pixels.get(x, y, 2);
 
+							//push to output array
 							output[frame].push( { point: new dp.Point(offset.x + x, offset.y + y), color: new dp.Color().fromRgb(r, g, b)})
 						}
 					}
 				}
 
 				//call our send function from earlier
+				//just sets the cache and the number of frames, remember that still images have '0' frames
 				if(c == context)
 				{
 					node.maxFrames = frames;
