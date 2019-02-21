@@ -185,7 +185,7 @@ module.exports = function(RED) {
 			{
 				for(const tuple of node.cache[node.currentFrame])
 				{
-					tuple.point.draw(led, tuple.color)
+					tuple.point.draw(led, tuple.color, new dp.Point(node.xOffset, node.yOffset))
 				}
 			}
 		}
@@ -204,7 +204,7 @@ module.exports = function(RED) {
 		}
 
 		//function that takes a file, and an offset and tries to convert the file into a stream of pixels
-		function createPixelStream (file, offset)
+		function createPixelStream (file)
 		{
 			const cc = context
 
@@ -239,7 +239,7 @@ module.exports = function(RED) {
 							const b = frames ? pixels.get(frame, x, y, 2) : pixels.get(x, y, 2);
 
 							//push to output array
-							output[frame].push( { point: new dp.Point(offset.x + x, offset.y + y), color: new dp.Color().fromRgb(r, g, b)})
+							output[frame].push( { point: new dp.Point(x, y), color: new dp.Color().fromRgb(r, g, b)})
 						}
 					}
 				}
@@ -291,24 +291,23 @@ module.exports = function(RED) {
 			if( !runFile) runFile = node.file
 			if( !runPoint) runPoint = new dp.Point(node.xOffset, node.yOffset)
 
+			node.xOffset = runPoint.x;
+			node.yOffset = runPoint.y;
 
 			//if we didn't dislpay an image yet, always display one
 			if(node.oldFile == undefined  || node.oldPoint == undefined) 
 			{
 				node.oldFile = runFile
-				node.oldPoint = runPoint
-
-				createPixelStream(runFile, runPoint)
+				createPixelStream(runFile)
 				return
 			}
 
 			//otherwise, carefully check if we are trying to draw the same image twice for no reason
-			if(runFile != node.oldFile && (runPoint.x != node.oldPoint.x && runPoint.y != node.oldPoint.y))
+			if(runFile != node.oldFile)
 			{
 				node.oldFile = runFile
-				node.oldPoint = runPoint
 
-				createPixelStream(runFile, runPoint)
+				createPixelStream(runFile)
 				return
 			}
 

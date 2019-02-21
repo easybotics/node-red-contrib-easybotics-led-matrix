@@ -91,10 +91,13 @@ exports.Point = function (x, y)
 		return exports.Points((this.x + p.x) / 2, (this.y + p.y) / 2)
 	}
 
-	//draws on an led matrix we give it
-	this.draw = function (l, color)
+	//d=raws on an led matrix we give it
+	this.draw = function (l, color, offset)
 	{
-		l.setPixel(parseInt(this.x), parseInt(this.y), parseInt(color.r), parseInt(color.g), parseInt(color.b))
+		const xOff = parseInt(offset != undefined ? offset.x : 0)
+		const yOff = parseInt(offset != undefined ? offset.y : 0)
+
+		l.setPixel(parseInt(this.x) + xOff, parseInt(this.y) + yOff, parseInt(color.r), parseInt(color.g), parseInt(color.b))
 	}
 }
 
