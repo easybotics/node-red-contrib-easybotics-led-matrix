@@ -176,12 +176,14 @@ module.exports = function(RED) {
 		node.lastFile	  = undefined
 		node.lastPoint	  = undefined
 		node.currentFrame = 0
+		node.maxFrames = 0
+		node.cache = [];
 
 		node.draw = function ()
 		{
-			if(node.output != undefined)
+			if(node.cache != undefined)
 			{
-				for(const tuple of node.output)
+				for(const tuple of node.cache[node.currentFrame])
 				{
 					tuple.point.draw(led, tuple.color)
 				}
@@ -219,33 +221,23 @@ module.exports = function(RED) {
 
 				const width = pixels.shape.length == 4 ?  Math.min( 128, pixels.shape[1]) :  Math.min( 128, pixels.shape[0])
 				const height = pixels.shape.length == 4 ?  Math.min( 128, pixels.shape[2]) :  Math.min( 128, pixels.shape[1])
+				const frames = pixels.shape.length == 4 ? pixels.shape[0] : 0;
 
-				//loop over the 2d array of pixels returned by getPixels
-				for(let x = 0; x < width; x++)
+				for(var frame = 0; frame <= frames; frame++)
 				{
-					//give up if the next frame is already being pushed
-					if(c != context) return
 
-					for(let y = 0; y < height; y++)
+					output[frame] = []
+					for(let x = 0;  x < width; x++)
 					{
-						//make sure the array actually contains data for this location
-						if(pixels.get(x,y,0) || pixels.get(node.currentFrame,x,y,0))
+						if(c != context) return
+						for(let y = 0; y < height; y++)
 						{
-							//push pixels to the output buffer
-							if(pixels.shape.length == 4)  //gif
-							{
-								output.push( { point: new dp.Point(offset.x + x, offset.y + y), color: new dp.Color().fromRgb( pixels.get(node.currentFrame, x, y, 0), pixels.get(node.currentFrame, x, y, 1) ,pixels.get(node.currentFrame, x, y, 2))})
+							const r = frames ? pixels.get(frame, x, y, 0) : pixels.get(x, y, 0);
+							const g = frames ? pixels.get(frame, x, y, 1) : pixels.get(x, y, 1);
+							const b = frames ? pixels.get(frame, x, y, 2) : pixels.get(x, y, 2);
+							node.log("adding frame: " + frame);
 
-
-								if(node.currentFrame == pixels.shape[0] -1)
-								{
-									node.currentFrame = 0 //restart the gif
-								}
-							}
-							else
-							{ //still image
-								output.push( { point: new dp.Point(x + offset.x, y + offset.y), color: new dp.Color().fromRgb( pixels.get(x, y, 0), pixels.get(x, y, 1) ,pixels.get(x, y, 2))})
-							}
+							output[frame].push( { point: new dp.Point(offset.x + x, offset.y + y), color: new dp.Color().fromRgb(r, g, b)})
 						}
 					}
 				}
@@ -253,9 +245,9 @@ module.exports = function(RED) {
 				//call our send function from earlier
 				if(c == context)
 				{
-					node.output = output
+					node.maxFrames = frames;
+					node.cache = output;
 					readySend()
-					if(pixels.shape[0] > 1) node.currentFrame++
 				}
 
 			})
@@ -264,6 +256,12 @@ module.exports = function(RED) {
 		//if we receive input
 		node.on('input', function(msg)
 		{
+			node.currentFrame++;
+			if(node.currentFrame > node.maxFrames) node.currentFrame = 0;
+
+			node.log("maxframes: " + node.maxFrames);
+			node.log("current frame: " + node.currentFrame);
+			node.matrix.draw();
 
 			//start out with a blank file and offset
 			var runFile = undefined
@@ -295,7 +293,7 @@ module.exports = function(RED) {
 
 
 			//if we didn't dislpay an image yet, always display one
-			if(node.oldFile == undefined  || node.oldPoint == undefined || node.currentFrame)
+			if(node.oldFile == undefined  || node.oldPoint == undefined) 
 			{
 				node.oldFile = runFile
 				node.oldPoint = runPoint
