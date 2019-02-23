@@ -166,18 +166,17 @@ module.exports = function(RED) {
 		node.matrix = RED.nodes.getNode(config.matrix)
 
 		//get config data
-		node.xOffset = config.xOffset
-		node.yOffset = config.yOffset
+		node.offset = new dp.Point(config.xOffset, config.yOffset)
 		node.zLevel = config.zLevel != undefined ? config.zLevel : 0
 		node.file = config.file
 
 		//info about the frame we've built last; expensive so we want to avoid repeating this if we can!
-		node.output		  = undefined
-		node.lastFile	  = undefined
-		node.lastPoint	  = undefined
+		node.output = undefined
+		node.lastFile = undefined
+		node.lastPoint = undefined
 		node.currentFrame = 0
-		node.maxFrames = 0
-		node.cache = [];
+		node.frames = 0 //still images have 0 frames, gifs have more
+		node.cache = []
 
 		node.draw = function ()
 		{
@@ -185,7 +184,7 @@ module.exports = function(RED) {
 			{
 				for(const tuple of node.cache[node.currentFrame])
 				{
-					tuple.point.draw(led, tuple.color, new dp.Point(node.xOffset, node.yOffset))
+					tuple.point.draw(led, tuple.color, node.offset)
 				}
 			}
 		}
@@ -210,38 +209,34 @@ module.exports = function(RED) {
 
 			getPixels(file, function(err, pixels, c = cc)
 			{
-
-				var output = []
-
 				if(!pixels)
 				{
 					node.error('image did not convert correctly\n please check the url or file location')
 					return
 				}
 
-				const width = pixels.shape.length == 4 ?  Math.min( 128, pixels.shape[1]) :  Math.min( 128, pixels.shape[0])
-				const height = pixels.shape.length == 4 ?  Math.min( 128, pixels.shape[2]) :  Math.min( 128, pixels.shape[1])
-				const frames = pixels.shape.length == 4 ? pixels.shape[0] : 0;
+				const width = pixels.shape.length == 4 ?  Math.min(128, pixels.shape[1]) :  Math.min(128, pixels.shape[0])
+				const height = pixels.shape.length == 4 ?  Math.min(128, pixels.shape[2]) :  Math.min(128, pixels.shape[1])
+				node.frames = pixels.shape.length == 4 ? pixels.shape[0] : 0
 
 				//loop agnostic between images and gifs
-				for(var frame = 0; frame < frames; frame++)
+				for(var frame = 0; frame < node.frames; frame++)
 				{
-
-					output[frame] = []
+					node.cache[frame] = []
 					for(let x = 0;  x < width; x++)
 					{
 						if(c != context) return
 						for(let y = 0; y < height; y++)
 						{
 							//getting pixel is different for still images
-							const r = frames ? pixels.get(frame, x, y, 0) : pixels.get(x, y, 0);
-							const g = frames ? pixels.get(frame, x, y, 1) : pixels.get(x, y, 1);
-							const b = frames ? pixels.get(frame, x, y, 2) : pixels.get(x, y, 2);
+							const r = node.frames ? pixels.get(frame, x, y, 0) : pixels.get(x, y, 0)
+							const g = node.frames ? pixels.get(frame, x, y, 1) : pixels.get(x, y, 1)
+							const b = node.frames ? pixels.get(frame, x, y, 2) : pixels.get(x, y, 2)
 
-							if( !(r || g || b)) continue;
+							if(!(r || g || b)) continue
 
-							//push to output array
-							output[frame].push( { point: new dp.Point(x, y), color: new dp.Color().fromRgb(r, g, b)})
+							//push to cache
+							node.cache[frame].push({point: new dp.Point(x, y), color: new dp.Color().fromRgb(r, g, b)})
 						}
 					}
 				}
@@ -250,8 +245,6 @@ module.exports = function(RED) {
 				//just sets the cache and the number of frames, remember that still images have '0' frames
 				if(c == context)
 				{
-					node.maxFrames = frames;
-					node.cache = output;
 					readySend()
 				}
 
@@ -261,13 +254,9 @@ module.exports = function(RED) {
 		//if we receive input
 		node.on('input', function(msg)
 		{
-			node.currentFrame++;
-			if(node.currentFrame >= node.maxFrames) node.currentFrame = 0;
-			node.matrix.draw();
-
-			//start out with a blank file and offset
-			var runFile = undefined
-			var runPoint = undefined
+			node.currentFrame++
+			if(node.currentFrame >= node.frames) node.currentFrame = 0
+			node.matrix.draw()
 
 			if(msg.clear)
 			{
@@ -277,42 +266,24 @@ module.exports = function(RED) {
 
 			//catch various attemps to modify the file and offset, either via direct injection
 			//or via a msg.payload.data property
-			//set the url var
-			if( typeof msg.payload === 'string')
+			if(typeof msg.payload === 'string')
 			{
-				runFile = msg.payload
+				node.file = msg.payload
+			}
+			if(msg.payload.data)
+			{
+				node.file = msg.payload.data
+			}
+			if(msg.payload.x !== undefined && msg.payload.y !== undefined){
+				node.offset = new dp.Point(msg.payload.x, msg.payload.y)
 			}
 
-			if( msg.payload.data)
+			//make a cache for the image if it doesn't exist or it's for a different image
+			if(node.cache[node.currentFrame] == undefined || node.file != node.lastFile)
 			{
-				runFile = msg.payload.data
-				runPoint = new dp.Point(msg.payload.x, msg.payload.y)
+				createPixelStream(node.file)
+				node.lastFile = node.file
 			}
-
-			//if the user didn't provide a file or offset, use the one from the config
-			if( !runFile) runFile = node.file
-			if( !runPoint) runPoint = new dp.Point(node.xOffset, node.yOffset)
-
-			node.xOffset = runPoint.x;
-			node.yOffset = runPoint.y;
-
-			//if we didn't dislpay an image yet, always display one
-			if(node.oldFile == undefined  || node.oldPoint == undefined) 
-			{
-				node.oldFile = runFile
-				createPixelStream(runFile)
-				return
-			}
-
-			//otherwise, carefully check if we are trying to draw the same image twice for no reason
-			if(runFile != node.oldFile)
-			{
-				node.oldFile = runFile
-
-				createPixelStream(runFile)
-				return
-			}
-
 		})
 	}
 
@@ -545,9 +516,9 @@ module.exports = function(RED) {
 		node.rgb = config.rgb || '255,255,255'
 		node.filled = config.filled || false
 
-		node.oldPoints = undefined; 
-		node.oldRgb = undefined; 
-		node.oldFilled = undefined; 
+		node.oldPoints = undefined;
+		node.oldRgb = undefined;
+		node.oldFilled = undefined;
 
 		//the data we'll use to actually draw starts off empty
 		node.polygon = undefined
@@ -579,7 +550,7 @@ module.exports = function(RED) {
 
 		node.draw = function ()
 		{
-		
+
 			if(node.polygon && node.color)
 			{
 				node.polygon.draw( led, node.color)
@@ -606,15 +577,15 @@ module.exports = function(RED) {
 			var runFilled	= undefined
 
 			if(data.savedPts) runPts = data.savedPts
-			if(data.filled) runFilled = data.filled 
-			if(data.rgb) runColor = data.rgb 
+			if(data.filled) runFilled = data.filled
+			if(data.rgb) runColor = data.rgb
 
-			if(!runPts) runPts = node.savedPts 
-			if(!runFilled) runFilled = node.filled 
+			if(!runPts) runPts = node.savedPts
+			if(!runFilled) runFilled = node.filled
 			if(!runColor) runColor = node.rgb
 
 
-			//color is cheap so we'll just set this every time 
+			//color is cheap so we'll just set this every time
 			node.color = new dp.Color().fromRgbString(runColor)
 
 
@@ -624,11 +595,11 @@ module.exports = function(RED) {
 			//don't redo this if we haven't had user data and the config hasn't changed
 			//this if statement will need changing
 			node.polygon = node.buildFromConfig(runPts, runFilled)
-			node.oldPoints = runPts 
+			node.oldPoints = runPts
 			node.oldFilled = runFilled
-			//dont forget to register our node to be drawn 
+			//dont forget to register our node to be drawn
 			readySend()
-			return; 
+			return;
 
 
 		})
