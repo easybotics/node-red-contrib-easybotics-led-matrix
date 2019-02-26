@@ -596,7 +596,7 @@ module.exports = function(RED) {
 			node.color = new dp.Color().fromRgbString(runColor)
 
 
-			if(node.polygon && (node.oldPoints != runPts && node.oldFilled != runFilled))
+			if(node.polygon && (node.oldPoints == runPts && node.oldFilled == runFilled))
 				return
 
 			//don't redo this if we haven't had user data and the config hasn't changed
