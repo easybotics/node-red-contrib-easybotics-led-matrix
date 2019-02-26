@@ -91,7 +91,7 @@ exports.Point = function (x, y)
 		return exports.Points((this.x + p.x) / 2, (this.y + p.y) / 2)
 	}
 
-	//d=raws on an led matrix we give it
+	//draws on an led matrix we give it
 	this.draw = function (l, color, offset)
 	{
 		const xOff = parseInt(offset != undefined ? offset.x : 0)
@@ -180,14 +180,14 @@ exports.Line = function (start, end)
 
 	this.intersection = function (line)
 	{
-		const x1 = this.start.x; 
+		const x1 = this.start.x;
 		const y1 = this.start.y;
 		const x2 = this.end.x;
 		const y2 = this.end.y;
 
-		const x3 = line.start.x; 
-		const y3 = line.start.y; 
-		const x4 = line.end.x; 
+		const x3 = line.start.x;
+		const y3 = line.start.y;
+		const x4 = line.end.x;
 		const y4 = line.end.y;
 
 		// Check if none of the lines are of length 0
@@ -233,22 +233,22 @@ exports.Polygon = function (p)
 	this.boundryIntersections = function (l)
 	{
 		var num = 0
-		var lowestX  = undefined; 
-		var highestX = undefined; 
+		var lowestX  = undefined;
+		var highestX = undefined;
 		const height = l.start.y
 
 		for (const c of this.getLines())
 		{
 			if(height == c.yMax()) continue
 			const interSect = l.intersection(c)
-			
-			//increment number of intersects 
+
+			//increment number of intersects
 			if(interSect)
 			{
 				num++
-			
-				//update lowest and highest X found 
-				if(interSect.x > highestX || highestX == undefined) highestX = interSect.x 
+
+				//update lowest and highest X found
+				if(interSect.x > highestX || highestX == undefined) highestX = interSect.x
 				if(interSect.y < lowestX  || lowestX == undefined) lowestX = interSect.x
 			}
 		}
@@ -316,7 +316,7 @@ exports.Polygon = function (p)
 
 				if ((left.num % 2) && (right.num % 2) )
 				{
-					//draw a line from the current position to the next line intersection 
+					//draw a line from the current position to the next line intersection
 					dfCache.push( new exports.Line( new exports.Point(left.highestX, y), new exports.Point( right.lowestX, y)))
 
 					//skip to the next line intersection, because we just filled in up to there anyway
@@ -329,11 +329,11 @@ exports.Polygon = function (p)
 	}
 
 	//wrap our pure function in a promise
-	//promises run asynchronously, and have a .then() method which defines 
+	//promises run asynchronously, and have a .then() method which defines
 	//-- what happens when the result is returned
 	this.promiseWrapperFill = function()
 	{
-		//tricky error here, which is that 'this' is not captured in these lambdas 
+		//tricky error here, which is that 'this' is not captured in these lambdas
 		const n = this
 
 		//so we just make a n. thing to use as this
