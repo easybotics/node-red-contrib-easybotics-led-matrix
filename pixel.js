@@ -549,7 +549,7 @@ module.exports = function(RED) {
 			//create our DP polygon
 			const polygon = new dp.Polygon(realPoints)
 
-			if(filled) polygon.fill(node.matrix.draw)
+			if(filled) polygon.fill(node.matrix.refresh)
 
 			return polygon
 		}
