@@ -174,21 +174,21 @@ exports.Line = function (start, end)
 		return false // Doesn't fall in any of the above cases
 	}
 
-// line intercept math by Paul Bourke http://paulbourke.net/geometry/pointlineplane/
-// Determine the intersection point of two line segments
-// Return FALSE if the lines don't intersect
+	// line intercept math by Paul Bourke http://paulbourke.net/geometry/pointlineplane/
+	// Determine the intersection point of two line segments
+	// Return FALSE if the lines don't intersect
 
 	this.intersection = function (line)
 	{
-		const x1 = this.start.x;
-		const y1 = this.start.y;
-		const x2 = this.end.x;
-		const y2 = this.end.y;
+		const x1 = this.start.x
+		const y1 = this.start.y
+		const x2 = this.end.x
+		const y2 = this.end.y
 
-		const x3 = line.start.x;
-		const y3 = line.start.y;
-		const x4 = line.end.x;
-		const y4 = line.end.y;
+		const x3 = line.start.x
+		const y3 = line.start.y
+		const x4 = line.end.x
+		const y4 = line.end.y
 
 		// Check if none of the lines are of length 0
 		if ((x1 === x2 && y1 === y2) || (x3 === x4 && y3 === y4)) {
@@ -214,7 +214,7 @@ exports.Line = function (start, end)
 		let x = x1 + ua * (x2 - x1)
 		let y = y1 + ua * (y2 - y1)
 
-		return new exports.Point(x, y);
+		return new exports.Point(x, y)
 	}
 
 	//draw on an led matrix we give it
@@ -233,8 +233,8 @@ exports.Polygon = function (p)
 	this.boundryIntersections = function (l)
 	{
 		var num = 0
-		var lowestX  = undefined;
-		var highestX = undefined;
+		var lowestX  = undefined
+		var highestX = undefined
 		const height = l.start.y
 
 		for (const c of this.getLines())
@@ -253,7 +253,7 @@ exports.Polygon = function (p)
 			}
 		}
 
-		return {num: num, lowestX: lowestX, highestX: highestX};
+		return {num: num, lowestX: lowestX, highestX: highestX}
 	}
 
 	this.clipBounds = function ()
