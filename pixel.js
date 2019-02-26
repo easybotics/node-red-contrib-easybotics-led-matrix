@@ -209,6 +209,7 @@ module.exports = function(RED) {
 
 			getPixels(file, function(err, pixels, c = cc)
 			{
+				var output = []
 				if(!pixels)
 				{
 					node.error('image did not convert correctly\n please check the url or file location')
@@ -217,26 +218,26 @@ module.exports = function(RED) {
 
 				const width = pixels.shape.length == 4 ?  Math.min(128, pixels.shape[1]) :  Math.min(128, pixels.shape[0])
 				const height = pixels.shape.length == 4 ?  Math.min(128, pixels.shape[2]) :  Math.min(128, pixels.shape[1])
-				node.frames = pixels.shape.length == 4 ? pixels.shape[0] : 0
+				const frames = pixels.shape.length == 4 ? pixels.shape[0] : 0
 
 				//loop agnostic between images and gifs
-				for(var frame = 0; frame < node.frames; frame++)
+				for(var frame = 0; frame < frames; frame++)
 				{
-					node.cache[frame] = []
+					output[frame] = []
 					for(let x = 0;  x < width; x++)
 					{
 						if(c != context) return
 						for(let y = 0; y < height; y++)
 						{
 							//getting pixel is different for still images
-							const r = node.frames ? pixels.get(frame, x, y, 0) : pixels.get(x, y, 0)
-							const g = node.frames ? pixels.get(frame, x, y, 1) : pixels.get(x, y, 1)
-							const b = node.frames ? pixels.get(frame, x, y, 2) : pixels.get(x, y, 2)
+							const r = frames ? pixels.get(frame, x, y, 0) : pixels.get(x, y, 0)
+							const g = frames ? pixels.get(frame, x, y, 1) : pixels.get(x, y, 1)
+							const b = frames ? pixels.get(frame, x, y, 2) : pixels.get(x, y, 2)
 
 							if(!(r || g || b)) continue
 
-							//push to cache
-							node.cache[frame].push({point: new dp.Point(x, y), color: new dp.Color().fromRgb(r, g, b)})
+							//push to output array
+							output[frame].push({point: new dp.Point(x, y), color: new dp.Color().fromRgb(r, g, b)})
 						}
 					}
 				}
@@ -245,6 +246,8 @@ module.exports = function(RED) {
 				//just sets the cache and the number of frames, remember that still images have '0' frames
 				if(c == context)
 				{
+					node.frames = frames
+					node.cache = output
 					readySend()
 				}
 
