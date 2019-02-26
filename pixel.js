@@ -28,7 +28,7 @@ module.exports = function(RED) {
 	/*
 	 * a config node that holds global state for the led matrix
 	 * nodes that want to use the hardware will hook into an instance of this
-	 * but right now it uses global var 'led' meaning its limited to one hardware output per flow
+	 * but right now it uses global var 'led' meaning its limited to one hardware output per node-red instance
 	 */
 	function LedMatrix(n)
 	{
@@ -50,6 +50,8 @@ module.exports = function(RED) {
 
 		context++
 
+		//nodes that wish to draw things on the matrix register themselves in the 'nodeRegister' set
+		//then when this node.draw callback is called we sort the set by Z level and call their draw callbacks
 		node.draw = function()
 		{
 
@@ -80,6 +82,8 @@ module.exports = function(RED) {
 
 		}
 
+		//nodes can request the display be refreshed, redrawing every registered node
+		//however their is a ratelimiting in effect based on the refreshDelay property
 		node.refresh = function ()
 		{
 			if (!node.autoRefresh) {return}
@@ -109,6 +113,7 @@ module.exports = function(RED) {
 
 
 		//if led is undefined we create a new one
+		//some funky stuff due to the global state we're managing
 		if(!led)
 		{
 			node.warn('initing led')
@@ -140,24 +145,19 @@ module.exports = function(RED) {
 		const node = this
 		node.matrix = RED.nodes.getNode(config.matrix)
 
-		node.on('input', function(msg)
+		node.on('input', function()
 		{
 			led.clear()
-
-			for(let n of nodeRegister)
-			{
-				n.draw()
-			}
-
+			node.draw();
 			led.update()
 		})
 	}
 
 
 	/*
-	 * takes a url and turns it into an array of pixel objects
-	 * instead of sending a buffer, it uses the node.send() method
-	 * overload for an array, meaning it in effect calls its output over and over again
+	 * Takes an image URI (not URL) and caches it in memory as an array of pixels
+	 * Can also cache an animated gif as a higher dimensional array
+	 * Increments frame when poked, and draws its cache to the display when requested
 	 */
 	function ImageToPixels (config)
 	{
@@ -175,6 +175,9 @@ module.exports = function(RED) {
 		node.frames = 0 //still images have 0 frames, gifs have more
 		node.cache = []
 
+		//callback used by the LED matrix object
+		//first we register ourselves to be drawn, and then wait for LED matrix to use this callback
+		//we can also manually request for the LED matrix to come and draw us
 		node.draw = function ()
 		{
 			if(node.cache != undefined)
@@ -287,7 +290,7 @@ module.exports = function(RED) {
 			//update frame on animated images
 			node.currentFrame++
 			if(node.currentFrame >= node.frames) node.currentFrame = 0
-			node.matrix.draw()
+			readySend();
 		})
 	}
 
