@@ -171,9 +171,6 @@ module.exports = function(RED) {
 		node.file = config.file
 
 		//info about the frame we've built last; expensive so we want to avoid repeating this if we can!
-		node.output = undefined
-		node.lastFile = undefined
-		node.lastPoint = undefined
 		node.currentFrame = 0
 		node.frames = 0 //still images have 0 frames, gifs have more
 		node.cache = []
@@ -218,7 +215,7 @@ module.exports = function(RED) {
 
 				const width = pixels.shape.length == 4 ?  Math.min(128, pixels.shape[1]) :  Math.min(128, pixels.shape[0])
 				const height = pixels.shape.length == 4 ?  Math.min(128, pixels.shape[2]) :  Math.min(128, pixels.shape[1])
-				const frames = pixels.shape.length == 4 ? pixels.shape[0] : 0
+				const frames = pixels.shape.length == 4 ? pixels.shape[0] : 1
 
 				//loop agnostic between images and gifs
 				for(var frame = 0; frame < frames; frame++)
@@ -257,36 +254,40 @@ module.exports = function(RED) {
 		//if we receive input
 		node.on('input', function(msg)
 		{
-			node.currentFrame++
-			if(node.currentFrame >= node.frames) node.currentFrame = 0
-			node.matrix.draw()
-
 			if(msg.clear)
 			{
 				node.clear()
 				return
 			}
 
+			var runFile = undefined
+
 			//catch various attemps to modify the file and offset, either via direct injection
 			//or via a msg.payload.data property
 			if(typeof msg.payload === 'string')
 			{
-				node.file = msg.payload
+				runFile = msg.payload
 			}
 			if(msg.payload.data)
 			{
-				node.file = msg.payload.data
+				runFile = msg.payload.data
 			}
 			if(msg.payload.x !== undefined && msg.payload.y !== undefined){
 				node.offset = new dp.Point(msg.payload.x, msg.payload.y)
 			}
 
 			//make a cache for the image if it doesn't exist or it's for a different image
-			if(node.cache[node.currentFrame] == undefined || node.file != node.lastFile)
+			if(node.cache[node.currentFrame] == undefined || runFile != node.file)
 			{
+				node.file = runFile
 				createPixelStream(node.file)
-				node.lastFile = node.file
+				return
 			}
+
+			//update frame on animated images
+			node.currentFrame++
+			if(node.currentFrame >= node.frames) node.currentFrame = 0
+			node.matrix.draw()
 		})
 	}
 
