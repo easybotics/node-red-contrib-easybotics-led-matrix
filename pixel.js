@@ -227,9 +227,9 @@ module.exports = function(RED) {
 						for(let y = 0; y < height; y++)
 						{
 							//getting pixel is different for still images
-							const r = frames ? pixels.get(frame, x, y, 0) : pixels.get(x, y, 0)
-							const g = frames ? pixels.get(frame, x, y, 1) : pixels.get(x, y, 1)
-							const b = frames ? pixels.get(frame, x, y, 2) : pixels.get(x, y, 2)
+							const r = frames != 1 ? pixels.get(frame, x, y, 0) : pixels.get(x, y, 0)
+							const g = frames != 1 ? pixels.get(frame, x, y, 1) : pixels.get(x, y, 1)
+							const b = frames != 1 ? pixels.get(frame, x, y, 2) : pixels.get(x, y, 2)
 
 							if(!(r || g || b)) continue
 
@@ -268,9 +268,13 @@ module.exports = function(RED) {
 			{
 				runFile = msg.payload
 			}
-			if(msg.payload.data)
+			else if(msg.payload.data)
 			{
 				runFile = msg.payload.data
+			}
+			else //if we don't do any type of payload and use the edit dialog instead
+			{
+				runFile = node.file
 			}
 			if(msg.payload.x !== undefined && msg.payload.y !== undefined){
 				node.offset = new dp.Point(msg.payload.x, msg.payload.y)
