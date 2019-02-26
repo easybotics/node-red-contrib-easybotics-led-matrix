@@ -520,9 +520,9 @@ module.exports = function(RED) {
 		node.rgb = config.rgb || '255,255,255'
 		node.filled = config.filled || false
 
-		node.oldPoints = undefined;
-		node.oldRgb = undefined;
-		node.oldFilled = undefined;
+		node.oldPoints = undefined
+		node.oldRgb = undefined
+		node.oldFilled = undefined
 
 		//the data we'll use to actually draw starts off empty
 		node.polygon = undefined
@@ -603,7 +603,7 @@ module.exports = function(RED) {
 			node.oldFilled = runFilled
 			//dont forget to register our node to be drawn
 			readySend()
-			return;
+			return
 
 
 		})
