@@ -516,6 +516,8 @@ module.exports = function(RED) {
 		//get the config data we'll use later
 		node.zLevel = config.zLevel != undefined ? config.zLevel : 1
 		node.savedPts = config.savedPts
+		node.offset = new dp.Point(config.xOffset != undefined ? config.xOffset : 0,
+			config.yOffset != undefined ? config.yOffset : 0)
 		node.rgb = config.rgb || '255,255,255'
 		node.filled = config.filled || false
 
@@ -556,7 +558,7 @@ module.exports = function(RED) {
 
 			if(node.polygon && node.color)
 			{
-				node.polygon.draw( led, node.color)
+				node.polygon.draw(led, node.color, node.offset)
 			}
 		}
 
@@ -600,6 +602,9 @@ module.exports = function(RED) {
 			node.polygon = node.buildFromConfig(runPts, runFilled)
 			node.oldPoints = runPts
 			node.oldFilled = runFilled
+			node.offset = new dp.Point(data.xOffset != undefined ? data.xOffset : 0,
+				data.yOffset != undefined ? data.yOffset : 0)
+
 			//dont forget to register our node to be drawn
 			readySend()
 			return;
