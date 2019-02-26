@@ -173,7 +173,7 @@ module.exports = function(RED) {
 		//info about the frame we've built last; expensive so we want to avoid repeating this if we can!
 		node.currentFrame = 0
 		node.frames = 0 //still images have 0 frames, gifs have more
-		node.cache = undefined 
+		node.cache = undefined
 
 		//callback used by the LED matrix object
 		//first we register ourselves to be drawn, and then wait for LED matrix to use this callback
@@ -202,7 +202,7 @@ module.exports = function(RED) {
 			node.matrix.refresh()
 		}
 
-		//function that takes a file, and an offset and tries to convert the file into a stream of pixels
+		//function that takes a file and tries to convert the file into a stream of pixels
 		//takes a callback which is handed the output and the number of frames
 		//imagine if it returned a promise though!
 		//probably uncesarry because we dont actually have to syncronize this to drawing, drawing when done is fine
@@ -251,7 +251,7 @@ module.exports = function(RED) {
 				{
 					//give our callback function the output and the number of frames
 					callback(output, frames)
-	
+
 				}
 
 			})
@@ -282,6 +282,7 @@ module.exports = function(RED) {
 			{
 				runFile = node.file
 			}
+			
 			if(msg.payload.x !== undefined && msg.payload.y !== undefined){
 				node.offset = new dp.Point(msg.payload.x, msg.payload.y)
 			}
