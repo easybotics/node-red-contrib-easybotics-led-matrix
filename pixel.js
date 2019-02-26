@@ -173,14 +173,14 @@ module.exports = function(RED) {
 		//info about the frame we've built last; expensive so we want to avoid repeating this if we can!
 		node.currentFrame = 0
 		node.frames = 0 //still images have 0 frames, gifs have more
-		node.cache = []
+		node.cache = undefined 
 
 		//callback used by the LED matrix object
 		//first we register ourselves to be drawn, and then wait for LED matrix to use this callback
 		//we can also manually request for the LED matrix to come and draw us
 		node.draw = function ()
 		{
-			if(node.cache != undefined)
+			if(node.cache)
 			{
 				for(const tuple of node.cache[node.currentFrame])
 				{
@@ -203,7 +203,10 @@ module.exports = function(RED) {
 		}
 
 		//function that takes a file, and an offset and tries to convert the file into a stream of pixels
-		function createPixelStream (file)
+		//takes a callback which is handed the output and the number of frames
+		//imagine if it returned a promise though!
+		//probably uncesarry because we dont actually have to syncronize this to drawing, drawing when done is fine
+		function createPixelStream (file, callback)
 		{
 			const cc = context
 
@@ -246,9 +249,9 @@ module.exports = function(RED) {
 				//just sets the cache and the number of frames, remember that still images have '0' frames
 				if(c == context)
 				{
-					node.frames = frames
-					node.cache = output
-					readySend()
+					//give our callback function the output and the number of frames
+					callback(output, frames)
+	
 				}
 
 			})
@@ -280,10 +283,25 @@ module.exports = function(RED) {
 			}
 
 			//make a cache for the image if it doesn't exist or it's for a different image
-			if(node.cache[node.currentFrame] == undefined || runFile != node.file)
+			if(node.cache == undefined || runFile != node.file)
 			{
 				node.file = runFile
-				createPixelStream(node.file)
+				//set cache to an intermediate but valid state
+				//thatway we only run when node.cache is in an UNDEFINED state, or we change the file
+				//we only draw node.cache when it is in a valid drawable state
+				//undefined -> intermediate -> drawable
+				node.cache = false
+				node.log("running create pixel stream")
+
+				//give create pixel stream a callback which sets node.cache to a state that node.draw can use
+				createPixelStream(node.file, function (output, frames)
+				{
+					node.cache = output
+					node.frames = frames
+					readySend()
+					node.cache = output
+				})
+
 				return
 			}
 
