@@ -296,7 +296,6 @@ module.exports = function(RED) {
 				//we only draw node.cache when it is in a valid drawable state
 				//undefined -> intermediate -> drawable
 				node.cache = false
-				node.log("running create pixel stream")
 
 				//give create pixel stream a callback which sets node.cache to a state that node.draw can use
 				createPixelStream(node.file, function (output, frames)
