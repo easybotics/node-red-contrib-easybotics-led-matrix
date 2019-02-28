@@ -632,8 +632,10 @@ module.exports = function(RED) {
 			node.polygon = node.buildFromConfig(runPts, runFilled)
 			node.oldPoints = runPts
 			node.oldFilled = runFilled
-			node.offset = new dp.Point(data.xOffset != undefined ? data.xOffset : 0,
-				data.yOffset != undefined ? data.yOffset : 0)
+			if(data.xOffset != undefined && data.yOffset != undefined)
+			{
+				node.offset = new dp.Point(data.xOffset, data.yOffset)
+			}
 
 			//dont forget to register our node to be drawn
 			readySend()
