@@ -221,7 +221,11 @@ module.exports = function(RED) {
 
 				const width = pixels.shape.length == 4 ?  Math.min(128, pixels.shape[1]) :  Math.min(128, pixels.shape[0])
 				const height = pixels.shape.length == 4 ?  Math.min(128, pixels.shape[2]) :  Math.min(128, pixels.shape[1])
-				const frames = pixels.shape.length == 4 ? pixels.shape[0] : 1
+				//for getPixels, all gifs need to be treated the same way, even
+				//single frame ones. this is why we need the gif variable, so
+				//a single frame gif's pixels won't be accessed the same as a still image
+				const isGif = pixels.shape.length == 4
+				const frames = isGif ? pixels.shape[0] : 1
 
 				//loop agnostic between images and gifs
 				for(var frame = 0; frame < frames; frame++)
@@ -233,9 +237,9 @@ module.exports = function(RED) {
 						for(let y = 0; y < height; y++)
 						{
 							//getting pixel is different for still images
-							const r = frames != 1 ? pixels.get(frame, x, y, 0) : pixels.get(x, y, 0)
-							const g = frames != 1 ? pixels.get(frame, x, y, 1) : pixels.get(x, y, 1)
-							const b = frames != 1 ? pixels.get(frame, x, y, 2) : pixels.get(x, y, 2)
+							const r = isGif ? pixels.get(frame, x, y, 0) : pixels.get(x, y, 0)
+							const g = isGif ? pixels.get(frame, x, y, 1) : pixels.get(x, y, 1)
+							const b = isGif ? pixels.get(frame, x, y, 2) : pixels.get(x, y, 2)
 
 							if(!(r || g || b)) continue
 
@@ -282,7 +286,7 @@ module.exports = function(RED) {
 			{
 				runFile = node.file
 			}
-			
+
 			if(msg.payload.x !== undefined && msg.payload.y !== undefined){
 				node.offset = new dp.Point(msg.payload.x, msg.payload.y)
 			}
