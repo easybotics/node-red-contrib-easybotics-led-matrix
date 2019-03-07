@@ -148,7 +148,7 @@ module.exports = function(RED) {
 		node.on('input', function()
 		{
 			led.clear()
-			node.draw();
+			node.matrix.draw();
 			led.update()
 		})
 	}
@@ -172,7 +172,7 @@ module.exports = function(RED) {
 
 		//info about the frame we've built last; expensive so we want to avoid repeating this if we can!
 		node.currentFrame = 0
-		node.frames = 0 //still images have 0 frames, gifs have more
+		node.frames = 0
 		node.cache = undefined
 
 		//callback used by the LED matrix object
