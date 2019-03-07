@@ -218,9 +218,12 @@ exports.Line = function (start, end)
 	}
 
 	//draw on an led matrix we give it
-	this.draw = function (l, color)
+	this.draw = function (l, color, offset)
 	{
-		l.drawLine( this.start.x, this.start.y, this.end.x, this.end.y, parseInt(color.r), parseInt(color.g), parseInt(color.b))
+		const xOff = parseInt(offset != undefined ? offset.x : 0)
+		const yOff = parseInt(offset != undefined ? offset.y : 0)
+
+		l.drawLine(this.start.x + xOff, this.start.y + yOff, this.end.x + xOff, this.end.y + yOff, parseInt(color.r), parseInt(color.g), parseInt(color.b))
 	}
 }
 
@@ -361,19 +364,18 @@ exports.Polygon = function (p)
 	}
 
 
-	this.draw = function (l, color)
+	this.draw = function (l, color, offset)
 	{
-
 		this.drawLinesCache = this.getLines()
 
-		for( const c of this.drawLinesCache)
+		for(const c of this.drawLinesCache)
 		{
-			c.draw(l, color)
+			c.draw(l, color, offset)
 		}
 
-		for( const p of this.drawFillCache)
+		for(const p of this.drawFillCache)
 		{
-			p.draw(l, color)
+			p.draw(l, color, offset)
 		}
 	}
 }

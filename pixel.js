@@ -173,7 +173,7 @@ module.exports = function(RED) {
 		//info about the frame we've built last; expensive so we want to avoid repeating this if we can!
 		node.currentFrame = 0
 		node.frames = 0 //still images have 0 frames, gifs have more
-		node.cache = undefined 
+		node.cache = undefined
 
 		//callback used by the LED matrix object
 		//first we register ourselves to be drawn, and then wait for LED matrix to use this callback
@@ -202,7 +202,7 @@ module.exports = function(RED) {
 			node.matrix.refresh()
 		}
 
-		//function that takes a file, and an offset and tries to convert the file into a stream of pixels
+		//function that takes a file and tries to convert the file into a stream of pixels
 		//takes a callback which is handed the output and the number of frames
 		//imagine if it returned a promise though!
 		//probably uncesarry because we dont actually have to syncronize this to drawing, drawing when done is fine
@@ -221,7 +221,11 @@ module.exports = function(RED) {
 
 				const width = pixels.shape.length == 4 ?  Math.min(128, pixels.shape[1]) :  Math.min(128, pixels.shape[0])
 				const height = pixels.shape.length == 4 ?  Math.min(128, pixels.shape[2]) :  Math.min(128, pixels.shape[1])
-				const frames = pixels.shape.length == 4 ? pixels.shape[0] : 1
+				//for getPixels, all gifs need to be treated the same way, even
+				//single frame ones. this is why we need the gif variable, so
+				//a single frame gif's pixels won't be accessed the same as a still image
+				const isGif = pixels.shape.length == 4
+				const frames = isGif ? pixels.shape[0] : 1
 
 				//loop agnostic between images and gifs
 				for(var frame = 0; frame < frames; frame++)
@@ -233,9 +237,9 @@ module.exports = function(RED) {
 						for(let y = 0; y < height; y++)
 						{
 							//getting pixel is different for still images
-							const r = frames ? pixels.get(frame, x, y, 0) : pixels.get(x, y, 0)
-							const g = frames ? pixels.get(frame, x, y, 1) : pixels.get(x, y, 1)
-							const b = frames ? pixels.get(frame, x, y, 2) : pixels.get(x, y, 2)
+							const r = isGif ? pixels.get(frame, x, y, 0) : pixels.get(x, y, 0)
+							const g = isGif ? pixels.get(frame, x, y, 1) : pixels.get(x, y, 1)
+							const b = isGif ? pixels.get(frame, x, y, 2) : pixels.get(x, y, 2)
 
 							if(!(r || g || b)) continue
 
@@ -251,7 +255,7 @@ module.exports = function(RED) {
 				{
 					//give our callback function the output and the number of frames
 					callback(output, frames)
-	
+
 				}
 
 			})
@@ -274,10 +278,15 @@ module.exports = function(RED) {
 			{
 				runFile = msg.payload
 			}
-			if(msg.payload.data)
+			else if(msg.payload.data)
 			{
 				runFile = msg.payload.data
 			}
+			else //if we don't do any type of payload and use the edit dialog instead
+			{
+				runFile = node.file
+			}
+
 			if(msg.payload.x !== undefined && msg.payload.y !== undefined){
 				node.offset = new dp.Point(msg.payload.x, msg.payload.y)
 			}
@@ -537,6 +546,8 @@ module.exports = function(RED) {
 		//get the config data we'll use later
 		node.zLevel = config.zLevel != undefined ? config.zLevel : 1
 		node.savedPts = config.savedPts
+		node.offset = new dp.Point(config.xOffset != undefined ? config.xOffset : 0,
+			config.yOffset != undefined ? config.yOffset : 0)
 		node.rgb = config.rgb || '255,255,255'
 		node.filled = config.filled || false
 
@@ -577,7 +588,7 @@ module.exports = function(RED) {
 
 			if(node.polygon && node.color)
 			{
-				node.polygon.draw( led, node.color)
+				node.polygon.draw(led, node.color, node.offset)
 			}
 		}
 
@@ -621,6 +632,11 @@ module.exports = function(RED) {
 			node.polygon = node.buildFromConfig(runPts, runFilled)
 			node.oldPoints = runPts
 			node.oldFilled = runFilled
+			if(data.xOffset != undefined && data.yOffset != undefined)
+			{
+				node.offset = new dp.Point(data.xOffset, data.yOffset)
+			}
+
 			//dont forget to register our node to be drawn
 			readySend()
 			return

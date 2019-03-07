@@ -881,6 +881,8 @@
 			zLevel:		{value: undefined},
 			savedPts:	{value: []},
 			tempPts:	{value: []},
+			xOffset:	{value: 0},
+			yOffset:	{value: 0},
 			allowDeploy:{value: 0}, //see comment in oneditsave
 			filled:		{value: false},
 		},
@@ -938,17 +940,17 @@
 <script type="text/x-red" data-template-name="polygon">
 
 	<div class='form-row'>
-		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
-		<input type='text' id='node-input-matrix'/>
+		<label for="node-config-input-matrix"><i class='fa fa-tag'></i>Display</label>
+		<input type='text' id='node-input-matrix'>
 	</div>
 
 	<div class="form-row">
-		<label for="node-config-input-name"><i class="icon-tag"></i> Name </label>
+		<label for="node-config-input-name"><i class="icon-tag"></i>Name</label>
 		<input type="text" id="node-input-name" placeholder="Name">
 	</div>
 
 	<div class = "form-row">
-		<label for="node-config-input-rgb"><i class="icon-tag"></i>RGB color </label>
+		<label for="node-config-input-rgb"><i class="icon-tag"></i>RGB color</label>
 		<input type="text" id="node-input-rgb" placeholder="255,255,255">
 	</div>
 
@@ -963,6 +965,16 @@
 	</div>
 
 	<div class='form-row'>
+		<label for="node-config-input-xOffset"><i class='fa fa-tag'></i>X Offset</label>
+		<input type='number' min='0' step='1' id='node-input-xOffset'/>
+	</div>
+
+	<div class='form-row'>
+		<label for="node-config-input-yOffset"><i class='fa fa-tag'></i>Y Offset</label>
+		<input type='number' min='0' step='1' id='node-input-yOffset'/>
+	</div>
+
+	<div class='form-row'>
 		<label for="node-config-input-filled"><i class='fa fa-tag'></i>Filled</label>
 		<input type='checkbox' id='node-input-filled' style='width: auto;'/>
 	</div>
@@ -971,29 +983,29 @@
 	<input type="number" id="node-input-allowDeploy" style="display: none">
 
     <div class="form-row">
-        <label for="node-config-input-zLevel"><i class="icon-tag"></i> z level</label>
+        <label for="node-config-input-zLevel"><i class="icon-tag"></i>z level</label>
         <input type="number" id="node-input-zLevel" placeholder="-">
     </div>
 </script>
 
 <script type="text/x-red" data-help-name="polygon">
-	<p> Prints a polygon to the matrix buffer, refresh the matrix to see the result  <br>
-		When injected it will add itself to the buffer, and will continue to be printed until a msg.clear property is injected into it <br>
-		Will use the location and color from the settings, or can be injected with an object with the following properties: <br><br>
-	<b> rgb:</b> rgb color, as a CSV string. Example: "255,0,0" (RED) <br>
-	<b> filled:</b> boolean determining if the shape will be filled <br>
-	<b> savedPts:</b> what points to draw the polygon with. Use the following format, replacing x1, x2, y1, y2, etc. with the numerical coordinates of the points: <br>
+	<p> Prints a polygon to the matrix buffer, refresh the matrix to see the result<br>
+		When injected it will add itself to the buffer, and will continue to be printed until a msg.clear property is injected into it<br>
+		Will use the location and color from the settings, or can be injected with an object with the following properties:<br><br>
+	<b> rgb:</b> rgb color, as a CSV string. Example: "255,0,0" (RED)<br>
+	<b> filled:</b> boolean determining if the shape will be filled<br>
+	<b> savedPts:</b> what points to draw the polygon with. Use the following format, replacing x1, x2, y1, y2, etc. with the numerical coordinates of the points:<br>
 	<code>
 		[{x: x1, y: y1}, {x: x2, y: y2}]
 	</code>
 
-	<br><br> <b> object example: </b> <br>
+	<br><br> <b>object example:</b> <br>
 	<i>
-	msg.payload = { <br>
-		&emsp;&emsp; savedPts: [ {x:10, y:10}, {x:25, y:10}, {x:25, y:25}, {x:10, y:25}], <br>
-		&emsp;&emsp; rgb: "255,255,0", <br>
-		&emsp;&emsp; filled: false  <br>
-		}; <br>
-		</i>
+		msg.payload = {<br>
+			&emsp;&emsp;savedPts: [{x:10, y:10}, {x:25, y:10}, {x:25, y:25}, {x:10, y:25}],<br>
+			&emsp;&emsp;rgb: "255,255,0",<br>
+			&emsp;&emsp;filled: false<br>
+		};<br>
+	</i>
 	</p>
 </script>
