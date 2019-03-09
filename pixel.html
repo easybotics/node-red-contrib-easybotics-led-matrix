@@ -175,6 +175,7 @@
 			brightness: {value:100, required:true},
 			refreshDelay: {value:500, required:true},
 			mapping: {value:"adafruit-hat-pwm", required:true},
+			rgbSequence: {value: "RGB", required: true},
 			autoRefresh: {value:true},
 		},
 
@@ -270,6 +271,10 @@
 		</select>
 	</div>
 
+	<div class="form-row">
+		<label for="node-config-input-rgbSequence"><i class="icon-tag"></i> RGB Sequence </label>
+		<input type="text" id="node-config-input-rgbSequence">
+	</div>
 
 <p>
 	<b> warning:</b> <br>
@@ -289,6 +294,7 @@
 		<br> <b> parallel:</b> amount of panels wired in parallel
 		<br> <b> brightness:</b> brightness as a percentage, 1 - 100
 		<br> <b> mapping: </b> type of hardware mapping, what pins hzeller will output too
+		<br> <b> rgb sequence: </b> the letters "R", "G", and "B", arranged according to your display's rgb sequence
 		<br> <b> autoRefresh: </b> if true flow will try and keep the display updated, otherwise use the refresh node manually
 		<br> <b> refresh delay: </b> when autorefresh is turned on, the flow will never update the screen faster than this delay
 	</p>
