@@ -244,22 +244,7 @@
 	<div class="form-row">
 		<label for="node-config-input-refreshDelay"> <i class= "icon-bookmark"></i> Refresh Delay milliseconds</label>
 		<input type="number" id="node-config-input-refreshDelay" min="0" placeholder="default: 500 milliseconds"/>
-
-		<label for="node-config-refreshCheck"> <i class= "icon-bookmark"></i> Auto Refresh Display</label>
-		<select id = "node-config-refreshCheck">
-			<option value="true"> auto </option>
-			<option value="false"> manual <option>
-		</select>
-
 	</div>
-
-
-<!--
-	<div class="form-row">
-		<label for="node-config-input-mapping"><i class="icon-bookmark"></i> Hardware Mapping</label>
-		<input type="text" id="node-config-input-mapping">
-	</div>
--->
 
 	<div class="form-row">
 		<label for="node-config-input-mapping"><i class="icon-tag"></i> Hardware Mapping </label>
@@ -836,28 +821,6 @@
 		</i>;
 
 		</p>
-</script>
-
-
-<script type="text/javascript">
-	RED.nodes.registerType("clear-node",
-	{
-		category: 'LED Matrix',
-		color: '#a6bbcf',
-		inputs:  1,
-		outputs: 1,
-		icon: "refresh.png",
-		label: function ()
-		{
-			return "clear node";
-		}
-
-	});
-</script>
-
-<script type="text/x-red" data-help-name="clear-node">
-	<p> Clears a shape, text, or image node from the display <br>
-		Note that these nodes usually re-impose themselves when injected, so if you are injecting on a loop it might just reappear on the display after you clear it </p>
 </script>
 
 <script type="text/javascript">

@@ -524,20 +524,6 @@ module.exports = function(RED) {
 		})
 	}
 
-
-	function ClearNode (config)
-	{
-		RED.nodes.createNode(this, config)
-		const node = this
-
-		node.on('input', function (msg)
-		{
-			msg.clear = true
-			node.send(msg)
-		})
-	}
-
-
 	function Polygon (config)
 	{
 		RED.nodes.createNode(this, config)
@@ -662,6 +648,5 @@ module.exports = function(RED) {
 	RED.nodes.registerType('text-to-matrix', Text)
 	RED.nodes.registerType('pixel-transform', PixelDataTransform)
 	RED.nodes.registerType('circle', Circle)
-	RED.nodes.registerType('clear-node', ClearNode)
 	RED.nodes.registerType('polygon', Polygon)
 }
