@@ -25,12 +25,17 @@ module.exports = function(RED) {
 	}
 
 	/*
-	 * function for parsing input fields from html
+	 * functions for parsing input fields from html
 	 */
+	function validateOrDefault(input, d, v)
+	{
+		return v(input) ? input : d
+	}
+
 	function validateInt(num, d=0)
 	{
 		var result = parseInt(num)
-		return Number.isInteger(result) ? result : d
+		return validateOrDefault(result, d, n => Number.isInteger(n))
 	}
 
 
