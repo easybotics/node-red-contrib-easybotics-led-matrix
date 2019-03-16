@@ -524,20 +524,6 @@ module.exports = function(RED) {
 		})
 	}
 
-
-	function ClearNode (config)
-	{
-		RED.nodes.createNode(this, config)
-		const node = this
-
-		node.on('input', function (msg)
-		{
-			msg.clear = true
-			node.send(msg)
-		})
-	}
-
-
 	function Polygon (config)
 	{
 		RED.nodes.createNode(this, config)
@@ -547,8 +533,11 @@ module.exports = function(RED) {
 		//get the config data we'll use later
 		node.zLevel = config.zLevel != undefined ? config.zLevel : 1
 		node.savedPts = config.savedPts
-		node.offset = new dp.Point(config.xOffset != undefined ? config.xOffset : 0,
-			config.yOffset != undefined ? config.yOffset : 0)
+		// xOffset and yOffset are strings, dp does parseInt when it gets these
+		// values, and node-red doesn't let you put anything other than a number in
+		// the input field, so all we need to check for is if they enter nothing
+		node.offset = new dp.Point(config.xOffset != "" ? config.xOffset : 0,
+			config.yOffset != "" ? config.yOffset : 0)
 		node.rgb = config.rgb || '255,255,255'
 		node.filled = config.filled || false
 
@@ -662,6 +651,5 @@ module.exports = function(RED) {
 	RED.nodes.registerType('text-to-matrix', Text)
 	RED.nodes.registerType('pixel-transform', PixelDataTransform)
 	RED.nodes.registerType('circle', Circle)
-	RED.nodes.registerType('clear-node', ClearNode)
 	RED.nodes.registerType('polygon', Polygon)
 }
