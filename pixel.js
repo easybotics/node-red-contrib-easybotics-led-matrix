@@ -24,6 +24,15 @@ module.exports = function(RED) {
 		return output
 	}
 
+	/*
+	 * function for parsing input fields from html
+	 */
+	function validateInt(num, d=0)
+	{
+		var result = parseInt(num)
+		return Number.isInteger(result) ? result : d
+	}
+
 
 	/*
 	 * a config node that holds global state for the led matrix
@@ -167,8 +176,8 @@ module.exports = function(RED) {
 		node.matrix = RED.nodes.getNode(config.matrix)
 
 		//get config data
-		node.offset = new dp.Point(config.xOffset, config.yOffset)
-		node.zLevel = config.zLevel != undefined ? config.zLevel : 0
+		node.offset = new dp.Point(validateInt(config.xOffset), validateInt(config.yOffset))
+		node.zLevel = validateInt(config.zLevel)
 		node.file = config.file
 
 		//info about the frame we've built last; expensive so we want to avoid repeating this if we can!
@@ -350,10 +359,10 @@ module.exports = function(RED) {
 		node.prefix		= config.prefix || ''
  		node.source		= config.source || 'msg.payload'
 		node.font		= config.font
-		node.xOffset	= config.xOffset
-		node.yOffset	= config.yOffset
+		node.xOffset	= validateInt(config.xOffset)
+		node.yOffset	= validateInt(config.yOffset)
 		node.rgb		= config.rgb
-		node.zLevel = config.zLevel != undefined ? config.zLevel : 2
+		node.zLevel = validateInt(config.zLevel, 2)
 
 		var outputInfo
 
@@ -531,13 +540,10 @@ module.exports = function(RED) {
 		node.matrix = RED.nodes.getNode(config.matrix)
 
 		//get the config data we'll use later
-		node.zLevel = config.zLevel != undefined ? config.zLevel : 1
+		node.zLevel = validateInt(config.zLevel, 1)
 		node.savedPts = config.savedPts
-		// xOffset and yOffset are strings, dp does parseInt when it gets these
-		// values, and node-red doesn't let you put anything other than a number in
-		// the input field, so all we need to check for is if they enter nothing
-		node.offset = new dp.Point(config.xOffset != "" ? config.xOffset : 0,
-			config.yOffset != "" ? config.yOffset : 0)
+		node.offset = new dp.Point(validateInt(config.xOffset),
+			validateInt(config.yOffset))
 		node.rgb = config.rgb || '255,255,255'
 		node.filled = config.filled || false
 
