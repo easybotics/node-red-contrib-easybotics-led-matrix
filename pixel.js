@@ -27,17 +27,53 @@ module.exports = function(RED) {
 	/*
 	 * functions for parsing input fields from html
 	 */
-	function validateOrDefault(input, d, v)
+	let converters = new Map([
+		['number', function(num) {
+			let out = Number(num)
+			//Number() doesn't output NaN when given an empty string
+			if(num === '') return false
+			if(isNaN(out)) return false
+			return out
+		}]
+	])
+
+	function validateOrDefault(input, d, v = false)
 	{
-		return v(input) ? input : d
+		let parsed
+
+		//as long as we have a validation function, use it
+		if(v !== false)
+		{
+			parsed = v(input) ? input : d
+		}
+		//if no validation function, check if input is the right type
+		else if(typeof input === typeof d)
+		{
+			parsed = input
+		}
+		//if not, try to convert it to the right type
+		else if(converters.has(typeof d))
+		{
+			parsed = converters.get(typeof d)(input)
+			if(parsed === false) parsed = d
+		}
+		//if we can't do anything, use default value
+		else
+		{
+			parsed = d
+		}
+
+		return parsed
 	}
 
-	function validateInt(num, d=0)
+	function validateRGBSequence(str)
 	{
-		var result = parseInt(num)
-		return validateOrDefault(result, d, n => Number.isInteger(n))
+		if(str.includes('R') && str.includes('G') && str.includes('B') && str.length === 3) {
+			return true
+		} else {
+			return false
+		}
 	}
-
 
 	/*
 	 * a config node that holds global state for the led matrix
@@ -53,14 +89,14 @@ module.exports = function(RED) {
 
 
 		//get the field settings, these inputs are defined in the html
-		node.width		  = (n.width		|| 64)
-		node.height		  = (n.height		|| 64)
-		node.chained	  = (n.chained		|| 2)
-		node.parallel	  = (n.parallel		|| 1)
-		node.brightness   = (n.brightness	|| 100)
+		node.width		  = validateOrDefault(n.width, 64)
+		node.height		  = validateOrDefault(n.height, 64)
+		node.chained	  = validateOrDefault(n.chained, 2)
+		node.parallel	  = validateOrDefault(n.parallel, 1)
+		node.brightness   = validateOrDefault(n.brightness, 100)
 		node.mapping	  = (n.mapping		|| 'adafruit-hat-pwm')
-		node.rgbSequence  = (n.rgbSequence	|| 'RGB')
-		node.refreshDelay = (n.refreshDelay || 500)
+		node.rgbSequence  = validateOrDefault(n.rgbSequence, 'RGB', validateRGBSequence)
+		node.refreshDelay = validateOrDefault(n.refreshDelay, 500)
 		node.autoRefresh  = (n.autoRefresh)
 
 		context++
@@ -181,8 +217,9 @@ module.exports = function(RED) {
 		node.matrix = RED.nodes.getNode(config.matrix)
 
 		//get config data
-		node.offset = new dp.Point(validateInt(config.xOffset), validateInt(config.yOffset))
-		node.zLevel = validateInt(config.zLevel)
+		node.offset = new dp.Point(validateOrDefault(config.xOffset, 0),
+			validateOrDefault(config.yOffset, 0))
+		node.zLevel = validateOrDefault(config.zLevel, 0)
 		node.file = config.file
 
 		//info about the frame we've built last; expensive so we want to avoid repeating this if we can!
@@ -364,10 +401,10 @@ module.exports = function(RED) {
 		node.prefix		= config.prefix || ''
  		node.source		= config.source || 'msg.payload'
 		node.font		= config.font
-		node.xOffset	= validateInt(config.xOffset)
-		node.yOffset	= validateInt(config.yOffset)
+		node.xOffset	= validateOrDefault(config.xOffset, 0)
+		node.yOffset	= validateOrDefault(config.yOffset, 0)
 		node.rgb		= config.rgb
-		node.zLevel = validateInt(config.zLevel, 2)
+		node.zLevel = validateOrDefault(config.zLevel, 2)
 
 		var outputInfo
 
@@ -494,11 +531,11 @@ module.exports = function(RED) {
 		var outputInfo
 
 		node.matrix  = RED.nodes.getNode(config.matrix)
-		node.xPos	 = (config.xPos   || 0)
-		node.yPos	 = (config.yPos	  || 0)
-		node.radius	 = (config.radius || 0)
+		node.xPos	 = validateOrDefault(config.xPos, 0)
+		node.yPos	 = validateOrDefault(config.yPos, 0)
+		node.radius	 = validateOrDefault(config.radius, 0)
 		node.rgb	 = (config.rgb    || '255,255,255')
-		node.zLevel = config.zLevel != undefined ? config.zLevel : 1
+		node.zLevel = validateOrDefault(config.zLevel, 1)
 
 		node.draw = function()
 		{
@@ -545,10 +582,10 @@ module.exports = function(RED) {
 		node.matrix = RED.nodes.getNode(config.matrix)
 
 		//get the config data we'll use later
-		node.zLevel = validateInt(config.zLevel, 1)
+		node.zLevel = validateOrDefault(config.zLevel, 1)
 		node.savedPts = config.savedPts
-		node.offset = new dp.Point(validateInt(config.xOffset),
-			validateInt(config.yOffset))
+		node.offset = new dp.Point(validateOrDefault(config.xOffset, 0),
+			validateOrDefault(config.yOffset, 0))
 		node.rgb = config.rgb || '255,255,255'
 		node.filled = config.filled || false
 
