@@ -1,29 +1,15 @@
 var Matrix		= require('easybotics-rpi-rgb-led-matrix')
 var getPixels	= require('get-pixels')
 var dp			= require('./displayPrimitives.js')
-
+var parse		= require('./parsers.js')
 
 //var led = new LedMatrix(64, 64, 1, 2, 'adafruit-hat-pwm')
 
 module.exports = function(RED) {
 
-
 	var led
 	var nodeRegister
 	var context = 0
-
-
-	/*
-	 * some functions for parsing color strings, between html hex values and rgb values
-	 */
-	function eatRGBString (str)
-	{
-		const s = str.split(',')
-		const  output = {r: parseInt(s[0]), g: parseInt(s[1]), b: parseInt(s[2])}
-
-		return output
-	}
-
 
 	/*
 	 * a config node that holds global state for the led matrix
@@ -39,14 +25,14 @@ module.exports = function(RED) {
 
 
 		//get the field settings, these inputs are defined in the html
-		node.width		  = (n.width		|| 64)
-		node.height		  = (n.height		|| 64)
-		node.chained	  = (n.chained		|| 2)
-		node.parallel	  = (n.parallel		|| 1)
-		node.brightness   = (n.brightness	|| 100)
+		node.width		  = parse.validateOrDefault(n.width, 64)
+		node.height		  = parse.validateOrDefault(n.height, 64)
+		node.chained	  = parse.validateOrDefault(n.chained, 2)
+		node.parallel	  = parse.validateOrDefault(n.parallel, 1)
+		node.brightness   = parse.validateOrDefault(n.brightness, 100)
 		node.mapping	  = (n.mapping		|| 'adafruit-hat-pwm')
-		node.rgbSequence  = (n.rgbSequence	|| 'RGB')
-		node.refreshDelay = (n.refreshDelay || 500)
+		node.rgbSequence  = parse.validateOrDefault(n.rgbSequence, 'RGB', parse.validateRGBSequence)
+		node.refreshDelay = parse.validateOrDefault(n.refreshDelay, 500)
 		node.autoRefresh  = (n.autoRefresh)
 
 		context++
@@ -167,8 +153,9 @@ module.exports = function(RED) {
 		node.matrix = RED.nodes.getNode(config.matrix)
 
 		//get config data
-		node.offset = new dp.Point(config.xOffset, config.yOffset)
-		node.zLevel = config.zLevel != undefined ? config.zLevel : 0
+		node.offset = new dp.Point(parse.validateOrDefault(config.xOffset, 0),
+			parse.validateOrDefault(config.yOffset, 0))
+		node.zLevel = parse.validateOrDefault(config.zLevel, 0)
 		node.file = config.file
 
 		//info about the frame we've built last; expensive so we want to avoid repeating this if we can!
@@ -350,10 +337,10 @@ module.exports = function(RED) {
 		node.prefix		= config.prefix || ''
  		node.source		= config.source || 'msg.payload'
 		node.font		= config.font
-		node.xOffset	= config.xOffset
-		node.yOffset	= config.yOffset
+		node.xOffset	= parse.validateOrDefault(config.xOffset, 0)
+		node.yOffset	= parse.validateOrDefault(config.yOffset, 0)
 		node.rgb		= config.rgb
-		node.zLevel = config.zLevel != undefined ? config.zLevel : 2
+		node.zLevel = parse.validateOrDefault(config.zLevel, 2)
 
 		var outputInfo
 
@@ -361,7 +348,7 @@ module.exports = function(RED) {
 		{
 			if(outputInfo != undefined)
 			{
-				const color = eatRGBString(outputInfo.rgb)
+				const color = new dp.Color().fromRgbString(outputInfo.rgb)
 				const fontDir = __dirname + '/fonts/' + node.font
 				led.drawText(parseInt(outputInfo.x), parseInt(outputInfo.y), outputInfo.data, fontDir, parseInt(color.r), parseInt(color.g), parseInt(color.b))
 			}
@@ -480,11 +467,11 @@ module.exports = function(RED) {
 		var outputInfo
 
 		node.matrix  = RED.nodes.getNode(config.matrix)
-		node.xPos	 = (config.xPos   || 0)
-		node.yPos	 = (config.yPos	  || 0)
-		node.radius	 = (config.radius || 0)
+		node.xPos	 = parse.validateOrDefault(config.xPos, 0)
+		node.yPos	 = parse.validateOrDefault(config.yPos, 0)
+		node.radius	 = parse.validateOrDefault(config.radius, 0)
 		node.rgb	 = (config.rgb    || '255,255,255')
-		node.zLevel = config.zLevel != undefined ? config.zLevel : 1
+		node.zLevel = parse.validateOrDefault(config.zLevel, 1)
 
 		node.draw = function()
 		{
@@ -512,7 +499,7 @@ module.exports = function(RED) {
 			const data   = msg.payload.data != undefined ? msg.payload.data : msg.payload
 			outputInfo =
 			{
-				color	: data.rgb		!= undefined   ? eatRGBString(data.rgb) : eatRGBString(node.rgb),
+				color	: data.rgb		!= undefined   ? new dp.Color().fromRgbString(data.rgb) : new dp.Color().fromRgbString(node.rgb),
 				y		: data.y		!= undefined   ? parseInt(data.y)		: parseInt(node.yPos),
 				x		: data.x		!= undefined   ? parseInt(data.x)		: parseInt(node.xPos),
 				radius	: data.radius	!= undefined   ? parseInt(data.radius)  : parseInt(node.radius),
@@ -531,13 +518,10 @@ module.exports = function(RED) {
 		node.matrix = RED.nodes.getNode(config.matrix)
 
 		//get the config data we'll use later
-		node.zLevel = config.zLevel != undefined ? config.zLevel : 1
+		node.zLevel = parse.validateOrDefault(config.zLevel, 1)
 		node.savedPts = config.savedPts
-		// xOffset and yOffset are strings, dp does parseInt when it gets these
-		// values, and node-red doesn't let you put anything other than a number in
-		// the input field, so all we need to check for is if they enter nothing
-		node.offset = new dp.Point(config.xOffset != "" ? config.xOffset : 0,
-			config.yOffset != "" ? config.yOffset : 0)
+		node.offset = new dp.Point(parse.validateOrDefault(config.xOffset, 0),
+			parse.validateOrDefault(config.yOffset, 0))
 		node.rgb = config.rgb || '255,255,255'
 		node.filled = config.filled || false
 
