@@ -7,22 +7,9 @@ var parse		= require('./parsers.js')
 
 module.exports = function(RED) {
 
-
 	var led
 	var nodeRegister
 	var context = 0
-
-
-	/*
-	 * some functions for parsing color strings, between html hex values and rgb values
-	 */
-	function eatRGBString (str)
-	{
-		const s = str.split(',')
-		const  output = {r: parseInt(s[0]), g: parseInt(s[1]), b: parseInt(s[2])}
-
-		return output
-	}
 
 	/*
 	 * a config node that holds global state for the led matrix
@@ -361,7 +348,7 @@ module.exports = function(RED) {
 		{
 			if(outputInfo != undefined)
 			{
-				const color = eatRGBString(outputInfo.rgb)
+				const color = new dp.Color().fromRgbString(outputInfo.rgb)
 				const fontDir = __dirname + '/fonts/' + node.font
 				led.drawText(parseInt(outputInfo.x), parseInt(outputInfo.y), outputInfo.data, fontDir, parseInt(color.r), parseInt(color.g), parseInt(color.b))
 			}
@@ -512,7 +499,7 @@ module.exports = function(RED) {
 			const data   = msg.payload.data != undefined ? msg.payload.data : msg.payload
 			outputInfo =
 			{
-				color	: data.rgb		!= undefined   ? eatRGBString(data.rgb) : eatRGBString(node.rgb),
+				color	: data.rgb		!= undefined   ? new dp.Color().fromRgbString(data.rgb) : new dp.Color().fromRgbString(node.rgb),
 				y		: data.y		!= undefined   ? parseInt(data.y)		: parseInt(node.yPos),
 				x		: data.x		!= undefined   ? parseInt(data.x)		: parseInt(node.xPos),
 				radius	: data.radius	!= undefined   ? parseInt(data.radius)  : parseInt(node.radius),
