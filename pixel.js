@@ -1,7 +1,7 @@
 var Matrix		= require('easybotics-rpi-rgb-led-matrix')
 var getPixels	= require('get-pixels')
 var dp			= require('./displayPrimitives.js')
-
+var parse		= require('./parsers.js')
 
 //var led = new LedMatrix(64, 64, 1, 2, 'adafruit-hat-pwm')
 
@@ -25,57 +25,6 @@ module.exports = function(RED) {
 	}
 
 	/*
-	 * functions for parsing input fields from html
-	 */
-	let converters = new Map([
-		['number', function(num) {
-			let out = Number(num)
-			//Number() doesn't output NaN when given an empty string
-			if(num === '') return false
-			if(isNaN(out)) return false
-			return out
-		}]
-	])
-
-	function validateOrDefault(input, d, v = false)
-	{
-		let parsed
-
-		//as long as we have a validation function, use it
-		if(v !== false)
-		{
-			parsed = v(input) ? input : d
-		}
-		//if no validation function, check if input is the right type
-		else if(typeof input === typeof d)
-		{
-			parsed = input
-		}
-		//if not, try to convert it to the right type
-		else if(converters.has(typeof d))
-		{
-			parsed = converters.get(typeof d)(input)
-			if(parsed === false) parsed = d
-		}
-		//if we can't do anything, use default value
-		else
-		{
-			parsed = d
-		}
-
-		return parsed
-	}
-
-	function validateRGBSequence(str)
-	{
-		if(str.includes('R') && str.includes('G') && str.includes('B') && str.length === 3) {
-			return true
-		} else {
-			return false
-		}
-	}
-
-	/*
 	 * a config node that holds global state for the led matrix
 	 * nodes that want to use the hardware will hook into an instance of this
 	 * but right now it uses global var 'led' meaning its limited to one hardware output per node-red instance
@@ -89,14 +38,14 @@ module.exports = function(RED) {
 
 
 		//get the field settings, these inputs are defined in the html
-		node.width		  = validateOrDefault(n.width, 64)
-		node.height		  = validateOrDefault(n.height, 64)
-		node.chained	  = validateOrDefault(n.chained, 2)
-		node.parallel	  = validateOrDefault(n.parallel, 1)
-		node.brightness   = validateOrDefault(n.brightness, 100)
+		node.width		  = parse.validateOrDefault(n.width, 64)
+		node.height		  = parse.validateOrDefault(n.height, 64)
+		node.chained	  = parse.validateOrDefault(n.chained, 2)
+		node.parallel	  = parse.validateOrDefault(n.parallel, 1)
+		node.brightness   = parse.validateOrDefault(n.brightness, 100)
 		node.mapping	  = (n.mapping		|| 'adafruit-hat-pwm')
-		node.rgbSequence  = validateOrDefault(n.rgbSequence, 'RGB', validateRGBSequence)
-		node.refreshDelay = validateOrDefault(n.refreshDelay, 500)
+		node.rgbSequence  = parse.validateOrDefault(n.rgbSequence, 'RGB', parse.validateRGBSequence)
+		node.refreshDelay = parse.validateOrDefault(n.refreshDelay, 500)
 		node.autoRefresh  = (n.autoRefresh)
 
 		context++
@@ -217,9 +166,9 @@ module.exports = function(RED) {
 		node.matrix = RED.nodes.getNode(config.matrix)
 
 		//get config data
-		node.offset = new dp.Point(validateOrDefault(config.xOffset, 0),
-			validateOrDefault(config.yOffset, 0))
-		node.zLevel = validateOrDefault(config.zLevel, 0)
+		node.offset = new dp.Point(parse.validateOrDefault(config.xOffset, 0),
+			parse.validateOrDefault(config.yOffset, 0))
+		node.zLevel = parse.validateOrDefault(config.zLevel, 0)
 		node.file = config.file
 
 		//info about the frame we've built last; expensive so we want to avoid repeating this if we can!
@@ -401,10 +350,10 @@ module.exports = function(RED) {
 		node.prefix		= config.prefix || ''
  		node.source		= config.source || 'msg.payload'
 		node.font		= config.font
-		node.xOffset	= validateOrDefault(config.xOffset, 0)
-		node.yOffset	= validateOrDefault(config.yOffset, 0)
+		node.xOffset	= parse.validateOrDefault(config.xOffset, 0)
+		node.yOffset	= parse.validateOrDefault(config.yOffset, 0)
 		node.rgb		= config.rgb
-		node.zLevel = validateOrDefault(config.zLevel, 2)
+		node.zLevel = parse.validateOrDefault(config.zLevel, 2)
 
 		var outputInfo
 
@@ -531,11 +480,11 @@ module.exports = function(RED) {
 		var outputInfo
 
 		node.matrix  = RED.nodes.getNode(config.matrix)
-		node.xPos	 = validateOrDefault(config.xPos, 0)
-		node.yPos	 = validateOrDefault(config.yPos, 0)
-		node.radius	 = validateOrDefault(config.radius, 0)
+		node.xPos	 = parse.validateOrDefault(config.xPos, 0)
+		node.yPos	 = parse.validateOrDefault(config.yPos, 0)
+		node.radius	 = parse.validateOrDefault(config.radius, 0)
 		node.rgb	 = (config.rgb    || '255,255,255')
-		node.zLevel = validateOrDefault(config.zLevel, 1)
+		node.zLevel = parse.validateOrDefault(config.zLevel, 1)
 
 		node.draw = function()
 		{
@@ -582,10 +531,10 @@ module.exports = function(RED) {
 		node.matrix = RED.nodes.getNode(config.matrix)
 
 		//get the config data we'll use later
-		node.zLevel = validateOrDefault(config.zLevel, 1)
+		node.zLevel = parse.validateOrDefault(config.zLevel, 1)
 		node.savedPts = config.savedPts
-		node.offset = new dp.Point(validateOrDefault(config.xOffset, 0),
-			validateOrDefault(config.yOffset, 0))
+		node.offset = new dp.Point(parse.validateOrDefault(config.xOffset, 0),
+			parse.validateOrDefault(config.yOffset, 0))
 		node.rgb = config.rgb || '255,255,255'
 		node.filled = config.filled || false
 

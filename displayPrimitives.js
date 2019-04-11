@@ -1,4 +1,3 @@
-
 var exports = module.exports = {}
 //some geo primitives we'll use everywhere
 
