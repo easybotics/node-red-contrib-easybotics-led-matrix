@@ -175,8 +175,9 @@
 			brightness: {value:100, required:true},
 			refreshDelay: {value:500, required:true},
 			mapping: {value:"adafruit-hat-pwm", required:true},
-			rgbSequence: {value: "RGB", required: true},
+			rgbSequence: {value: "RGB", required:true},
 			autoRefresh: {value:true},
+			cmdArgs: {value: ''},
 		},
 
 		oneditprepare: function ()
@@ -243,7 +244,7 @@
 
 	<div class="form-row">
 		<label for="node-config-input-refreshDelay"> <i class= "icon-bookmark"></i> Refresh Delay milliseconds</label>
-		<input type="number" id="node-config-input-refreshDelay" min="0" placeholder="default: 500 milliseconds"/>
+		<input type="number" id="node-config-input-refreshDelay" min="0" placeholder="default: 500 milliseconds">
 	</div>
 
 	<div class="form-row">
@@ -258,8 +259,14 @@
 
 	<div class="form-row">
 		<label for="node-config-input-rgbSequence"><i class="icon-tag"></i> RGB Sequence </label>
-		<input type="text" id="node-config-input-rgbSequence">
+		<input type="text" id="node-config-input-rgbSequence" placeholder="RGB">
 	</div>
+
+	<div class="form-row">
+		<label for="node-config-input-cmdArgs"><i class="icon-tag"></i>Command-Line Arguments</label>
+		<input type="text" id="node-config-input-cmdArgs">
+	</div>
+
 
 <p>
 	<b> warning:</b> <br>
