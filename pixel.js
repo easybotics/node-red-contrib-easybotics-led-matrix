@@ -30,10 +30,13 @@ module.exports = function(RED) {
 		node.chained	  = parse.validateOrDefault(n.chained, 2)
 		node.parallel	  = parse.validateOrDefault(n.parallel, 1)
 		node.brightness   = parse.validateOrDefault(n.brightness, 100)
-		node.mapping	  = (n.mapping		|| 'adafruit-hat-pwm')
+		node.mapping	  = (n.mapping || 'adafruit-hat-pwm')
 		node.rgbSequence  = parse.validateOrDefault(n.rgbSequence, 'RGB', parse.validateRGBSequence)
 		node.refreshDelay = parse.validateOrDefault(n.refreshDelay, 500)
 		node.autoRefresh  = (n.autoRefresh)
+		node.cmdArgs      = n.cmdArgs.split(' ')
+
+		console.log(node.cmdArgs)
 
 		context++
 
@@ -104,7 +107,7 @@ module.exports = function(RED) {
 		if(!led)
 		{
 			node.warn('initing led')
-			led = new Matrix(parseInt(node.height), parseInt(node.width), parseInt(node.parallel), parseInt(node.chained), parseInt(node.brightness), node.mapping, node.rgbSequence)
+			led = new Matrix(parseInt(node.height), parseInt(node.width), parseInt(node.parallel), parseInt(node.chained), parseInt(node.brightness), node.mapping, node.rgbSequence, node.cmdArgs)
 			led.clear()
 			led.update()
 
