@@ -986,3 +986,157 @@
 	</i>
 	</p>
 </script>
+
+<script type="text/javascript">
+
+		function componentToHex(c)
+		{
+			var hex = c.toString(16);
+			return hex.length == 1 ? "0" + hex : hex;
+		}
+
+		function rgbToHex(r, g, b)
+		{
+			return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+		}
+
+
+
+	RED.nodes.registerType('graph-to-matrix', 
+		{
+			category: 'LED Matrix', 
+			color: '#a6bbcf', 
+
+			defaults:
+			{
+				name: {value: ""}, 
+				rgb:  {value: "255, 255, 255"},
+				rgbTick: {value: "255, 0, 0"},
+				xOffset: {value:0, required: true}, 
+				yOffset: {value:0, required: true}, 
+				height:  {value:0, required: true}, 
+				width:   {value:0, required: true}, 
+
+				minIn:	 {value: 0, required: true}, 
+				maxIn:   {value: 0, required: true},
+
+				matrix: {type: 'led-matrix', required: true},
+			},
+
+			inputs: 1, 
+			outputs: 0, 
+			icon: "circle.png", 
+			label: function ()
+			{
+				return this.name || "graph";
+			},
+
+	oneditprepare: function ()
+		{
+
+			$("#node-input-rgb2").change(function()
+				{
+					var hex = $("#node-input-rgb2").val();
+					var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+					hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+						return r + r + g + g + b + b;
+					});
+
+					var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+					var output =  "" + parseInt(result[1], 16) + ',' + parseInt(result[2], 16) + ',' + parseInt(result[3], 16);
+
+					$("#node-input-rgb").val(output);
+				});
+
+				var tr = $("#node-input-rgb").val();
+				var split = tr.split(',');
+
+				$("#node-input-rgb2").val( rgbToHex( parseInt(split[0]), parseInt(split[1]), parseInt(split[2])));
+
+			$("#node-input-rgb2Tick").change(function()
+				{
+					var hex = $("#node-input-rgb2Tick").val();
+					var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+					hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+						return r + r + g + g + b + b;
+					});
+
+					var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+					var output =  "" + parseInt(result[1], 16) + ',' + parseInt(result[2], 16) + ',' + parseInt(result[3], 16);
+
+					$("#node-input-rgbTick").val(output);
+				});
+
+				var tr = $("#node-input-rgbTick").val();
+				var split = tr.split(',');
+
+				$("#node-input-rgb2Tick").val( rgbToHex( parseInt(split[0]), parseInt(split[1]), parseInt(split[2])));
+		}
+
+		});
+</script>
+
+<script type="text/x-red" data-template-name="graph-to-matrix">
+
+	<div class="form-row">
+		<label for="node-config-input-matrix"><i class='fa fa-tag'></i> Display</label>
+		<input type='text' id='node-input-matrix'/>
+	</div>
+
+	<div class="form-row">
+		<label for="node-config-input-name"><i class="icon-tag"></i> Name </label>
+		<input type="text" id="node-input-name" placeholder="Name">
+	</div>
+
+	<div class = "form-row">
+		<label for="node-config-input-rgb"><i class="icon-tag"></i>Line RGB color </label>
+		<input type="text" id="node-input-rgb" placeholder="112,79,86">
+		<label for="node-config-input-rgb2"><i class="icon-tag"></i>Color picker</label>
+		<input type="color" id="node-input-rgb2" placeholder="#43DB2D">
+	</div>
+
+	<div class = "form-row">
+		<label for="node-config-input-rgbTick"><i class="icon-tag"></i>Tick RGB color </label>
+		<input type="text" id="node-input-rgbTick" placeholder="112,79,86">
+		<label for="node-config-input-rgb2Tick"><i class="icon-tag"></i>Color picker</label>
+		<input type="color" id="node-input-rgb2Tick" placeholder="#43DB2D">
+	</div>
+
+
+
+
+	<div class="form-row">
+		<label for="node-config-input-xOffset"> <i class="fa fa-tag"></i> X position</label>
+		<input type="number" id="node-input-xOffset" min="0" placeholder="0"/>
+		<label for="node-config-input-yOffset"> <i class="fa fa-tag"></i> Y position</label>
+		<input type="number" id="node-input-yOffset" min="0" placeholder="0" />
+	</div>
+
+	<div class="form-row">
+		<label for="node-config-input-height"> <i class="fa fa-tag"></i> Height</label>
+		<input type="number" id="node-input-height" min="0" placeholder="0"/>
+		<label for="node-config-input-width"> <i class="fa fa-tag"></i> Width</label>
+		<input type="number" id="node-input-width" min="0" placeholder="0" />
+	</div>
+
+	<div class="form-row">
+		<label for="node-config-input-minIn"> <i class="fa fa-tag"></i> min input</label>
+		<input type="number" id="node-input-minIn" min="0" placeholder="0"/>
+		<label for="node-config-input-maxIn"> <i class="fa fa-tag"></i> max input</label>
+		<input type="number" id="node-input-maxIn" min="0" placeholder="0" />
+	</div>
+</script>
+
+
+<script type="text/x-red" data-help-name="graph-to-matrix">
+	<p> Takes a number as the payload and uses it to print a graph <br>
+	Draws one dot per input, use the delay node to rate-limit faster inputs <br> <br>
+
+	The x and y options are for the top left origin of the graph <br> 
+	Min and Max input are what values the top and the bottom of the graph will scale too <br> 
+	Line color is the color of the line <br>
+	Tick color is changes the color of the most recent data point <br>
+	
+</script>
+
+						  

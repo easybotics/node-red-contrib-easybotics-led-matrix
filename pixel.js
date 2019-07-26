@@ -336,8 +336,8 @@ module.exports = function(RED) {
 		RED.nodes.createNode(this, config)
 		var node = this
 
-		node.matrix		= RED.nodes.getNode(config.matrix)
-		node.prefix		= config.prefix || ''
+		node.matrix		= RED.nodes.getNode(config.matrix) //fetch the matrix instantiation from the config 
+		node.prefix		= config.prefix || '' 
  		node.source		= config.source || 'msg.payload'
 		node.font		= config.font
 		node.xOffset	= parse.validateOrDefault(config.xOffset, 0)
@@ -351,12 +351,14 @@ module.exports = function(RED) {
 		{
 			if(outputInfo != undefined)
 			{
+				//when drawing we calculate the fonr directory, and call the drawText 
 				const color = new dp.Color().fromRgbString(outputInfo.rgb)
 				const fontDir = __dirname + '/fonts/' + node.font
 				led.drawText(parseInt(outputInfo.x), parseInt(outputInfo.y), outputInfo.data, fontDir, parseInt(color.r), parseInt(color.g), parseInt(color.b))
 			}
 		}
 
+		//dont draw this node anymore on the matrix
 		node.clear = function ()
 		{
 			nodeRegister.delete(node)
@@ -371,8 +373,12 @@ module.exports = function(RED) {
 				return
 			}
 
+			//scary and dangerous!
+			//RCE waiting to happen 
 			const outputData =  eval( node.source)
 
+
+			//round floats 
 			const handleFloat = function (i)
 			{
 				if( !isNaN(i))
@@ -383,6 +389,7 @@ module.exports = function(RED) {
 				return i
 			}
 
+			//handle being handed a struct instead of a string
 			if(outputData != undefined)
 			{
 
@@ -514,6 +521,9 @@ module.exports = function(RED) {
 		})
 	}
 
+	/*draws a bounded polygon to the display, either filled or not filled
+	 * can be designed in the settings using a little drawing tool 
+	 */ 
 	function Polygon (config)
 	{
 		RED.nodes.createNode(this, config)
@@ -523,8 +533,7 @@ module.exports = function(RED) {
 		//get the config data we'll use later
 		node.zLevel = parse.validateOrDefault(config.zLevel, 1)
 		node.savedPts = config.savedPts
-		node.offset = new dp.Point(parse.validateOrDefault(config.xOffset, 0),
-			parse.validateOrDefault(config.yOffset, 0))
+		node.offset = new dp.Point(parse.validateOrDefault(config.xOffset, 0), parse.validateOrDefault(config.yOffset, 0))
 		node.rgb = config.rgb || '255,255,255'
 		node.filled = config.filled || false
 
@@ -588,6 +597,7 @@ module.exports = function(RED) {
 			var runColor	= undefined
 			var runFilled	= undefined
 
+			//if we aren't handed new data we'll use the one from last time 
 			if(data.savedPts) runPts = data.savedPts
 			if(data.filled) runFilled = data.filled
 			if(data.rgb) runColor = data.rgb
@@ -601,6 +611,7 @@ module.exports = function(RED) {
 			node.color = new dp.Color().fromRgbString(runColor)
 
 
+			//can we use the cached polygon? 
 			if(node.polygon && (node.oldPoints == runPts && node.oldFilled == runFilled))
 				return
 
@@ -630,9 +641,92 @@ module.exports = function(RED) {
 
 	}
 
+	/*draws a scaled line graph in a boxed area*/ 
+	function Graph (config)
+	{
+		RED.nodes.createNode(this, config)
+		const node = this 
+		node.matrix = RED.nodes.getNode(config.matrix) 
+
+		//get the config data we'll use later 
+		node.zLevel = -10 
+
+		//these are the values we'll scale the graph between
+		//for example, with the default values here 
+		//100 would be the very bottom of the graph
+		//and 1500 would be the very top of the graph
+		node.inMin  = parse.validateOrDefault(config.minIn,  100)
+		node.inMax  = parse.validateOrDefault(config.maxIn,  1500)
+
+		//width and height of the graph, origin is the top left corner
+		node.width  = parse.validateOrDefault(config.width, 100) 
+		node.height = parse.validateOrDefault(config.height, 50) 
+
+		//origin point 
+		node.x = parse.validateOrDefault(config.xOffset, 0) 
+		node.y = parse.validateOrDefault(config.yOffset, 0) 
+
+		//how far along the graph we're in
+		node.tick	= 0
+
+		node.rgb	 = parse.validateOrDefault(config.rgb, '255,255,255')
+		node.rgbTick = parse.validateOrDefault(config.rgbTick, '255, 0, 0')
+
+		node.color  = new dp.Color().fromRgbString(node.rgb)
+		node.bg		= new dp.Color().fromRgbString(node.rgbTick)
+
+		node.data   = []
+		node.polygon = undefined
+		node.raw = 0
+
+		//normalizer
+		node.scale = function (data, inMin, inMax, outMin, outMax)
+		{
+			return ( ((data - inMin) / (inMax - inMin)) * (outMax - outMin)) + outMin
+		}
+
+		node.on('input', function (msg)
+		{
+			if(msg.clear)
+			{
+				node.clear()
+				return 
+			}
+
+			const data = node.scale(msg.payload, node.inMin, node.inMax, node.height, 0)
+			node.raw = data
+			node.data[node.tick % node.width] = {x: (node.tick % node.width), y: data}
+
+			node.polygon = new dp.Polygon([].concat.apply([],[ node.data , node.data.slice().reverse()]))
+
+			node.tick++
+
+			readySend()
+		})
+
+		node.draw = function ()
+		{
+			if(node.polygon)
+			{
+				node.polygon.draw(led, node.color, new dp.Point(node.x, node.y))
+				dot = new dp.Line(new dp.Point((node.tick - 1) % node.width, node.raw - 1), new dp.Point((node.tick - 1) % node.width, node.raw + 1))
+
+				dot.draw(led, node.bg, new dp.Point(node.x, node.y))
+			}
+		}
+
+		function readySend()
+		{
+			nodeRegister.add(node)
+			node.matrix.refresh()
+		}
+	}
+
+
 	//register our functions with node-red
 	RED.nodes.registerType('led-matrix', LedMatrix)
 	//RED.nodes.registerType('clear-matrix', ClearMatrix)
+	RED.nodes.registerType('graph-to-matrix', Graph)
 	RED.nodes.registerType('refresh-matrix', RefreshMatrix)
 	RED.nodes.registerType('image-to-matrix', ImageToPixels)
 	RED.nodes.registerType('text-to-matrix', Text)
