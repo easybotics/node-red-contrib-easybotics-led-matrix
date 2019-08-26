@@ -676,7 +676,6 @@ module.exports = function(RED) {
 		node.bg		= new dp.Color().fromRgbString(node.rgbTick)
 
 		node.data   = []
-		node.polygon = undefined
 		node.raw = 0
 
 		//normalizer
@@ -693,12 +692,9 @@ module.exports = function(RED) {
 				return 
 			}
 
-			const data = node.scale(msg.payload, node.inMin, node.inMax, node.height, 0)
+			const data = node.scale(msg.payload, node.inMin, node.inMax, node.height - 1, 0)
 			node.raw = data
-			node.data[node.tick % node.width] = {x: (node.tick % node.width), y: data}
-
-			node.polygon = new dp.Polygon([].concat.apply([],[ node.data , node.data.slice().reverse()]))
-
+			node.data[node.tick % node.width] = new dp.Point((node.tick % node.width), data)
 			node.tick++
 
 			readySend()
@@ -706,9 +702,10 @@ module.exports = function(RED) {
 
 		node.draw = function ()
 		{
-			if(node.polygon)
+			if(node.data[0])
 			{
-				node.polygon.draw(led, node.color, new dp.Point(node.x, node.y))
+				const offset = new dp.Point(node.x, node.y)
+				for(const point of node.data) point.draw(led, node.color, offset)
 				dot = new dp.Line(new dp.Point((node.tick - 1) % node.width, node.raw - 1), new dp.Point((node.tick - 1) % node.width, node.raw + 1))
 
 				dot.draw(led, node.bg, new dp.Point(node.x, node.y))
