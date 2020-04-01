@@ -1,5 +1,8 @@
 var exports = module.exports = {}
 //some geo primitives we'll use everywhere
+//written by ben
+//contains objects for drawing different types of primitive geometric shapes
+//and structures for managing colors and stuff (convert rgb to hex and vice versa)
 
 exports.Color = function ()
 {
@@ -7,6 +10,7 @@ exports.Color = function ()
 	this.g
 	this.b
 
+	//constructs a rgb color from a hexstring (uses regex <bluurrrgggh>)
 	this.fromHexString = function (h)
 	{
 		function eatHexString (hex)
@@ -30,6 +34,8 @@ exports.Color = function ()
 		this.b = e.b
 	}
 
+
+	//converts the current stored rgb color into a hex string 
 	this.toHex = function ()
 	{
 		function componentToHex(c)
@@ -46,6 +52,7 @@ exports.Color = function ()
 		return rgbToHex(this.r, this.g, this.b)
 	}
 
+	//same thing for rgb strings 
 	this.fromRgbString = function (str)
 	{
 		const s = str.split(',')
@@ -73,6 +80,8 @@ exports.Color = function ()
 	}
 }
 
+//represents a point in 2d euclidian space
+//used to manage pixels
 exports.Point = function (x, y)
 {
 	this.x = parseInt(x)
@@ -226,6 +235,9 @@ exports.Line = function (start, end)
 	}
 }
 
+//a polygon is a collection of points that form a bounded area
+//we can render a polygon either filled or unfilled
+//here we use a fancy algorithm to render filled polygons also 
 exports.Polygon = function (p)
 {
 	this.points = p

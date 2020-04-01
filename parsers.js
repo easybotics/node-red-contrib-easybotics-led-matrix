@@ -1,6 +1,14 @@
 var exports = module.exports = {}
 
 /*
+ * this was a probably uncesary project that Ryan did in order to help validate user input
+ * for example, the 'validOrDefault' function is used for taking a user input, checking if its valid
+ * and then providing a default value if the user value isn't valid
+ * it's used in pixel.js sparsleey to validate .config options for node-red
+ *
+ */
+
+/*
  * Used to convert types in validateOrDefault, easy to add more if needed
  */
 let converters = new Map([
